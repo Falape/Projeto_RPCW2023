@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  mongodb:
+    image: mongo:5.0.16-focal
+    container_name: mongodb-auth
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=admin
+    #   - MONGO_INITDB_ROOT_PASSWORD=12345
+    ports:
+      - 4001:27017
+    # volumes:
+    #   - /home/falape/Nearsoft/Docker/dremio-env:/opt/dremio/conf/dremio-env
+    restart: unless-stopped
+
+  
+# -e MONGO_INITDB_DATABASE=test 
+# -v /tmp/mongo-data:/data/db mongo:6-jammy
