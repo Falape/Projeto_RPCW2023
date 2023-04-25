@@ -1,4 +1,5 @@
-var createError = require('http-errors');
+var createError = require('http-errors'),
+    User = require("./models/user"),
     express = require('express'),
     mongoose = require("mongoose"),
     bodyParser = require("body-parser"),
@@ -45,8 +46,9 @@ passport.deserializeUser(User.deserializeUser());
 
 
 app.use(logger('dev'));
-app.use(express.json()); //same thing as the body-parser...check
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.json()); //same thing as the body-parser...check
+// app.use(express.urlencoded({ extended: false }));
+
 
 app.use('/admin', adminRouter);
 app.use('/', index);
