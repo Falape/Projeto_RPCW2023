@@ -9,7 +9,7 @@ module.exports.list = function () {
 
 module.exports.lookup = function(id) { 
     return User
-        .findOne({username:id})  //devolve só o obejto se fosse find devolvia uma lista com o objeto
+        .findOne({_id:id})  //devolve só o obejto se fosse find devolvia uma lista com o objeto
         .exec()
 }
 
