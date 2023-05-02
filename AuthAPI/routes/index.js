@@ -1,9 +1,12 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
-    passport = require("passport");
+const requestUpdateRole = require('../models/requestUpdateRole');
+    passport = require("passport"),
 
-    User = require("../controllers/user");
-    user = require("../models/user");
+    User = require("../controllers/user"),
+    user = require("../models/user"),
+    RequestUpdateRole = require("../controllers/requestUpdateRole")
+    requestUpdateRole = require("../models/requestUpdateRole");
 var router = express.Router();
 
 /* GET home page. */
@@ -80,33 +83,7 @@ router.post("/login", function (req, res) {
   })(req, res);
 });
 
-// router.post("/updatePassword", async function (req, res) {
-//   try {
-//     var payload = await checkValidToken(req)
-//     console.log("payload", payload)
-//     if (req.body.oldPassword == undefined || req.body.newPassword == undefined) {
-//       return res.status(400).jsonp({ error: "Field is missing" })
-//     } else {
-//       User.lookup(payload._id)
-//         .then(user => {
-//           //console.log("user password",user.password)
-//           if (user.validPassword(req.body.oldPassword)) {
-//             console.log("password is valid")
-//             user.setPassword(req.body.newPassword, function () {
-//               user.save()
-//               res.status(200).json(user);
-//             })
-//           } else {
-//             res.status(400).jsonp({ error: "Old password doens't match" })
-//           }
-//         })
-//         .catch(e => res.status(500).jsonp({ error: 'Erro na procura do utilizador: ' + e }))
-//     }
-//   } catch (e) {
-//     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
-//   }
-// });
-
+// Update Password
 router.post("/updatePassword", async function (req, res) {
   try {
     var payload = await checkValidToken(req)
@@ -140,6 +117,23 @@ router.post("/updatePassword", async function (req, res) {
 });
 
 
+router.post("/user/requestUpdateRole",async function (req, res){
+  try {
+    var payload = await checkValidToken(req)
+    console.log("Payload", payload)
+    console.log("username: ", payload.username)
+    if(req.body.current_Role == undefined || req.body.required_Role == undefined){
+      return res.status(400).jsonp({ error: "Field is missing" })
+    }else{
+      reqUp = new requestUpdateRole({user_id: payload._id, current_Role: req.body.current_Role, required_Role: req.body.required_Role})
+      console.log(reqUp)
+      //requestUpdateRole.create(reqUp)
+    }
+  } catch (e) {
+    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+  }
+})
+
 // Logout 
 //FIXME: (NOT WORKING)
 router.get("/logout", function (req, res) {
@@ -148,6 +142,7 @@ router.get("/logout", function (req, res) {
   res.status(200).json({'body':"test"});
 });
 
+// Check if token is valid
 function checkValidToken(req) {
   return new Promise((resolve, reject) => {
     const authHeader = req.headers['authorization']
