@@ -107,7 +107,34 @@ router.post('/listUsers', async function(req, res, next) {
     }else{
       return res.status(200).json(await User.filter(req.body.accepted));
     }
+    
+    //return res.status(200).json(await User.list(req.params.id));
 
+  } catch (e) {
+    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+  }
+});
+
+router.get('/deleteUser/:id', async function(req, res, next) {
+  console.log("DeleteUser by id") 
+  try {
+    var payload = await checkValidToken(req)
+    console.log("Payload", payload)
+    console.log("username: ", payload.username)
+  
+    User.lookup(req.params.id)
+      .then(userr => {
+        userr.deleted = true;
+        userr.deleted_date = Date.now();
+        //var savedUser = 
+        userr.save()
+         .then(savedUser => {
+           res.status(200).json(savedUser);
+         });
+      })
+      .catch(err => {
+        res.status(500).jsonp({ error: 'Erro getting user: ' + err })
+      });
     //return res.status(200).json(await User.list(req.params.id));
 
   } catch (e) {
