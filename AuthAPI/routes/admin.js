@@ -68,9 +68,13 @@ router.post('/updateRole/:id', async function(req, res, next) {
       
       //if it was accepted then updates the user role
       if(req.body.accept == true){
-        var userToUpdate = await User.lookup(updateRole.user_id)
-        userToUpdate.role = updateRole.required_Role;
-        return res.status(200).json(await userToUpdate.save());
+         
+        User.lookup(updateRole.user_id)
+          .then(userToUpdate => {
+            userToUpdate.role = updateRole.required_Role;
+            var savedUser = userToUpdate.save()
+            return res.status(200).json(savedUser);
+          });
       }
     }
   } catch (e) {
@@ -107,7 +111,6 @@ router.post('/listUsers', async function(req, res, next) {
     }else{
       return res.status(200).json(await User.filter(req.body.accepted));
     }
-    
     //return res.status(200).json(await User.list(req.params.id));
 
   } catch (e) {

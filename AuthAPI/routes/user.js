@@ -33,15 +33,41 @@ router.post("/requestUpdateRole",async function (req, res){
 router.get('/getUser', async function(req, res, next) {
   console.log("get_updateRole_id")
   try {
-    console.log("Gonna check token")
     var payload = await checkValidToken(req)
     console.log("Payload", payload)
     console.log("username: ", payload.username)
     
-    
-    
     return res.status(200).json(await User.lookup(payload._id));
+
+  } catch (e) {
+    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+  }
+});
+
+
+router.get('/deleteUser', async function(req, res, next) {
+  console.log("get_updateRole_id")
+  try {
+    var payload = await checkValidToken(req)
+    console.log("Payload", payload)
+    console.log("username: ", payload.username)
     
+    User.lookup(payload._id)
+      .then(userr => {
+        userr.deleted = true;
+        userr.deleted_date = Date.now();
+        //var savedUser = 
+        userr.save()
+         .then(savedUser => {
+           res.status(200).json(savedUser);
+         });
+      })
+      .catch(err => {
+        res.status(500).jsonp({ error: 'Erro getting user: ' + err })
+      });
+
+
+    //return res.status(200).json(await User.lookup(payload._id));
 
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
