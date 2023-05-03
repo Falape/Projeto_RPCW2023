@@ -6,6 +6,7 @@ const passport = require("passport"),
     user = require("../models/user"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
+    
 var router = express.Router();
 
 /* GET home page. */
@@ -129,7 +130,8 @@ router.post("/user/requestUpdateRole",async function (req, res){
     }else{
       const reqUp = new requestUpdateRole({user_id: payload._id, current_Role: payload.role, required_Role: req.body.required_Role})
       console.log(reqUp)
-      await reqUp.save();
+      await RequestUpdateRole.insert(reqUp)
+      //await reqUp.save();
       res.status(200).json(reqUp);
     }
   } catch (e) {
