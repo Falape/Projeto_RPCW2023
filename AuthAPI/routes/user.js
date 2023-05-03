@@ -66,9 +66,6 @@ router.get('/deleteUser', async function(req, res, next) {
         res.status(500).jsonp({ error: 'Erro getting user: ' + err })
       });
 
-
-    //return res.status(200).json(await User.lookup(payload._id));
-
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
   }
@@ -80,14 +77,10 @@ function checkValidToken(req) {
   return new Promise((resolve, reject) => {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1];
-    console.log(token)
 
     jwt.verify(token, process.env.TOKEN_SECRET, function (e, payload) {
-      console.log("dentro jwt")
       if (e) reject('Erro na verificação do token: ' + e)
       else {
-        //console.log(payload);
-        console.log("token é válido: ", payload)
         resolve(payload);
       }
     })

@@ -14,10 +14,7 @@ router.post('/updateRoleList', async function(req, res, next) {
   console.log("updateRoleList")
   try {
     var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
-    
-    
+
     if(req.body.accepted == undefined || req.body.accepted == null){
       return res.status(200).jsonp(await RequestUpdateRole.list())
 
@@ -35,9 +32,7 @@ router.get('/updateRole/:id', async function(req, res, next) {
   console.log("get_updateRole_id")
   try {
     var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
-    
+
     return res.status(200).json(await RequestUpdateRole.lookup(req.params.id));
 
   } catch (e) {
@@ -51,9 +46,7 @@ router.post('/updateRole/:id', async function(req, res, next) {
   try {
     //Validate token
     var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
- 
+
     //accpet must be true or false
     if(req.body.accept == undefined || req.body.accept == null){
       return res.status(400).jsonp({error:"Field is missing"})
@@ -87,9 +80,7 @@ router.get('/getUser/:id', async function(req, res, next) {
   console.log("get_user_id")
   try {
     var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
-    
+
     return res.status(200).json(await User.lookup(req.params.id));
 
   } catch (e) {
@@ -101,9 +92,6 @@ router.post('/listUsers', async function(req, res, next) {
   console.log("listUsers")
   try {
     var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
-    
 
     if(req.body.deleted == undefined || req.body.deleted == null){
       return res.status(200).jsonp(await User.list())
@@ -111,8 +99,6 @@ router.post('/listUsers', async function(req, res, next) {
     }else{
       return res.status(200).json(await User.filter(req.body.accepted));
     }
-    //return res.status(200).json(await User.list(req.params.id));
-
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
   }
@@ -122,8 +108,6 @@ router.get('/deleteUser/:id', async function(req, res, next) {
   console.log("DeleteUser by id") 
   try {
     var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
   
     User.lookup(req.params.id)
       .then(userr => {
@@ -138,8 +122,6 @@ router.get('/deleteUser/:id', async function(req, res, next) {
       .catch(err => {
         res.status(500).jsonp({ error: 'Erro getting user: ' + err })
       });
-    //return res.status(200).json(await User.list(req.params.id));
-
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
   }
@@ -150,16 +132,13 @@ function checkValidToken(req) {
   return new Promise((resolve, reject) => {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1];
-    console.log(token)
 
     jwt.verify(token, process.env.TOKEN_SECRET, function (e, payload) {
-      console.log("dentro jwt")
       if (e) reject('Erro na verificação do token: ' + e)
       else {
         if(payload.role != 'admin'){
           reject('Not authorized')
         }else{
-          console.log("token é válido: ", payload)
           resolve(payload);
         }
       }

@@ -9,30 +9,20 @@ const passport = require("passport"),
 
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.status(200).json({'body':"test"});
-});
-
 // Signup
 router.post("/signup", function (req, res) {
   console.log("signup");
-  console.log(req.body);
-  //console.log(req.body.password);
   if(req.body.email == undefined || req.body.password == undefined || req.body.name == undefined || req.body.filiacao == undefined || req.body.username == undefined){
     return res.status(500).jsonp({error:"Field is missing"})
   }
 
   user.register(new user({email: req.body.email, role : 'consumer', username : req.body.username}), req.body.password, function (err, user) {
     if (err) {
-      console.log(err);
       return res.status(500).jsonp({
         message: 'Error signing up', user: user
       });
     }
     passport.authenticate('local', { session: false }, (err, user, info) => {
-      console.log(err)
-      console.log(user)
       if (err || !user) {
         return res.status(500).jsonp({error:"Erro na Autentificação", err:err})
       }
@@ -89,14 +79,13 @@ router.post("/updatePassword", async function (req, res) {
   console.log("updatePassword")
   try {
     var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
+    // console.log("Payload", payload)
+    // console.log("username: ", payload.username)
     if (req.body.oldPassword == undefined || req.body.newPassword == undefined) {
       return res.status(400).jsonp({ error: "Field is missing" })
     } else {
       console.log("old and new password given, username: ", payload.username)
       user.authenticate()(payload.username, req.body.oldPassword, function(err, user, options) {
-        console.log("user: ", user)
         if (err) {
           // handle error
           res.status(500).jsonp({ error: 'Erro na autenticação do utilizador: ' + err })
@@ -105,7 +94,6 @@ router.post("/updatePassword", async function (req, res) {
           res.status(401).jsonp({ error: "Old password doens't match" })
         } else {
           // user authenticated successfully, update password
-          console.log("Authenticated successfully, update password")
           user.setPassword(req.body.newPassword, function () {
             user.save()
             res.status(200).json(user);
@@ -134,11 +122,8 @@ function checkValidToken(req) {
     console.log(token)
 
     jwt.verify(token, process.env.TOKEN_SECRET, function (e, payload) {
-      console.log("dentro jwt")
       if (e) reject('Erro na verificação do token: ' + e)
       else {
-        //console.log(payload);
-        console.log("token é válido")
         resolve(payload);
       }
     })
