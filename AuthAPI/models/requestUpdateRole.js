@@ -11,4 +11,4 @@ var RequestUpdateRoleSchema = new mongoose.Schema({
 
 //RequestUpdateRoleSchema.plugin(passportLocalMongoose);
 
-module.exports = mongoose.model("User", RequestUpdateRoleSchema);
+module.exports = mongoose.model("RequestUpdateRole", RequestUpdateRoleSchema);

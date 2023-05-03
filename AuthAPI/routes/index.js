@@ -1,11 +1,10 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
-const requestUpdateRole = require('../models/requestUpdateRole');
-    passport = require("passport"),
+const passport = require("passport"),
 
     User = require("../controllers/user"),
     user = require("../models/user"),
-    RequestUpdateRole = require("../controllers/requestUpdateRole")
+    RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
 var router = express.Router();
 
@@ -16,13 +15,14 @@ router.get('/', function(req, res, next) {
 
 // Signup
 router.post("/signup", function (req, res) {
+  console.log("signup");
   console.log(req.body);
   //console.log(req.body.password);
-  if(req.body.email == undefined || req.body.password == undefined || req.body.nome == undefined || req.body.filiacao == undefined || req.body.username == undefined){
+  if(req.body.email == undefined || req.body.password == undefined || req.body.name == undefined || req.body.filiacao == undefined || req.body.username == undefined){
     return res.status(500).jsonp({error:"Field is missing"})
   }
 
-  User.register(new user({email: req.body.email, role : 'consumer', username : req.body.username}), req.body.password, function (err, user) {
+  user.register(new user({email: req.body.email, role : 'consumer', username : req.body.username}), req.body.password, function (err, user) {
     if (err) {
       console.log(err);
       return res.status(500).jsonp({
@@ -56,7 +56,7 @@ router.post("/signup", function (req, res) {
 
 // Login
 router.post("/login", function (req, res) {
-  console.log('entra aqui')
+  console.log('login')
   passport.authenticate('local', { session: false }, (err, user, info) => {
     if (err || !user) {
       return res.status(400).json({
@@ -85,6 +85,7 @@ router.post("/login", function (req, res) {
 
 // Update Password
 router.post("/updatePassword", async function (req, res) {
+  console.log("updatePassword")
   try {
     var payload = await checkValidToken(req)
     console.log("Payload", payload)
@@ -118,16 +119,18 @@ router.post("/updatePassword", async function (req, res) {
 
 
 router.post("/user/requestUpdateRole",async function (req, res){
+  console.log("requestUpdateRole")
   try {
     var payload = await checkValidToken(req)
     console.log("Payload", payload)
     console.log("username: ", payload.username)
-    if(req.body.current_Role == undefined || req.body.required_Role == undefined){
+    if(req.body.required_Role == undefined){
       return res.status(400).jsonp({ error: "Field is missing" })
     }else{
-      reqUp = new requestUpdateRole({user_id: payload._id, current_Role: req.body.current_Role, required_Role: req.body.required_Role})
+      const reqUp = new requestUpdateRole({user_id: payload._id, current_Role: payload.role, required_Role: req.body.required_Role})
       console.log(reqUp)
-      //requestUpdateRole.create(reqUp)
+      await reqUp.save();
+      res.status(200).json(reqUp);
     }
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
