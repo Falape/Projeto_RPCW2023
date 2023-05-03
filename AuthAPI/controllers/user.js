@@ -7,6 +7,12 @@ module.exports.list = function () {
         .exec()
 }
 
+module.exports.filter = function (deleted) {
+    return User
+        .find({deleted:deleted})  //procurar parametros
+        .exec()
+}
+
 module.exports.lookup = function(id) { 
     return User
         .findOne({_id:id})  //devolve só o obejto se fosse find devolvia uma lista com o objeto

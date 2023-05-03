@@ -9,17 +9,16 @@ const passport = require("passport"),
 
 var router = express.Router();
 
-/* GET users listing. */
+//gets the list of requests for role update
 router.post('/updateRoleList', async function(req, res, next) {
   console.log("updateRoleList")
   try {
-    console.log("Gonna check token")
     var payload = await checkValidToken(req)
     console.log("Payload", payload)
     console.log("username: ", payload.username)
     
     
-    if(req.body.accepted == undefined){
+    if(req.body.accepted == undefined || req.body.accepted == null){
       return res.status(200).jsonp(await RequestUpdateRole.list())
 
     }else{
@@ -31,10 +30,10 @@ router.post('/updateRoleList', async function(req, res, next) {
   }
 });
 
+//gets the request for role update by id
 router.get('/updateRole/:id', async function(req, res, next) {
   console.log("get_updateRole_id")
   try {
-    console.log("Gonna check token")
     var payload = await checkValidToken(req)
     console.log("Payload", payload)
     console.log("username: ", payload.username)
@@ -46,6 +45,7 @@ router.get('/updateRole/:id', async function(req, res, next) {
   }
 });
 
+//accepts or rejects the request for role update
 router.post('/updateRole/:id', async function(req, res, next) {
   console.log("get_updateRole_id")
   try {
@@ -78,15 +78,37 @@ router.post('/updateRole/:id', async function(req, res, next) {
   }
 });
 
+//Get user by id
 router.get('/getUser/:id', async function(req, res, next) {
-  console.log("get_updateRole_id")
+  console.log("get_user_id")
   try {
-    console.log("Gonna check token")
     var payload = await checkValidToken(req)
     console.log("Payload", payload)
     console.log("username: ", payload.username)
     
     return res.status(200).json(await User.lookup(req.params.id));
+
+  } catch (e) {
+    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+  }
+});
+
+router.post('/listUsers', async function(req, res, next) {
+  console.log("listUsers")
+  try {
+    var payload = await checkValidToken(req)
+    console.log("Payload", payload)
+    console.log("username: ", payload.username)
+    
+
+    if(req.body.deleted == undefined || req.body.deleted == null){
+      return res.status(200).jsonp(await User.list())
+
+    }else{
+      return res.status(200).json(await User.filter(req.body.accepted));
+    }
+
+    //return res.status(200).json(await User.list(req.params.id));
 
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
