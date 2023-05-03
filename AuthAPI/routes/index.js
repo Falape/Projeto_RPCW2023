@@ -6,7 +6,7 @@ const passport = require("passport"),
     user = require("../models/user"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
-    
+
 var router = express.Router();
 
 /* GET home page. */
@@ -117,27 +117,6 @@ router.post("/updatePassword", async function (req, res) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
   }
 });
-
-
-router.post("/user/requestUpdateRole",async function (req, res){
-  console.log("requestUpdateRole")
-  try {
-    var payload = await checkValidToken(req)
-    console.log("Payload", payload)
-    console.log("username: ", payload.username)
-    if(req.body.required_Role == undefined){
-      return res.status(400).jsonp({ error: "Field is missing" })
-    }else{
-      const reqUp = new requestUpdateRole({user_id: payload._id, current_Role: payload.role, required_Role: req.body.required_Role})
-      console.log(reqUp)
-      await RequestUpdateRole.insert(reqUp)
-      //await reqUp.save();
-      res.status(200).json(reqUp);
-    }
-  } catch (e) {
-    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
-  }
-})
 
 // Logout 
 //FIXME: (NOT WORKING)
