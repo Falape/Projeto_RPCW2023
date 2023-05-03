@@ -34,6 +34,25 @@ router.post('/updateRoleList', async function(req, res, next) {
   }
 });
 
+router.get('/updateRole/:id', async function(req, res, next) {
+  console.log("get_updateRole_id")
+  try {
+    console.log("Gonna check token")
+    var payload = await checkValidToken(req)
+    console.log("Payload", payload)
+    console.log("username: ", payload.username)
+    
+    if(payload.role != 'admin'){
+      return res.status(401).jsonp({error:"Not authorized"})
+    }else{
+      return res.status(200).json(await RequestUpdateRole.lookup(req.params.id));
+    }
+
+  } catch (e) {
+    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+  }
+});
+
 // Check if token is valid
 function checkValidToken(req) {
   return new Promise((resolve, reject) => {
