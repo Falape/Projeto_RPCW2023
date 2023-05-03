@@ -12,6 +12,7 @@ require('dotenv').config({ path: '.env' })
 
 var index = require('./routes/index');
 var adminRouter = require('./routes/admin');
+var userRouter = require('./routes/user');
 
 
 var mongoBD = 'mongodb://' + process.env.MONGO_HOST + ':' + process.env.MONGO_PORT + '/' + process.env.MONGO_DB;
@@ -51,6 +52,7 @@ app.use(logger('dev'));
 
 
 app.use('/admin', adminRouter);
+app.use('/user', userRouter);
 app.use('/', index);
 
 

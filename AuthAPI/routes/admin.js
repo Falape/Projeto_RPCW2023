@@ -18,9 +18,6 @@ router.post('/updateRoleList', async function(req, res, next) {
     console.log("Payload", payload)
     console.log("username: ", payload.username)
     
-    if(payload.role != 'admin'){
-      return res.status(401).jsonp({error:"Not authorized"})
-    }
     
     if(req.body.accepted == undefined){
       return res.status(200).jsonp(await RequestUpdateRole.list())
@@ -42,11 +39,7 @@ router.get('/updateRole/:id', async function(req, res, next) {
     console.log("Payload", payload)
     console.log("username: ", payload.username)
     
-    if(payload.role != 'admin'){
-      return res.status(401).jsonp({error:"Not authorized"})
-    }else{
-      return res.status(200).json(await RequestUpdateRole.lookup(req.params.id));
-    }
+    return res.status(200).json(await RequestUpdateRole.lookup(req.params.id));
 
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
@@ -61,10 +54,6 @@ router.post('/updateRole/:id', async function(req, res, next) {
     console.log("Payload", payload)
     console.log("username: ", payload.username)
  
-    //if role is admin
-    if(payload.role != 'admin'){
-      return res.status(401).jsonp({error:"Not authorized"})
-    }
     //accpet must be true or false
     if(req.body.accept == undefined || req.body.accept == null){
       return res.status(400).jsonp({error:"Field is missing"})
@@ -82,10 +71,22 @@ router.post('/updateRole/:id', async function(req, res, next) {
         var userToUpdate = await User.lookup(updateRole.user_id)
         userToUpdate.role = updateRole.required_Role;
         return res.status(200).json(await userToUpdate.save());
-
       }
-
     }
+  } catch (e) {
+    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+  }
+});
+
+router.get('/getUser/:id', async function(req, res, next) {
+  console.log("get_updateRole_id")
+  try {
+    console.log("Gonna check token")
+    var payload = await checkValidToken(req)
+    console.log("Payload", payload)
+    console.log("username: ", payload.username)
+    
+    return res.status(200).json(await User.lookup(req.params.id));
 
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
@@ -103,9 +104,12 @@ function checkValidToken(req) {
       console.log("dentro jwt")
       if (e) reject('Erro na verificação do token: ' + e)
       else {
-        //console.log(payload);
-        console.log("token é válido")
-        resolve(payload);
+        if(payload.role != 'admin'){
+          reject('Not authorized')
+        }else{
+          console.log("token é válido: ", payload)
+          resolve(payload);
+        }
       }
     })
   })
