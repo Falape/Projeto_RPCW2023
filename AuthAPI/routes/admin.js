@@ -65,8 +65,10 @@ router.post('/updateRole/:id', async function(req, res, next) {
         User.lookup(updateRole.user_id)
           .then(userToUpdate => {
             userToUpdate.role = updateRole.required_Role;
-            var savedUser = userToUpdate.save()
-            return res.status(200).json(savedUser);
+            userToUpdate.save()
+            .then(savedUser => {
+              return res.status(200).json(savedUser);
+            });
           });
       }
     }
@@ -97,7 +99,7 @@ router.post('/listUsers', async function(req, res, next) {
       return res.status(200).jsonp(await User.list())
 
     }else{
-      return res.status(200).json(await User.filter(req.body.accepted));
+      return res.status(200).json(await User.filter(req.body.deleted));
     }
   } catch (e) {
     res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
@@ -117,6 +119,37 @@ router.get('/deleteUser/:id', async function(req, res, next) {
         userr.save()
          .then(savedUser => {
            res.status(200).json(savedUser);
+         });
+      })
+      .catch(err => {
+        res.status(500).jsonp({ error: 'Erro getting user: ' + err })
+      });
+  } catch (e) {
+    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+  }
+});
+
+router.post('/updateUser/:id', async function(req, res, next) {
+  console.log("updateUser by id") 
+  try {
+    await checkValidToken(req)
+    console.log("going to search user")
+    User.lookup(req.params.id)
+      .then(userr => {
+        console.log("GetsUser")
+        if(req.body.username != undefined && req.body.username != null){
+          userr.username = req.body.username;
+        }
+        if(req.body.email != undefined && req.body.email != null){
+          userr.email = req.body.email;
+        }
+        //var savedUser = 
+        userr.save()
+         .then(savedUser => {
+           res.status(200).json(savedUser);
+         })
+         .catch(err => {
+          res.status(500).jsonp({ error: 'Erro updating user: ' + err })
          });
       })
       .catch(err => {

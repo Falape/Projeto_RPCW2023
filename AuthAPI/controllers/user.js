@@ -19,6 +19,11 @@ module.exports.lookup = function(id) {
         .exec()
 }
 
+module.exports.findByUsername = function(username) { 
+    return User
+        .findOne({username : username})  //devolve só o obejto se fosse find devolvia uma lista com o objeto
+        .exec()
+}
 
 module.exports.insert = function(user) { 
     var newUser = new User(user)

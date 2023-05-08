@@ -1,5 +1,6 @@
 var createError = require('http-errors'),
-    User = require("./models/user"),
+    userModel = require("./models/user"),
+    User = require("./controllers/user"),
     express = require('express'),
     mongoose = require("mongoose"),
     bodyParser = require("body-parser"),
@@ -20,9 +21,24 @@ mongoose.connect(mongoBD, {useNewUrlParser: true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console,'Error connecting to MongoBD'));
 db.once('open', function() {
-  console.log("Conexão ao MongoBD realizada com sucesso!")
-})
+  console.log("Conexão ao MongoBD realizada com sucesso!");
 
+  // Check if admin account exists
+  // User.findByUsername({ username: 'admin' }, function(err, user) {
+  //   if (err) {
+  //     console.error(err);
+  //   } else if (!user) {
+  //     // Create admin account
+  //     User.register(new User({ username: 'admin', email: 'admin@example.com', role: 'admin' }), 'adminpassword', function(err, user) {
+  //       if (err) {
+  //         console.error(err);
+  //       } else {
+  //         console.log('Admin account created');
+  //       }
+  //     });
+  //   }
+  // });
+})
 
 var app = express();
 
@@ -41,9 +57,9 @@ app.use(require("express-session")({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.use(new LocalStrategy(userModel.authenticate()));
+passport.serializeUser(userModel.serializeUser());
+passport.deserializeUser(userModel.deserializeUser());
 
 
 app.use(logger('dev'));

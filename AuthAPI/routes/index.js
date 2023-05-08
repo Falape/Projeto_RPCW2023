@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken');
 const passport = require("passport"),
 
     User = require("../controllers/user"),
-    user = require("../models/user"),
+    userModel = require("../models/user"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
 
@@ -16,12 +16,15 @@ router.post("/signup", function (req, res) {
     return res.status(500).jsonp({error:"Field is missing"})
   }
 
-  user.register(new user({email: req.body.email, role : 'consumer', username : req.body.username}), req.body.password, function (err, user) {
+  console.log("req.body ", req.body)
+  var newUser = new userModel({email: req.body.email, role : 'consumer', username : req.body.username})
+  userModel.register(newUser, req.body.password, function (err, nUser) {
     if (err) {
       return res.status(500).jsonp({
-        message: 'Error signing up', user: user
+        message: 'Error signing up', user: nUser
       });
     }
+    console.log("regista o user", nUser)
     passport.authenticate('local', { session: false }, (err, user, info) => {
       if (err || !user) {
         return res.status(500).jsonp({error:"Erro na Autentificação", err:err})
@@ -85,7 +88,7 @@ router.post("/updatePassword", async function (req, res) {
       return res.status(400).jsonp({ error: "Field is missing" })
     } else {
       console.log("old and new password given, username: ", payload.username)
-      user.authenticate()(payload.username, req.body.oldPassword, function(err, user, options) {
+      userModel.authenticate()(payload.username, req.body.oldPassword, function(err, user, options) {
         if (err) {
           // handle error
           res.status(500).jsonp({ error: 'Erro na autenticação do utilizador: ' + err })
