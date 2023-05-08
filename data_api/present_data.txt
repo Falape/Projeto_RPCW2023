@@ -1,0 +1,27 @@
+Tipos de dados, suportudados pelo modal:
+
+    Images:
+        JPEG (.jpg, .jpeg)
+        PNG (.png)
+        GIF (.gif)
+        SVG (.svg)
+
+    Video:
+        MP4 (.mp4) - H.264 video codec and AAC audio codec
+        WebM (.webm) - VP8 or VP9 video codec and Vorbis or Opus audio codec
+
+    Audio:
+        MP3 (.mp3)
+        WAV (.wav)
+        Ogg (.ogg) - Vorbis audio codec
+
+    Text:
+        HTML (.html, .htm)
+        XML (.xml)
+        CSS (.css)
+        JavaScript (.js)
+        JSON (.json)
+        Plain text (.txt)
+
+    Documents:
+        PDF (.pdf)
