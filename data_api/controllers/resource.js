@@ -1,7 +1,8 @@
-var User = require('../models/resource')
+var Resource = require('../models/resource')
 
+// List all resources
 module.exports.list = () => {
-    return User
+    return Resource
         .find()
         .then(resposta => {
             return resposta
@@ -11,9 +12,9 @@ module.exports.list = () => {
         })
 }
 
-
-module.exports.getUser = id => {
-    return User.findOne({_id:id})
+// Get resource by id
+module.exports.getResource = id => {
+    return Resource.findOne({_id:id})
         .then(resposta => {
             return resposta
         })
@@ -22,9 +23,21 @@ module.exports.getUser = id => {
         })
 }
 
+// Add new resource
+module.exports.addResource = resourceData => {
+    const newResource = new Resource(resourceData);
+    return newResource.save()
+      .then(resposta => {
+        return resposta
+      })
+      .catch(erro => {
+        throw erro
+      })
+}
 
-module.exports.updateUser = (id, info) => {
-    return User.updateOne({_id:id}, info)
+// Generic update 
+module.exports.updateResource = (id, info) => {
+    return Resource.updateOne({_id:id}, info)
         .then(resposta => {
             return resposta
         })
@@ -33,8 +46,9 @@ module.exports.updateUser = (id, info) => {
         })
 }
 
-module.exports.deleteUser = id => {
-    return User.updateOne({_id:id})
+// Hard delete
+module.exports.deleteResourceHard = id => {
+    return Resource.deleteOne({_id:id})
         .then(resposta => {
             return resposta
         })
@@ -43,8 +57,9 @@ module.exports.deleteUser = id => {
         })
 }
 
-module.exports.updateUsertatus = (id, status) => {
-    return User.updateOne({_id:id}, {active:status})
+// Soft delete
+module.exports.deleteResourceSoft = (id, user_id, date) => {
+    return Resource.updateOne({_id:id}, {deleted : true, deletedBy: user_id, deleteDate: date})
         .then(resposta => {
             return resposta
         })

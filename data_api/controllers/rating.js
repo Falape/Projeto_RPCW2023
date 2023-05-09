@@ -1,8 +1,8 @@
-var Comment = require('../models/comment')
+var Rating = require('../models/rating')
 
-// List all comments
+// List all ratings
 module.exports.list = () => {
-    return Comment
+    return Rating
         .find()
         .then(resposta => {
             return resposta
@@ -12,9 +12,9 @@ module.exports.list = () => {
         })
 }
 
-// Get comment by id
-module.exports.getComment = id => {
-    return Comment.findOne({_id:id})
+// Get rating by id
+module.exports.getRating = id => {
+    return Rating.findOne({_id:id})
         .then(resposta => {
             return resposta
         })
@@ -23,9 +23,9 @@ module.exports.getComment = id => {
         })
 }
 
-// Get comments by Resource id
-module.exports.getCommentOfResource = resource_id => {
-    return Comment.find({resourceId : resource_id})
+// Get ratings by Resource id
+module.exports.getRatingOfResource = resource_id => {
+    return Rating.find({resourceId : resource_id})
         .then(resposta => {
             return resposta
         })
@@ -34,10 +34,10 @@ module.exports.getCommentOfResource = resource_id => {
         })
 }
 
-// Add new comment
-module.exports.addComment = commentData => {
-    const newComment = new Comment(commentData);
-    return newComment.save()
+// Add new rating
+module.exports.addRating = ratingData => {
+    const newRating = new Rating(ratingData);
+    return newRating.save()
       .then(resposta => {
         return resposta
       })
@@ -47,8 +47,8 @@ module.exports.addComment = commentData => {
 }
 
 // Generic update 
-module.exports.updateComment = (id, info) => {
-    return Comment.updateOne({_id:id}, info)
+module.exports.updateRating = (id, info) => {
+    return Rating.updateOne({_id:id}, info)
         .then(resposta => {
             return resposta
         })
@@ -58,8 +58,8 @@ module.exports.updateComment = (id, info) => {
 }
 
 // Hard delete
-module.exports.deleteCommentHard = id => {
-    return Comment.deleteOne({_id:id})
+module.exports.deleteRatingHard = id => {
+    return Rating.deleteOne({_id:id})
         .then(resposta => {
             return resposta
         })
@@ -69,8 +69,8 @@ module.exports.deleteCommentHard = id => {
 }
 
 // Soft delete
-module.exports.deleteCommentSoft = (id, user_id, date) => {
-    return Comment.updateOne({_id:id}, {deleted : true, deletedBy: user_id, deleteDate: date})
+module.exports.deleteRatingSoft = (id, user_id, date) => {
+    return Rating.updateOne({_id:id}, {deleted : true, deletedBy: user_id, deleteDate: date})
         .then(resposta => {
             return resposta
         })

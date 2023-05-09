@@ -1,6 +1,5 @@
 var mongoose = require('mongoose'), 
-    Schema = mongoose.Schema,
-    passportLocalMongoose = require('passport-local-mongoose')
+    Schema = mongoose.Schema
 
 var resourceSchema = new Schema({
     title: { type: String, required: true },
@@ -11,15 +10,12 @@ var resourceSchema = new Schema({
     dateCreated: String,
     path: { type: String, required: true },
     browserSupported : { type: Boolean, required: true },
+    //for soft delete
     deleted: Boolean,
     deleteDate : String,
-    deleteUser : String,
-    //classificacao: String, //Ver melhor pois assim não dá para fazer média de resultados
-    //nclassicacoes : Number.
-    //mediaclassificacao : Number    
+    deletedBy : String, 
 })
 
-User.plugin(passportLocalMongoose)
 
 module.exports = mongoose.model('resource', resourceSchema)
 

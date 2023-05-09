@@ -10,11 +10,13 @@ var mongoDB = 'mongodb://' + process.env.MONGO_HOST + ':' + process.env.MONGO_PO
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true})
 var db = mongoose.connection
 db.on('error', function(){
-    console.error.bind(console, 'Erro na ligação ao MongoDB...')})
+    console.error.bind(console, 'MongoDB: Connection error occurred...')})
 db.on('open', () => {
-    console.log('MongoDB: ligação estabelecida...')})
+    console.log('MongoDB: Connection established successfully...')})
 
-var indexRouter = require('./routes/index');
+var resourceRouter = require('./routes/resourceRoute');
+var commentRouter = require('./routes/commentRoute');
+var ratingRouter = require('./routes/ratingRoute');
 
 var app = express();
 
@@ -24,7 +26,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/resource', resourceRouter);
+app.use('/comment', commentRouter);
+app.use('/rating', ratingRouter);
 
 module.exports = app;
