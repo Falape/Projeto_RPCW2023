@@ -70,6 +70,9 @@ router.post('/add', function (req, res) {
     if (missingFields.length > 0) {
         return res.status(400).jsonp({ error: `Missing required fields: ${missingFields.join(', ')}` });
     }
+    if (req.body.value < 0 || req.body.value > 5) { //valor do rating tem de ser entre 0 e 5
+        return res.status(401).jsonp({ message: "Rating value should be between 0 and 5." });
+    }
     // get fields from body
     ra_data = {
         postedBy: req.body.postedBy,
