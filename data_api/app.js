@@ -4,6 +4,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('dotenv').config({ path: '.env' })
 
+console.log('MONGO_HOST: ' + process.env.MONGO_HOST)
+console.log('MONGO_PORT: ' + process.env.MONGO_PORT)
+console.log('MONGO_DB: ' + process.env.MONGO_DB)
+
 // connection to MongoDB
 var mongoose = require('mongoose')
 var mongoDB = 'mongodb://' + process.env.MONGO_HOST + ':' + process.env.MONGO_PORT + '/' + process.env.MONGO_DB;

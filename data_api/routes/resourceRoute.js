@@ -109,7 +109,7 @@ router.put('/edit/:id', function (req, res) {
 // delete resource (hard)
 router.delete('/delete/hard/:id', function (req, res) {
     re_id = req.params.id
-    resourceController.deleteResourceHard(re_id)
+    resourceController.deleteResourceMEGA(re_id)
         .then(resources => {
             res.status(205).jsonp(resources)
         })
@@ -121,7 +121,12 @@ router.delete('/delete/hard/:id', function (req, res) {
 // delete resource (soft)
 router.delete('/delete/soft/:id', function (req, res) {
     re_id = req.params.id
-    resourceController.getResource(re_id, info)
+    info = {
+        deleted: true,
+        deleteDate: new Date().toISOString().substring(0, 16),
+        deletedBy: req.body.deletedBy
+    }
+    resourceController.deleteResourceSoft(re_id, info)
         .then(resources => {
             res.status(206).jsonp(resources)
         })

@@ -1,4 +1,6 @@
 var Resource = require('../models/resource')
+var commentModel = require('../models/comment')
+var ratingModel = require('../models/rating')
 
 // List all resources
 module.exports.list = () => {
@@ -58,8 +60,8 @@ module.exports.deleteResourceHard = id => {
 }
 
 // Soft delete
-module.exports.deleteResourceSoft = (id, user_id, date) => {
-    return Resource.updateOne({_id:id}, {deleted : true, deletedBy: user_id, deleteDate: date})
+module.exports.deleteResourceSoft = (id, info) => {
+    return Resource.updateOne({_id:id}, info)
         .then(resposta => {
             return resposta
         })
@@ -68,3 +70,20 @@ module.exports.deleteResourceSoft = (id, user_id, date) => {
         })
 }
 
+
+/*This controller deletes every document related to the resource on ther other collections*/
+module.exports.deleteResourceMEGA = async (id) => {
+    try {
+      // Remove associated comments and ratings
+      await commentModel.deleteMany({ resourceId: id });
+      await ratingModel.deleteMany({ resourceId: id });
+  
+      // Remove the resource
+      const result = await Resource.deleteOne({ _id: id });
+  
+      // Return the result of the resource deletion
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  };

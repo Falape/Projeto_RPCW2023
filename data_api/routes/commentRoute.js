@@ -46,7 +46,7 @@ router.get('/:id', function (req, res) {
 });
 
 /* Get comments resource*/
-router.get('(/resource/:id', function (req, res) {
+router.get('/resource/:id', function (req, res) {
     ra_id = req.params.id
     commentController.getCommentOfResource(ra_id)
         .then(comments => {
@@ -58,9 +58,9 @@ router.get('(/resource/:id', function (req, res) {
 });
 
 /* Add new comment */
-router.post('/add', function (req, res) {
+router.post('/add/:id', function (req, res) {
     //check for required fields
-    const requiredFields = ['postedBy', 'content', 'ResourceId'];
+    const requiredFields = ['postedBy', 'content',];
     const missingFields = [];
     for (let field of requiredFields) {
         if (!req.body[field]) 
@@ -74,7 +74,7 @@ router.post('/add', function (req, res) {
         postedBy: req.body.postedBy,
         content: req.body.content,
         dateCreated: new Date().toISOString().substring(0, 16),
-        resourceId: req.body.resourceId,
+        resourceId: req.params.id,
         deleted: false,
         deleteDate: null,
         deletedBy: null
@@ -123,7 +123,12 @@ router.delete('/delete/hard/:id', function (req, res) {
 // delete comment (soft)
 router.delete('/delete/soft/:id', function (req, res) {
     ra_id = req.params.id
-    commentController.deleteCommentSoft(ra_id)
+    info = {
+        deleted: true,
+        deleteDate: new Date().toISOString().substring(0, 16),
+        deletedBy: req.body.deletedBy
+    }
+    commentController.deleteCommentSoft(ra_id, info)
         .then(comment => {
             res.status(207).jsonp(comment)
         })

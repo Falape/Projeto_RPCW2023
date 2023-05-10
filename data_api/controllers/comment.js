@@ -69,8 +69,8 @@ module.exports.deleteCommentHard = id => {
 }
 
 // Soft delete
-module.exports.deleteCommentSoft = (id, user_id, date) => {
-    return Comment.updateOne({_id:id}, {deleted : true, deletedBy: user_id, deleteDate: date})
+module.exports.deleteCommentSoft = (id, info) => {
+    return Comment.updateOne({_id:id}, info)
         .then(resposta => {
             return resposta
         })

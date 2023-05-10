@@ -69,8 +69,8 @@ module.exports.deleteRatingHard = id => {
 }
 
 // Soft delete
-module.exports.deleteRatingSoft = (id, user_id, date) => {
-    return Rating.updateOne({_id:id}, {deleted : true, deletedBy: user_id, deleteDate: date})
+module.exports.deleteRatingSoft = (id, info) => {
+    return Rating.updateOne({_id:id}, info)
         .then(resposta => {
             return resposta
         })

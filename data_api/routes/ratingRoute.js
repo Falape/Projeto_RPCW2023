@@ -47,7 +47,7 @@ router.get('/:id', function (req, res) {
 });
 
 /* Get ratings resource*/
-router.get('(/resource/:id', function (req, res) {
+router.get('/resource/:id', function (req, res) {
     ra_id = req.params.id
     ratingController.getRatingOfResource(ra_id)
         .then(ratings => {
@@ -59,9 +59,9 @@ router.get('(/resource/:id', function (req, res) {
 });
 
 /* Add new rating */
-router.post('/add', function (req, res) {
+router.post('/add/:id', function (req, res) {
     //check for required fields
-    const requiredFields = ['postedBy', 'value', 'ResourceId'];
+    const requiredFields = ['postedBy', 'value'];
     const missingFields = [];
     for (let field of requiredFields) {
         if (!req.body[field]) 
@@ -78,7 +78,7 @@ router.post('/add', function (req, res) {
         postedBy: req.body.postedBy,
         value: req.body.value,
         dateCreated: new Date().toISOString().substring(0, 16),
-        resourceId: req.body.resourceId,
+        resourceId: req.params.id,
         deleted: false,
         deleteDate: null,
         deletedBy: null
@@ -127,7 +127,12 @@ router.delete('/delete/hard/:id', function (req, res) {
 // delete rating (soft)
 router.delete('/delete/soft/:id', function (req, res) {
     ra_id = req.params.id
-    ratingController.deleteRatingSoft(ra_id)
+    info = {
+        deleted: true,
+        deleteDate: new Date().toISOString().substring(0, 16),
+        deletedBy: req.body.deletedBy
+    }
+    ratingController.deleteRatingSoft(ra_id, info)
         .then(rating => {
             res.status(207).jsonp(rating)
         })
