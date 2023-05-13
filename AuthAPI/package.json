@@ -1,0 +1,39 @@
+{
+  "name": "authapi",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^16.0.3",
+    "express": "~4.16.1",
+    "express-session": "^1.17.3",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.4",
+    "morgan": "~1.9.1",
+    "nodemon": "^2.0.22",
+    "passport": "^0.6.0",
+    "passport-local-mongoose": "^8.0.0"
+  },
+  "description": "Authentication API for the RPCW project.",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Falape/Projeto_RPCW2023.git"
+  },
+  "keywords": [
+    "authentication"
+  ],
+  "author": "Team:AROM98/Falape",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Falape/Projeto_RPCW2023/issues"
+  },
+  "homepage": "https://github.com/Falape/Projeto_RPCW2023#readme"
+}
