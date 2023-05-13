@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doc>
+    <meta>
+        <titulo>TPC2 - Criação de servidor e pagina html </titulo>
+        <data> 2022-02-27 </data>
+        <autor>
+            <id> A84347 </id>
+            <nome> André Rafael Olim Martins </nome>
+        </autor>
+        <uc>
+            <sigla> RPCW2022 </sigla>
+            <designacao> Representação e Processamento de Conhecimento na Web </designacao>  
+        </uc>
+    </meta>
+    
+    <resumo> 
+        <p>Este trabalho resume-se em fazer um site htlm para a uc de RPCW. 
+            O site tem o tema de jacaré, contém alguma informação basica sobre os mesmos,
+            além de alguns factos e imagens.</p>
+        <p> Terceiro paragrafo a apontar par o 
+            <xref>
+                <url> xml.com</url>
+                <texto> XML </texto>
+            </xref>.</p>
+    </resumo>
+    
+    <resultados>
+        <resultado> <url> jose.html</url>  <texto> pagina web</texto> </resultado>
+        <resultado> <url> jose.css</url>  <texto> stylesheet do TPC</texto> </resultado>
+    </resultados>
+</doc>
