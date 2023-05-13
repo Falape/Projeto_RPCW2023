@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
 // Os ratings funcionaram de forma semelhante aos comentários
 // serão uma coleção à parte, mas identificados com o ID do recurso a que pertencem
 var ratingSchema = new Schema({
-    postedBy : { type: String, required: true },
+    postedBy : { type: String, required: true, unique: true },
     value: { type: Number, required: true, min: 0, max: 5}, // valor do rating, entre 0 e 5
     dateCreated : { type: String, required: true },
     resourceId: { type: Schema.Types.ObjectId, ref: 'resource', required: true }, // ID do recurso a que pertence o comentário

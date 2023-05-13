@@ -67,7 +67,7 @@ router.post('/add/:id', function (req, res) {
             missingFields.push(field);
     }
     if (missingFields.length > 0) {
-        return res.status(400).jsonp({ error: `Missing required fields: ${missingFields.join(', ')}` });
+        res.status(400).jsonp({ error: `Missing required fields: ${missingFields.join(', ')}` });
     }
     // get fields from body
     ra_data = {
@@ -81,7 +81,8 @@ router.post('/add/:id', function (req, res) {
     }
     commentController.addComment(ra_data)
         .then(comment => {
-            res.status(204).jsonp(comment)
+            console.log("comment added: ", comment)
+            res.status(200).jsonp(comment)
         })
         .catch(error => {
             res.status(504).jsonp({ error: error, message: "Error adding comment..." })

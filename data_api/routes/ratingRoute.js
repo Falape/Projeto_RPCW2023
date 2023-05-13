@@ -85,7 +85,7 @@ router.post('/add/:id', function (req, res) {
     }
     ratingController.addRating(ra_data)
         .then(rating => {
-            res.status(204).jsonp(rating)
+            res.status(200).jsonp(rating)
         })
         .catch(error => {
             res.status(504).jsonp({ error: error, message: "Error adding rating..." })
