@@ -22,22 +22,7 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console,'Error connecting to MongoBD'));
 db.once('open', function() {
   console.log("Conexão ao MongoBD realizada com sucesso!");
-
-  // Check if admin account exists
-  // User.findByUsername({ username: 'admin' }, function(err, user) {
-  //   if (err) {
-  //     console.error(err);
-  //   } else if (!user) {
-  //     // Create admin account
-  //     User.register(new User({ username: 'admin', email: 'admin@example.com', role: 'admin' }), 'adminpassword', function(err, user) {
-  //       if (err) {
-  //         console.error(err);
-  //       } else {
-  //         console.log('Admin account created');
-  //       }
-  //     });
-  //   }
-  // });
+  createAdminUser();
 })
 
 var app = express();
@@ -87,5 +72,33 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 599);
   res.render('error');
 });
+
+
+async function createAdminUser() {
+  try {
+    const adminUser = await User.findByFilter({username: 'admin'});
+    console.log(adminUser);
+    if (adminUser == null || !adminUser) {
+      console.log('Creating admin user');
+      const newUser = new userModel({
+        username: 'admin',
+        email: 'admin@example.com',
+        role: 'admin'
+      });
+      userModel.register(newUser, 'admin', function (err, nUser) {
+        if (err) {
+          res.status(500).jsonp({
+            message: 'Error creating admin user', user: nUser
+          });
+        }
+      });
+      console.log('Admin user created successfully');
+    } else {
+      console.log('Admin user already exists');
+    }
+  } catch (error) {
+    console.error('Failed to create admin user', error);
+  }
+}
 
 module.exports = app;

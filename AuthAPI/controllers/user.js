@@ -19,9 +19,9 @@ module.exports.lookup = function(id) {
         .exec()
 }
 
-module.exports.findByUsername = function(username) { 
+module.exports.findByFilter = function(filter) { 
     return User
-        .findOne({username : username})  //devolve só o obejto se fosse find devolvia uma lista com o objeto
+        .findOne(filter)  //devolve só o obejto se fosse find devolvia uma lista com o objeto
         .exec()
 }
 

@@ -13,25 +13,23 @@ var router = express.Router();
 router.post("/signup", function (req, res) {
   console.log("signup");
   if(req.body.email == undefined || req.body.password == undefined || req.body.name == undefined || req.body.filiacao == undefined || req.body.username == undefined){
-    return res.status(500).jsonp({error:"Field is missing"})
+    res.status(500).jsonp({error:"Field is missing"})
   }
 
-  console.log("req.body ", req.body)
   var newUser = new userModel({email: req.body.email, role : 'consumer', username : req.body.username})
   userModel.register(newUser, req.body.password, function (err, nUser) {
     if (err) {
-      return res.status(500).jsonp({
+      res.status(500).jsonp({
         message: 'Error signing up', user: nUser
       });
     }
-    console.log("regista o user", nUser)
     passport.authenticate('local', { session: false }, (err, user, info) => {
       if (err || !user) {
-        return res.status(500).jsonp({error:"Erro na Autentificação", err:err})
+        res.status(500).jsonp({error:"Erro na Autentificação", err:err})
       }
       req.login(user, { session: false }, (err) => {
         if (err) {
-          return res.status(500).jsonp({error:"Erro no login"})
+          res.status(500).jsonp({error:"Erro no login"})
         }
         // generate a signed son web token with the contents of user object and return it in the response
         var userTosend = {}
@@ -53,13 +51,13 @@ router.post("/login", function (req, res) {
   console.log('login')
   passport.authenticate('local', { session: false }, (err, user, info) => {
     if (err || !user) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Username or password are wrong'
       });
     }
     req.login(user, { session: false }, (err) => {
       if (err) {
-        return res.status(500).jsonp({error:"Erro no login"});
+        res.status(500).jsonp({error:"Erro no login"});
       }
 
       var userTosend = {}
@@ -78,59 +76,67 @@ router.post("/login", function (req, res) {
 });
 
 // Update Password
-router.post("/updatePassword", async function (req, res) {
+router.post("/updatePassword", checkValidToken, async function (req, res) {
   console.log("updatePassword")
-  try {
-    var payload = await checkValidToken(req)
-    // console.log("Payload", payload)
-    // console.log("username: ", payload.username)
-    if (req.body.oldPassword == undefined || req.body.newPassword == undefined) {
-      return res.status(400).jsonp({ error: "Field is missing" })
-    } else {
-      console.log("old and new password given, username: ", payload.username)
-      userModel.authenticate()(payload.username, req.body.oldPassword, function(err, user, options) {
-        if (err) {
-          // handle error
-          res.status(500).jsonp({ error: 'Erro na autenticação do utilizador: ' + err })
-        } else if (!user) {
-          // user not found or password incorrect
-          res.status(401).jsonp({ error: "Old password doens't match" })
-        } else {
-          // user authenticated successfully, update password
-          user.setPassword(req.body.newPassword, function () {
-            user.save()
-            res.status(200).json(user);
-          })
-        }
-      })
-    }
-  } catch (e) {
-    res.status(401).jsonp({ error: 'Erro token inválido: ' + e })
+
+  if (req.body.oldPassword == undefined || req.body.newPassword == undefined) {
+    res.status(400).jsonp({ error: "Field is missing" })
+  } else {
+    userModel.authenticate()(req.payload.username, req.body.oldPassword, function(err, user, options) {
+      if (err) {
+        // handle error
+        res.status(500).jsonp({ error: 'Erro na autenticação do utilizador: ' + err })
+      } else if (!user) {
+        // user not found or password incorrect
+        res.status(401).jsonp({ error: "Old password doens't match" })
+      } else {
+        // user authenticated successfully, update password
+        user.setPassword(req.body.newPassword, function () {
+          user.save()
+          res.status(200).json(user);
+        })
+      }
+    })
   }
+
 });
 
 // Logout 
 //FIXME: (NOT WORKING)
-router.get("/logout", function (req, res) {
-  console.log("logout");
-  req.logout();
-  res.status(200).json({'body':"test"});
+// router.get("/logout", checkValidToken, function (req, res) {
+//   console.log("logout");
+//   userModel.logout(req.payload.username, function (err, user) {
+//     res.status(200).json({'body':"test"});
+//   })
+// });
+
+
+router.get('/logout', checkValidToken, function(req, res) {
+  req.logout(function(err){
+    if(err)
+      res.status(444).jsonp('error', {error: err})
+    else
+      res.status(200).json({'body':"test"});
+  })
 });
 
 // Check if token is valid
-function checkValidToken(req) {
-  return new Promise((resolve, reject) => {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1];
-    console.log(token)
+function checkValidToken(req, res, next) {
 
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if(authHeader){
     jwt.verify(token, process.env.TOKEN_SECRET, function (e, payload) {
-      if (e) reject('Erro na verificação do token: ' + e)
-      else {
-        resolve(payload);
+      if (e) res.status(401).jsonp({error:'Erro na verificação do token: ' + e})
+      else {      
+        req.payload=payload;
+        next();
       }
     })
-  })
+  }else{
+    res.status(401).jsonp({error:'No token provided'})
+  }
 }
 
 
