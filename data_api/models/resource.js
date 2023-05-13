@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema
 
 var resourceSchema = new Schema({
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique: true },
     author: String, // autor do recurso, pode não haver.
     uploadedBy: { type: String, required: true }, // ID do utilizador que fez o upload
     type: { type: String, required: true },  

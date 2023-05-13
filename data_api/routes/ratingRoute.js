@@ -95,6 +95,11 @@ router.post('/add/:id', function (req, res) {
 /* Update rating information */
 router.put('/edit/:id', function (req, res) {
     ra_id = req.params.id
+    if(req.body.value){
+        if (req.body.value < 0 || req.body.value > 5) {
+            return res.status(400).jsonp({ error: 'Rating value should be between 0 and 5.' });
+        }
+    }
     info =  {
         postedBy: req.body.postedBy,
         value: req.body.value,
