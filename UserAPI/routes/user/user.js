@@ -5,23 +5,24 @@ var router = express.Router();
 
 const { checkValidToken, checkValidTokenAdmin } = require('../../javascript/validateToken');
 
-//must create some sord of OAuth2.0, so in the signup, a requests is sent to here
-router.post('/create', function(req, res) {
-  console.log("create")
-  const user = new userModel({name: req.body.name, username: req.body.username, userId: req.body.userId, filiacao: req.body.filiacao, created_date: Date.now(), last_access: Date.now()})
-  User.insert(user)
-    .then(savedUser => {
-      res.status(200).json(savedUser);
-    })
-    .catch(err => {
-      res.status(500).jsonp({ error: 'Erro creating user: ' + err })
-    });
-});
-
 router.put('/update', checkValidToken, function(req, res) {
   console.log("update")
 
-  res.send('respond with a resource');
+  //User.lookup(req.payload._id)
+  User.lookup("user1")
+  .then(user => {
+    if(req.body.name != undefined && req.body.name != "" && req.body.name != null){
+      user.name = req.body.name;
+    }
+    if(req.body.username != undefined && req.body.username != "" && req.body.username != null){
+      user.username = req.body.username;
+    }
+    
+    user.save()
+     .then(savedUser => {
+       res.status(200).json(savedUser);
+     });
+  })
 });
 
 module.exports = router;
