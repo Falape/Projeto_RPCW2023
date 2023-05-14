@@ -2,24 +2,7 @@ var express = require('express');
 var router = express.Router();
 var ratingController = require('../controllers/rating');
 const rating = require('../models/rating');
-
-function verifyAccess(req, res, next) {
-  var myToken = req.query.token || req.body.token
-  if(myToken) {
-    jwt.verify(myToken, 'rpcw2023', function(err, payload) {
-      if(err){
-        res.status(401).jsonp({error:err})
-      }
-      else {
-        req.payload = payload;
-        next()
-      }
-    })
-  }
-  else {
-    res.status(401).jsonp({ error: 'No token provided' });
-  }
-}
+const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = require('../javascript/validateToken');
 
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
 
@@ -47,7 +30,7 @@ router.get('/:id', function (req, res) {
 });
 
 /* Get ratings resource*/
-router.get('/resource/:id', function (req, res) {
+router.get('/resource/:id', checkValidToken,function (req, res) {
     ra_id = req.params.id
     ratingController.getRatingOfResource(ra_id)
         .then(ratings => {
@@ -59,7 +42,7 @@ router.get('/resource/:id', function (req, res) {
 });
 
 /* Add new rating */
-router.post('/add/:id', function (req, res) {
+router.post('/add/:id', checkValidToken, function (req, res) {
     //check for required fields
     const requiredFields = ['postedBy', 'value'];
     const missingFields = [];
@@ -75,7 +58,7 @@ router.post('/add/:id', function (req, res) {
     }
     // get fields from body
     ra_data = {
-        postedBy: req.body.postedBy,
+        postedBy: req.payload._id,
         value: req.body.value,
         dateCreated: new Date().toISOString().substring(0, 16),
         resourceId: req.params.id,
@@ -93,7 +76,10 @@ router.post('/add/:id', function (req, res) {
 });
 
 /* Update rating information */
-router.put('/edit/:id', function (req, res) {
+router.put('/edit/:id', checkValidToken, function (req, res) {
+    //user id is in req.payload._id
+    //user role is in req.payload.role
+    //user username is in req.payload.username
     ra_id = req.params.id
     if(req.body.value){
         if (req.body.value < 0 || req.body.value > 5) {
@@ -118,7 +104,7 @@ router.put('/edit/:id', function (req, res) {
 
 
 // delete rating (hard)
-router.delete('/delete/hard/:id', function (req, res) {
+router.delete('/delete/hard/:id', checkValidTokenAdmin, function (req, res) {
     ra_id = req.params.id
     ratingController.deleteRatingHard(ra_id)
         .then(rating => {
@@ -131,6 +117,9 @@ router.delete('/delete/hard/:id', function (req, res) {
 
 // delete rating (soft)
 router.delete('/delete/soft/:id', function (req, res) {
+    //user id is in req.payload._id
+    //user role is in req.payload.role
+    //user username is in req.payload.username
     ra_id = req.params.id
     info = {
         deleted: true,
