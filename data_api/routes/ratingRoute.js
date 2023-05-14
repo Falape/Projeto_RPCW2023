@@ -7,8 +7,24 @@ const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = requi
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
 
 /* List all ratings. */
-router.get('/', function (req, res) {
-    ratingController.list()
+router.post('/', function (req, res) {
+
+    ra_data = {
+        postedBy: req.body.postedBy,
+        postedByUsername: req.body.postedByUsername,
+        value: req.body.value,
+        dateCreated: req.body.dateCreated,
+        resourceId: req.params.id,
+        updateDate: req.body.updateDate,
+        deleted: req.body.deleted,
+        deleteDate: req.body.deleteDate,
+        deletedBy: req.body.deletedBy,
+    }
+
+    // if field is undefined, delete it from object
+    Object.keys(ra_data).forEach(key => ra_data[key] === undefined ? delete ra_data[key] : '');
+
+    ratingController.list(ra_data)
         .then(ratings => {
             res.status(201).jsonp(ratings)
         })
@@ -44,7 +60,7 @@ router.get('/resource/:id', checkValidToken,function (req, res) {
 /* Add new rating */
 router.post('/add/:id', checkValidToken, function (req, res) {
     //check for required fields
-    const requiredFields = ['postedBy', 'value'];
+    const requiredFields = ['value'];
     const missingFields = [];
     for (let field of requiredFields) {
         if (!req.body[field]) 
@@ -56,22 +72,35 @@ router.post('/add/:id', checkValidToken, function (req, res) {
     if (req.body.value < 0 || req.body.value > 5) { //valor do rating tem de ser entre 0 e 5
         return res.status(401).jsonp({ message: "Rating value should be between 0 and 5." });
     }
-    // get fields from body
-    ra_data = {
-        postedBy: req.payload._id,
-        value: req.body.value,
-        dateCreated: new Date().toISOString().substring(0, 16),
-        resourceId: req.params.id,
-        deleted: false,
-        deleteDate: null,
-        deletedBy: null
-    }
-    ratingController.addRating(ra_data)
-        .then(rating => {
-            res.status(200).jsonp(rating)
-        })
-        .catch(error => {
-            res.status(504).jsonp({ error: error, message: "Error adding rating..." })
+
+    // check if user already rated this resource
+    ratingController.list({postedBy: req.payload._id, resourceId: req.params.id})
+        .then(rat => {
+            console.log("RAT:", rat)
+                // if rat is an empty list, it means that the user didn't rate this resource yet
+            if(rat.length > 0){
+                return res.status(402).jsonp({ message: "You already rated this resource." });
+            }
+            else{
+                // get fields from body
+                ra_data = {
+                    postedBy: req.payload._id,
+                    postedByUsername: req.payload.username,
+                    value: req.body.value,
+                    dateCreated: new Date().toISOString().substring(0, 16),
+                    resourceId: req.params.id,
+                    deleted: false,
+                    deleteDate: null,
+                    deletedBy: null
+                }
+                ratingController.addRating(ra_data)
+                    .then(rating => {
+                        res.status(200).jsonp(rating)
+                    })
+                    .catch(error => {
+                        res.status(504).jsonp({ error: error, message: "Error adding rating..." })
+                    })
+            }
         })
 });
 
@@ -81,16 +110,23 @@ router.put('/edit/:id', checkValidToken, function (req, res) {
     //user role is in req.payload.role
     //user username is in req.payload.username
     ra_id = req.params.id
+    // Se não for admin, tenho que verificar se quem quer editar é o dono do recurso
+    if(req.payload.role != "admin"){
+        rec = ratingController.getRating(ra_id)
+        if(rec.postedBy != req.payload._id && rec.postedByUsername != req.payload.username){
+            return res.status(401).jsonp({ error: `Unauthorized to edit this rating...` });
+        }
+    }
+
     if(req.body.value){
         if (req.body.value < 0 || req.body.value > 5) {
             return res.status(400).jsonp({ error: 'Rating value should be between 0 and 5.' });
         }
     }
+
     info =  {
-        postedBy: req.body.postedBy,
         value: req.body.value,
-        dateCreated: req.body.dateCreated,
-        resourceId: req.body.resourceId,
+        updateDate: new Date().toISOString().substring(0, 16),
     }
     ratingController.updateRating(ra_id, info)
         .then(rating => {
@@ -116,15 +152,24 @@ router.delete('/delete/hard/:id', checkValidTokenAdmin, function (req, res) {
 });
 
 // delete rating (soft)
-router.delete('/delete/soft/:id', function (req, res) {
+router.delete('/delete/soft/:id', checkValidToken, function (req, res) {
     //user id is in req.payload._id
     //user role is in req.payload.role
     //user username is in req.payload.username
     ra_id = req.params.id
+
+    // Se não for admin, tenho que verificar se quem quer editar é o dono do recurso
+    if(req.payload.role != "admin"){
+        rec = ratingController.getRating(ra_id)
+        if(rec.postedBy != req.payload._id && rec.postedByUsername != req.payload.username){
+            return res.status(401).jsonp({ error: `Unauthorized to delete this rating...` });
+        }
+    }
+
     info = {
         deleted: true,
         deleteDate: new Date().toISOString().substring(0, 16),
-        deletedBy: req.body.deletedBy
+        deletedBy: req.payload._id
     }
     ratingController.deleteRatingSoft(ra_id, info)
         .then(rating => {
