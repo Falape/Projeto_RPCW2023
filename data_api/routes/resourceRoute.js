@@ -1,24 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var resourceController = require('../controllers/resource')
-
-function verifyAccess(req, res, next) {
-    var myToken = req.query.token || req.body.token
-    if (myToken) {
-        jwt.verify(myToken, 'rpcw2023', function (err, payload) {
-            if (err) {
-                res.status(401).jsonp({ error: err })
-            }
-            else {
-                req.payload = payload;
-                next()
-            }
-        })
-    }
-    else {
-        res.status(401).jsonp({ error: 'No token provided' });
-    }
-}
+const { checkValidTokenAdmin, checkValidTokenConsumer, checkValidToken } = require('../javascript/validateToken');
 
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
 
@@ -46,9 +29,9 @@ router.get('/:id', function (req, res) {
 });
 
 /* Add new resource */
-router.post('/add', function (req, res) {
+router.post('/add', checkValidTokenConsumer, function (req, res) {
     //check for required fields
-    const requiredFields = ['title', 'uploadedBy', 'type', 'path', 'browserSupported'];
+    const requiredFields = ['title', 'type', 'path', 'browserSupported'];
     const missingFields = [];
     for (let field of requiredFields) {
         if (!req.body[field]) 
@@ -60,8 +43,8 @@ router.post('/add', function (req, res) {
     // get fields from body, if not present in request, it will be null
     re_data = {
         title: req.body.title,
-        author: req.body.author || null,
-        uploadedBy: req.body.uploadedBy,
+        author: req.payload.username || null,
+        uploadedBy: req.payload._id,
         type: req.body.type,
         public: req.body.public || true, // default is public or must come in request
         dateCreated: new Date().toISOString().substring(0, 16),
@@ -97,7 +80,7 @@ router.put('/edit/:id', function (req, res) {
     }
     resourceController.updateResource(re_id, info)
         .then(resources => {
-            res.status(204).jsonp(resources)
+            res.status(200).jsonp(resources)
         })
         .catch(error => {
             res.status(504).jsonp({ error: error, message: "Error editing resource..." })
