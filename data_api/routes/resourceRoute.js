@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var resourceController = require('../controllers/resource')
-const { checkValidTokenAdmin, checkValidTokenConsumer, checkValidToken } = require('../javascript/validateToken');
+const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = require('../javascript/validateToken');
 
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
 
@@ -29,7 +29,7 @@ router.get('/:id', function (req, res) {
 });
 
 /* Add new resource */
-router.post('/add', checkValidTokenConsumer, function (req, res) {
+router.post('/add', checkValidTokenProducer, function (req, res) {
     //check for required fields
     const requiredFields = ['title', 'type', 'path', 'browserSupported'];
     const missingFields = [];
@@ -64,7 +64,11 @@ router.post('/add', checkValidTokenConsumer, function (req, res) {
 });
 
 /* Update resource information */
-router.put('/edit/:id', function (req, res) {
+router.put('/edit/:id', checkValidTokenProducer, function (req, res) {
+
+    //user id is in req.payload._id
+    //user role is in req.payload.role
+    //user username is in req.payload.username
     re_id = req.params.id
 
     // get fields from body, if not present in request, it will be changed.
@@ -90,7 +94,7 @@ router.put('/edit/:id', function (req, res) {
 
 
 // delete resource (hard)
-router.delete('/delete/hard/:id', function (req, res) {
+router.delete('/delete/hard/:id', checkValidTokenAdmin, function (req, res) {
     re_id = req.params.id
     resourceController.deleteResourceMEGA(re_id)
         .then(resources => {
@@ -102,12 +106,15 @@ router.delete('/delete/hard/:id', function (req, res) {
 });
 
 // delete resource (soft)
-router.delete('/delete/soft/:id', function (req, res) {
+router.delete('/delete/soft/:id', checkValidTokenProducer,function (req, res) {
+    //user id is in req.payload._id
+    //user role is in req.payload.role
+    //user username is in req.payload.username
     re_id = req.params.id
     info = {
         deleted: true,
         deleteDate: new Date().toISOString().substring(0, 16),
-        deletedBy: req.body.deletedBy
+        deletedBy: req.payload._id
     }
     resourceController.deleteResourceSoft(re_id, info)
         .then(resources => {

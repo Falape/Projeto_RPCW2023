@@ -19,7 +19,7 @@ function checkValidToken(req, res, next) {
     }
   }
 
-  function checkValidTokenConsumer(req, res, next) {
+  function checkValidTokenProducer(req, res, next) {
 
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1];
@@ -66,6 +66,6 @@ function checkValidTokenAdmin(req, res, next) {
 
 module.exports = {
     checkValidToken,
-    checkValidTokenConsumer,
+    checkValidTokenProducer,
     checkValidTokenAdmin
 }
