@@ -1,24 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var commentController = require('../controllers/comment')
-
-function verifyAccess(req, res, next) {
-  var myToken = req.query.token || req.body.token
-  if(myToken) {
-    jwt.verify(myToken, 'rpcw2023', function(err, payload) {
-      if(err){
-        res.status(401).jsonp({error:err})
-      }
-      else {
-        req.payload = payload;
-        next()
-      }
-    })
-  }
-  else {
-    res.status(401).jsonp({ error: 'No token provided' });
-  }
-}
+const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = require('../javascript/validateToken');
 
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
 
@@ -58,7 +41,7 @@ router.get('/resource/:id', function (req, res) {
 });
 
 /* Add new comment */
-router.post('/add/:id', function (req, res) {
+router.post('/add/:id', checkValidToken, function (req, res) {
     //check for required fields
     const requiredFields = ['postedBy', 'content',];
     const missingFields = [];
@@ -71,7 +54,8 @@ router.post('/add/:id', function (req, res) {
     }
     // get fields from body
     ra_data = {
-        postedBy: req.body.postedBy,
+        author : req.payload.username,
+        postedBy: req.payload._id,
         content: req.body.content,
         dateCreated: new Date().toISOString().substring(0, 16),
         resourceId: req.params.id,
@@ -90,10 +74,13 @@ router.post('/add/:id', function (req, res) {
 });
 
 /* Update comment information */
-router.put('/edit/:id', function (req, res) {
+router.put('/edit/:id', checkValidToken, function (req, res) {
+    //user id is in req.payload._id
+    //user role is in req.payload.role
+    //user username is in req.payload.username
     ra_id = req.params.id
     info = {
-        postedBy: req.body.postedBy,
+        postedBy: req.body.postedBy, // se for alterado pelo admin, não deve alerar o postedby
         content: req.body.content,
         dateCreated: req.body.dateCreated,
         resourceId: req.body.resourceId,
@@ -110,7 +97,7 @@ router.put('/edit/:id', function (req, res) {
 
 
 // delete comment (hard)
-router.delete('/delete/hard/:id', function (req, res) {
+router.delete('/delete/hard/:id', checkValidTokenAdmin, function (req, res) {
     ra_id = req.params.id
     commentController.deleteCommentHard(ra_id)
         .then(comment => {
@@ -122,7 +109,10 @@ router.delete('/delete/hard/:id', function (req, res) {
 });
 
 // delete comment (soft)
-router.delete('/delete/soft/:id', function (req, res) {
+router.delete('/delete/soft/:id', checkValidToken, function (req, res) {
+    //user id is in req.payload._id
+    //user role is in req.payload.role
+    //user username is in req.payload.username
     ra_id = req.params.id
     info = {
         deleted: true,
