@@ -5,7 +5,8 @@ var express = require('express'),
     logger = require('morgan');
 require('dotenv').config({ path: '.env' })
 
-var userRouter = require('./routes/user');
+var userRouter = require('./routes/user/user');
+var adminRouter = require('./routes/admin/admin');
 
 var mongoBD = 'mongodb://' + process.env.MONGO_HOST + ':' + process.env.MONGO_PORT + '/' + process.env.MONGO_DB;
 mongoose.connect(mongoBD, {useNewUrlParser: true});
@@ -24,6 +25,7 @@ app.use(logger('dev'));
 
 
 app.use('/user', userRouter);
+app.use('/admin', adminRouter);
 
 app.use(function(req, res, next) {
     next(createError(404));
