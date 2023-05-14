@@ -1,9 +1,9 @@
 var Comment = require('../models/comment')
 
 // List all comments
-module.exports.list = () => {
+module.exports.list = (fields) => {
     return Comment
-        .find()
+        .find(fields)  //filtra por parametros
         .then(resposta => {
             return resposta
         })
@@ -49,6 +49,9 @@ module.exports.addComment = commentData => {
 // Generic update 
 module.exports.updateComment = (id, info) => {
     return Comment.updateOne({_id:id}, info)
+        .then(() =>{
+            return Comment.findOne({_id:id})
+        })
         .then(resposta => {
             return resposta
         })
@@ -71,6 +74,9 @@ module.exports.deleteCommentHard = id => {
 // Soft delete
 module.exports.deleteCommentSoft = (id, info) => {
     return Comment.updateOne({_id:id}, info)
+        .then(() =>{
+            return Comment.findOne({_id:id})
+        })
         .then(resposta => {
             return resposta
         })
