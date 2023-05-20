@@ -11,6 +11,8 @@ var createError = require('http-errors'),
     jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env' })
 
+const { createAdminUser } = require('./javascript/createAdminUser');
+
 var index = require('./routes/index');
 var adminRouter = require('./routes/admin');
 var userRouter = require('./routes/user');
@@ -72,33 +74,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 599);
   res.render('error');
 });
-
-
-async function createAdminUser() {
-  try {
-    const adminUser = await User.findByFilter({username: 'admin'});
-    console.log(adminUser);
-    if (adminUser == null || !adminUser) {
-      console.log('Creating admin user');
-      const newUser = new userModel({
-        username: 'admin',
-        email: 'admin@example.com',
-        role: 'admin'
-      });
-      userModel.register(newUser, 'admin', function (err, nUser) {
-        if (err) {
-          res.status(500).jsonp({
-            message: 'Error creating admin user', user: nUser
-          });
-        }
-      });
-      console.log('Admin user created successfully');
-    } else {
-      console.log('Admin user already exists');
-    }
-  } catch (error) {
-    console.error('Failed to create admin user', error);
-  }
-}
 
 module.exports = app;

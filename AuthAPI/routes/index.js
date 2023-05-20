@@ -7,6 +7,8 @@ const passport = require("passport"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
 
+const { checkValidToken } = require('../javascript/validateToken');
+
 var router = express.Router();
 
 // Signup
@@ -101,16 +103,6 @@ router.post("/updatePassword", checkValidToken, async function (req, res) {
 
 });
 
-// Logout 
-//FIXME: (NOT WORKING)
-// router.get("/logout", checkValidToken, function (req, res) {
-//   console.log("logout");
-//   userModel.logout(req.payload.username, function (err, user) {
-//     res.status(200).json({'body':"test"});
-//   })
-// });
-
-
 router.get('/logout', checkValidToken, function(req, res) {
   req.logout(function(err){
     if(err)
@@ -119,25 +111,6 @@ router.get('/logout', checkValidToken, function(req, res) {
       res.status(200).json({'body':"test"});
   })
 });
-
-// Check if token is valid
-function checkValidToken(req, res, next) {
-
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if(authHeader){
-    jwt.verify(token, process.env.TOKEN_SECRET, function (e, payload) {
-      if (e) res.status(401).jsonp({error:'Erro na verificação do token: ' + e})
-      else {      
-        req.payload=payload;
-        next();
-      }
-    })
-  }else{
-    res.status(401).jsonp({error:'No token provided'})
-  }
-}
 
 
 

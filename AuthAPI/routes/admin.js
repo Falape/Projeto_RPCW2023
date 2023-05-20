@@ -6,11 +6,13 @@ const passport = require("passport"),
     user = require("../models/user"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
+  
+const { checkValidTokenAdmin } = require('../javascript/validateToken');
 
 var router = express.Router();
 
 //gets the list of requests for role update
-router.post('/updateRoleList', checkValidToken, async function(req, res, next) {
+router.post('/updateRoleList', checkValidTokenAdmin, async function(req, res, next) {
   console.log("updateRoleList")
 
   if(req.body.accepted == undefined || req.body.accepted == null){
@@ -23,14 +25,14 @@ router.post('/updateRoleList', checkValidToken, async function(req, res, next) {
 });
 
 //gets the request for role update by id
-router.get('/updateRole/:id', checkValidToken,async function(req, res, next) {
+router.get('/updateRole/:id', checkValidTokenAdmin,async function(req, res, next) {
   console.log("get_updateRole_id")
 
   res.status(200).json(await RequestUpdateRole.lookup(req.params.id));
 });
 
 //accepts or rejects the request for role update
-router.post('/updateRole/:id', checkValidToken, async function(req, res, next) {
+router.post('/updateRole/:id', checkValidTokenAdmin, async function(req, res, next) {
   console.log("get_updateRole_id")
 
   //accpet must be true or false
@@ -60,13 +62,13 @@ router.post('/updateRole/:id', checkValidToken, async function(req, res, next) {
 });
 
 //Get user by id
-router.get('/getUser/:id', checkValidToken, async function(req, res, next) {
+router.get('/getUser/:id', checkValidTokenAdmin, async function(req, res, next) {
   console.log("get_user_id")
 
   res.status(200).json(await User.lookup(req.params.id));
 });
 
-router.post('/listUsers', checkValidToken,async function(req, res, next) {
+router.post('/listUsers', checkValidTokenAdmin,async function(req, res, next) {
   console.log("listUsers")
 
   if(req.body.deleted == undefined || req.body.deleted == null){
@@ -77,7 +79,7 @@ router.post('/listUsers', checkValidToken,async function(req, res, next) {
   }
 });
 
-router.get('/deleteUser/:id', checkValidToken, function(req, res, next) {
+router.get('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
   console.log("DeleteUser by id") 
 
   User.lookup(req.params.id)
@@ -96,7 +98,7 @@ router.get('/deleteUser/:id', checkValidToken, function(req, res, next) {
   
 });
 
-router.post('/updateUser/:id', checkValidToken, function(req, res, next) {
+router.post('/updateUser/:id', checkValidTokenAdmin, function(req, res, next) {
   console.log("updateUser by id") 
 
   User.lookup(req.params.id)
@@ -120,28 +122,5 @@ router.post('/updateUser/:id', checkValidToken, function(req, res, next) {
     });
 
 });
-
-// Check if token is valid
-function checkValidToken(req, res, next) {
-
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if(authHeader){
-    jwt.verify(token, process.env.TOKEN_SECRET, function (e, payload) {
-      if (e) res.status(401).jsonp({error:'Erro na verificação do token: ' + e})
-      else {
-        if(payload.role != 'admin'){
-          res.status(401).jsonp({error:'Not authorized'})
-        }else{
-          req.payload=payload;
-          next();
-        }
-      }
-    })
-  }else{
-    res.status(401).jsonp({error:'No token provided'})
-  }
-}
 
 module.exports = router;

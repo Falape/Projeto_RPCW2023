@@ -4,9 +4,11 @@ var mongoose = require('mongoose'),
 // Os comentários ficam numa coleção à parte, mas identificados com o ID do recurso a que pertencem
 var commentSchema = new Schema({
     postedBy : { type: String, required: true },
+    postedByUsername : { type: String, required: true },
     content : { type: String, required: true },
     dateCreated : { type: String, required: true },
     resourceId: { type: Schema.Types.ObjectId, ref: 'resource', required: true }, // ID do recurso a que pertence o comentário
+    updateDate: String,
     //for soft delete
     deleted: Boolean,
     deleteDate : String,
