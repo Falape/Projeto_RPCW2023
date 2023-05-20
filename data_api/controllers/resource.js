@@ -3,9 +3,9 @@ var commentModel = require('../models/comment')
 var ratingModel = require('../models/rating')
 
 // List all resources
-module.exports.list = () => {
+module.exports.list = (fields) => {
     return Resource
-        .find()
+        .find(fields)  //filtra por parametros
         .then(resposta => {
             return resposta
         })
@@ -13,6 +13,7 @@ module.exports.list = () => {
             throw erro
         })
 }
+
 
 // Get resource by id
 module.exports.getResource = id => {
@@ -39,7 +40,11 @@ module.exports.addResource = resourceData => {
 
 // Generic update 
 module.exports.updateResource = (id, info) => {
-    return Resource.updateOne({_id:id}, info)
+    console.log("INFO IN CONTROLLER:",info)
+    return Resource.updateOne({_id:id}, {$set: info})
+        .then(() =>{
+            return Resource.findOne({_id:id})
+        })
         .then(resposta => {
             return resposta
         })
@@ -62,6 +67,9 @@ module.exports.deleteResourceHard = id => {
 // Soft delete
 module.exports.deleteResourceSoft = (id, info) => {
     return Resource.updateOne({_id:id}, info)
+        .then(() =>{
+            return Resource.findOne({_id:id})
+        })
         .then(resposta => {
             return resposta
         })

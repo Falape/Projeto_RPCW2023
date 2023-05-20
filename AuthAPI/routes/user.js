@@ -7,6 +7,8 @@ const passport = require("passport"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
 
+const { checkValidToken } = require('../javascript/validateToken');
+
 var router = express.Router();
 
 
@@ -49,25 +51,5 @@ router.get('/deleteUser', checkValidToken, function(req, res, next) {
       res.status(500).jsonp({ error: 'Erro getting user: ' + err })
     });
 });
-
-
-// Check if token is valid
-function checkValidToken(req, res, next) {
-
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if(authHeader){
-    jwt.verify(token, process.env.TOKEN_SECRET, function (e, payload) {
-      if (e) res.status(401).jsonp({error:'Erro na verificação do token: ' + e})
-      else {      
-        req.payload=payload;
-        next();
-      }
-    })
-  }else{
-    res.status(401).jsonp({error:'No token provided'})
-  }
-}
 
 module.exports = router;

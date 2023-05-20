@@ -1,9 +1,9 @@
 var Rating = require('../models/rating')
 
 // List all ratings
-module.exports.list = () => {
+module.exports.list = (fields) => {
     return Rating
-        .find()
+        .find(fields)  //filtra por parametros
         .then(resposta => {
             return resposta
         })
@@ -49,6 +49,9 @@ module.exports.addRating = ratingData => {
 // Generic update 
 module.exports.updateRating = (id, info) => {
     return Rating.updateOne({_id:id}, info)
+        .then(() =>{
+            return Rating.findOne({_id:id})
+        })
         .then(resposta => {
             return resposta
         })
@@ -71,6 +74,9 @@ module.exports.deleteRatingHard = id => {
 // Soft delete
 module.exports.deleteRatingSoft = (id, info) => {
     return Rating.updateOne({_id:id}, info)
+        .then(() =>{
+            return Rating.findOne({_id:id})
+        })
         .then(resposta => {
             return resposta
         })
