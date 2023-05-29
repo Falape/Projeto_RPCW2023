@@ -10,9 +10,10 @@ module.exports.insert = function(user) {
 }
 
 
-module.exports.updateUser = (id, date) => {
-    return userModel.updateOne({_id:id},{last_access:date})
+module.exports.updateLastAccess = (id, date) => {
+    return userModel.updateOne({userId:id},{last_access:date})
         .then(() =>{
+            console.log("inseriu o last access")
             return userModel.findOne({_id:id})
         })
         .catch(erro => {
@@ -21,7 +22,7 @@ module.exports.updateUser = (id, date) => {
 }
 
 
-module.exports.updateLastAccess = (id, info) => {
+module.exports.updateUser = (id, info) => {
     return userModel.updateOne({_id:id}, info)
         .then(() =>{
             return userModel.findOne({_id:id})

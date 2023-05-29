@@ -42,8 +42,11 @@ router.post('/delete/:id', function(req, res) {
 
 router.get('/updateLastAccess/:id', function(req, res) {
   console.log("updateLastAccess")
+  console.log(req.params.id)
+  console.log(Date.now())
   User.updateLastAccess(req.params.id, Date.now())
     .then(resp => {
+      console.log("fez update")
       res.status(200);
     })
     .catch(err => {

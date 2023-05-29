@@ -88,7 +88,12 @@ router.post("/login", function (req, res) {
                 function(e, token){
                   if(e) res.status(507).jsonp({error:"Error creating token"})
                   else{
-                    axios.get('http://'+ process.env.USER_SERVER_HOST +':'+ process.env.USER_SERVER_PORT + '/api/user/updateLastAccess')
+                    try{
+                      //axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
+                      axios.get(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST +':'+ process.env.USER_SERVER_PORT + '/api/updateLastAccess/'+ user._id)
+                    }catch(e){  
+                      console.log(e)
+                    }
                     res.status(201).jsonp({token:token})
                   } 
       });
