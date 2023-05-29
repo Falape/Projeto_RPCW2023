@@ -1,5 +1,6 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
+const axios = require('axios');
 const passport = require("passport"),
 
     User = require("../controllers/user"),
@@ -41,7 +42,22 @@ router.post("/signup", function (req, res) {
                 {expiresIn: process.env.TOKEN_EXPIRATION}, 
                 function(e, token){
                   if(e) res.status(507).jsonp({error:"Error creating token"})
-                  else res.status(201).jsonp({token:token})
+                  else{
+                    userInfo = {
+                      name: req.body.name,
+                      filiacao: req.body.filiacao,
+                      username: req.body.username,
+                      userId: user._id
+                    }
+                    try{
+                      axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
+                    }catch(e){  
+                      console.log(e)
+                    }
+                      
+                    res.status(201).jsonp({token:token})
+                  }
+                    
         });
       });
     })(req, res);
@@ -71,7 +87,10 @@ router.post("/login", function (req, res) {
                 {expiresIn: process.env.TOKEN_EXPIRATION}, 
                 function(e, token){
                   if(e) res.status(507).jsonp({error:"Error creating token"})
-                  else res.status(201).jsonp({token:token})
+                  else{
+                    axios.get('http://'+ process.env.USER_SERVER_HOST +':'+ process.env.USER_SERVER_PORT + '/api/user/updateLastAccess')
+                    res.status(201).jsonp({token:token})
+                  } 
       });
     });
   })(req, res);
