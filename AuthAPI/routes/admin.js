@@ -79,18 +79,15 @@ router.post('/listUsers', checkValidTokenAdmin,async function(req, res, next) {
   }
 });
 
-router.get('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
+router.delete('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
   console.log("DeleteUser by id") 
 
   User.lookup(req.params.id)
     .then(userr => {
-      userr.deleted = true;
-      userr.deleted_date = Date.now();
-
-      userr.save()
-       .then(savedUser => {
-         res.status(200).json(savedUser);
-       });
+      User.delete(req.params.id)
+        .then(resp => {        
+          res.status(200).json(resp);
+        })
     })
     .catch(err => {
       res.status(500).jsonp({ error: 'Erro getting user: ' + err })
@@ -98,7 +95,7 @@ router.get('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
   
 });
 
-router.post('/updateUser/:id', checkValidTokenAdmin, function(req, res, next) {
+router.put('/updateUser/:id', checkValidTokenAdmin, function(req, res, next) {
   console.log("updateUser by id") 
 
   User.lookup(req.params.id)

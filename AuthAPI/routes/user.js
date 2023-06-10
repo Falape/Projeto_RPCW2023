@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken');
 const passport = require("passport"),
 
     User = require("../controllers/user"),
-    user = require("../models/user"),
+    userModel = require("../models/user"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
 
@@ -34,18 +34,15 @@ router.get('/getUser', checkValidToken, async function(req, res, next) {
 });
 
 
-router.get('/deleteUser', checkValidToken, function(req, res, next) {
+router.delete('/deleteUser', checkValidToken, function(req, res, next) {
   console.log("get_updateRole_id")
     
   User.lookup(req.payload._id)
     .then(userr => {
-      userr.deleted = true;
-      userr.deleted_date = Date.now();
-      //var savedUser = 
-      userr.save()
-       .then(savedUser => {
-         res.status(200).json(savedUser);
-       });
+      User.delete(userr._id)
+        .then(resp => {        
+          res.status(200).json(resp);
+        })
     })
     .catch(err => {
       res.status(500).jsonp({ error: 'Erro getting user: ' + err })
