@@ -29,7 +29,7 @@ router.get('/user/:id', function(req, res) {
     });
 });
 
-router.post('/delete/:id', function(req, res) {
+router.delete('/delete/:id', function(req, res) {
   console.log("delete")
   User.hardDelete(req.params.id)
     .then(deletedUser => {

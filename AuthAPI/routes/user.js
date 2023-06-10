@@ -40,7 +40,14 @@ router.delete('/deleteUser', checkValidToken, function(req, res, next) {
   User.lookup(req.payload._id)
     .then(userr => {
       User.delete(userr._id)
-        .then(resp => {        
+        .then(resp => {    
+          
+          try{
+            axios.delete(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/delete/'+userr._id)  
+          }catch(e){  
+            console.log(e)
+          }
+          
           res.status(200).json(resp);
         })
     })
