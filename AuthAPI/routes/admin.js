@@ -1,4 +1,5 @@
 var express = require('express');
+const axios = require('axios');
 var jwt = require('jsonwebtoken');
 const passport = require("passport"),
 
@@ -65,7 +66,34 @@ router.post('/updateRole/:id', checkValidTokenAdmin, async function(req, res, ne
 router.get('/getUser/:id', checkValidTokenAdmin, async function(req, res, next) {
   console.log("get_user_id")
 
-  res.status(200).json(await User.lookup(req.params.id));
+  User.lookup(req.params.id)
+    .then(userr => {
+      userResp = {};
+      userResp._id = userr._id;
+      userResp.email = userr.email;
+      userResp.role = userr.role;
+      userResp.username = userr.username;
+     
+      const axiosPromise = axios.get(`${process.env.USER_SERVER_PROTOCOL}://${process.env.USER_SERVER_HOST}:${process.env.USER_SERVER_PORT}/api/user/${userr._id}`);
+
+      Promise.all([axiosPromise])
+        .then(([response]) => {
+          console.log(response.data);
+          userResp.name = response.data.name;
+          userResp.filiacao = response.data.filiacao;
+          userResp.created_date = response.data.created_date;
+          userResp.last_access = response.data.last_access;
+          console.log(userResp);
+  
+          res.status(200).json(userResp);
+        })
+        .catch(error => {
+          console.log(error);
+          // Handle the error, e.g., log the error or set default values for userResp properties
+  
+          res.status(200).json(userResp);
+        });
+    })
 });
 
 router.post('/listUsers', checkValidTokenAdmin,async function(req, res, next) {
@@ -79,18 +107,23 @@ router.post('/listUsers', checkValidTokenAdmin,async function(req, res, next) {
   }
 });
 
-router.get('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
+router.delete('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
   console.log("DeleteUser by id") 
 
   User.lookup(req.params.id)
     .then(userr => {
-      userr.deleted = true;
-      userr.deleted_date = Date.now();
-
-      userr.save()
-       .then(savedUser => {
-         res.status(200).json(savedUser);
-       });
+      User.delete(req.params.id)
+        .then(resp => {       
+          
+          try{
+            console.log("delete user from user server, id: "+userr._id)
+            axios.delete(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/delete/'+userr._id)  
+            console.log("fez delete")
+          }catch(e){  
+            console.log(e)
+          }
+          res.status(200).json(resp);
+        })
     })
     .catch(err => {
       res.status(500).jsonp({ error: 'Erro getting user: ' + err })
@@ -98,7 +131,7 @@ router.get('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
   
 });
 
-router.post('/updateUser/:id', checkValidTokenAdmin, function(req, res, next) {
+router.put('/updateUser/:id', checkValidTokenAdmin, function(req, res, next) {
   console.log("updateUser by id") 
 
   User.lookup(req.params.id)

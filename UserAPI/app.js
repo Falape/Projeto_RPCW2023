@@ -5,9 +5,9 @@ var express = require('express'),
     logger = require('morgan');
 require('dotenv').config({ path: '.env' })
 
-var userRouter = require('./routes/user/user');
-var adminRouter = require('./routes/admin/admin');
-var apiRouter = require('./routes/api/api');
+var userRouter = require('./routes/user');
+var adminRouter = require('./routes/admin');
+var apiRouter = require('./routes/api');
 
 var mongoBD = 'mongodb://' + process.env.MONGO_HOST + ':' + process.env.MONGO_PORT + '/' + process.env.MONGO_DB;
 mongoose.connect(mongoBD, {useNewUrlParser: true});

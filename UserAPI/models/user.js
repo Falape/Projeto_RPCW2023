@@ -8,8 +8,8 @@ var UserSchema = new mongoose.Schema({
     filiacao: String,
     created_date : { type: Date, required: true },
     last_access : Date,
-    deleted: { type: Boolean, default: false },
-    deleted_date : { type: Date, default: null },
+    // deleted: { type: Boolean, default: false },
+    // deleted_date : { type: Date, default: null },
 });
 
 
