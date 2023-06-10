@@ -1,4 +1,5 @@
 var express = require('express');
+const axios = require('axios');
 var jwt = require('jsonwebtoken');
 const passport = require("passport"),
 
@@ -27,10 +28,36 @@ router.post("/requestUpdateRole", checkValidToken, async function (req, res){
 
 })
 
-router.get('/getUser', checkValidToken, async function(req, res, next) {
+router.get('/getUser', checkValidToken, function(req, res, next) {
   console.log("get_updateRole_id")
-    
-  res.status(200).json(await User.lookup(req.payload._id));
+  User.lookup(req.payload._id)
+    .then(userr => {
+      userResp = {};
+      userResp._id = userr._id;
+      userResp.email = userr.email;
+      userResp.role = userr.role;
+      userResp.username = userr.username;
+           
+      const axiosPromise = axios.get(`${process.env.USER_SERVER_PROTOCOL}://${process.env.USER_SERVER_HOST}:${process.env.USER_SERVER_PORT}/api/user/${userr._id}`);
+
+      Promise.all([axiosPromise])
+        .then(([response]) => {
+          console.log(response.data);
+          userResp.name = response.data.name;
+          userResp.filiacao = response.data.filiacao;
+          userResp.created_date = response.data.created_date;
+          userResp.last_access = response.data.last_access;
+          console.log(userResp);
+  
+          res.status(200).json(userResp);
+        })
+        .catch(error => {
+          console.log(error);
+          // Handle the error, e.g., log the error or set default values for userResp properties
+  
+          res.status(200).json(userResp);
+        });
+    })
 });
 
 
