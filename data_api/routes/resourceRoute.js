@@ -55,7 +55,7 @@ router.get('/:id', function (req, res) {
 /* Add new resource */
 router.post('/add', checkValidTokenProducer, function (req, res) {
     //check for required fields
-    const requiredFields = ['title', 'type', 'path', 'browserSupported', 'uploadedBy', 'uploadedByUsername'];
+    const requiredFields = ['title', 'type', 'uploadedBy', 'uploadedByUsername'];
     const missingFields = [];
     for (let field of requiredFields) {
         if (!req.body[field]) 

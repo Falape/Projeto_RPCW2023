@@ -21,6 +21,7 @@ db.on('open', () => {
 var resourceRouter = require('./routes/resourceRoute');
 var commentRouter = require('./routes/commentRoute');
 var ratingRouter = require('./routes/ratingRoute');
+var fileRouter = require('./routes/fileRoute');
 
 var app = express();
 
@@ -33,5 +34,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/resource', resourceRouter);
 app.use('/comment', commentRouter);
 app.use('/rating', ratingRouter);
+app.use('/file', fileRouter);
 
 module.exports = app;

@@ -58,16 +58,16 @@ function StoreSIP(zip_name){
                         console.log("Extensão: ", '['+extension+']')
                         if(filename != 'manifest.json'){
                             var file_info = {
-                                "title" : filename,
+                                "fileName" : filename,
                                 "type" : extension,
                             }
                             if(approvedExtensions.includes(extension)){
                                 unzipedFiles.push(entry.name)
-                                file_info["broserSupported"] = true
+                                file_info["browserSupported"] = true
                                 file_info["path"] = final_dir + '/' + 'unziped' + '/' + filename
                             }
                             else{
-                                file_info["broserSupported"] = false
+                                file_info["browserSupported"] = false
                                 file_info["path"] = final_dir + '/' + filename
                             }
                             final_info.push(file_info)

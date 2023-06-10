@@ -1,6 +1,7 @@
 var Resource = require('../models/resource')
 var commentModel = require('../models/comment')
 var ratingModel = require('../models/rating')
+var fileModel = require('../models/file')
 
 // List all resources
 module.exports.list = (fields) => {
@@ -85,6 +86,7 @@ module.exports.deleteResourceMEGA = async (id) => {
       // Remove associated comments and ratings
       await commentModel.deleteMany({ resourceId: id });
       await ratingModel.deleteMany({ resourceId: id });
+      await fileModel.deleteMany({ resourceId: id });
   
       // Remove the resource
       const result = await Resource.deleteOne({ _id: id });
@@ -94,4 +96,4 @@ module.exports.deleteResourceMEGA = async (id) => {
     } catch (error) {
       throw error;
     }
-  };
+};
