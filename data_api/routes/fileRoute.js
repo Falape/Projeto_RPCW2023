@@ -42,6 +42,7 @@ router.post('/add/:id', checkValidToken, function (req, res) {
     }
     if (missingFields.length > 0) {
         res.status(400).jsonp({ error: `Missing required fields: ${missingFields.join(', ')}` });
+        return;
     }
 
     // get fields from body

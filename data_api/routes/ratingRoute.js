@@ -112,10 +112,15 @@ router.put('/edit/:id', checkValidToken, function (req, res) {
     ra_id = req.params.id
     // Se não for admin, tenho que verificar se quem quer editar é o dono do recurso
     if(req.payload.role != "admin"){
-        rec = ratingController.getRating(ra_id)
-        if(rec.postedBy != req.payload._id && rec.postedByUsername != req.payload.username){
-            return res.status(401).jsonp({ error: `Unauthorized to edit this rating...` });
-        }
+        ratingController.getRating(ra_id)
+        .then(rec => {
+            // console.log("rec = ", rec)
+            // console.log("red.postedby = ", rec.postedBy)
+            // console.log("req.payload = ", req.payload._id)
+            if(rec.postedBy != req.payload._id){
+                return res.status(401).jsonp({ error: `Unauthorized to edit this rating...` });
+            }
+        })
     }
 
     if(req.body.value){
@@ -160,10 +165,12 @@ router.delete('/delete/soft/:id', checkValidToken, function (req, res) {
 
     // Se não for admin, tenho que verificar se quem quer editar é o dono do recurso
     if(req.payload.role != "admin"){
-        rec = ratingController.getRating(ra_id)
-        if(rec.postedBy != req.payload._id && rec.postedByUsername != req.payload.username){
-            return res.status(401).jsonp({ error: `Unauthorized to delete this rating...` });
-        }
+        ratingController.getRating(ra_id)
+        .then(rec => {
+            if(rec.postedBy != req.payload._id && rec.postedByUsername != req.payload.username){
+                return res.status(401).jsonp({ error: `Unauthorized to delete this rating...` });
+            }
+        })
     }
 
     info = {
