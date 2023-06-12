@@ -22,6 +22,7 @@ var resourceRouter = require('./routes/resourceRoute');
 var commentRouter = require('./routes/commentRoute');
 var ratingRouter = require('./routes/ratingRoute');
 var fileRouter = require('./routes/fileRoute');
+var apiRouter = require('./routes/apiRoute');
 
 var app = express();
 
@@ -35,5 +36,6 @@ app.use('/resource', resourceRouter);
 app.use('/comment', commentRouter);
 app.use('/rating', ratingRouter);
 app.use('/file', fileRouter);
+app.use('/api', apiRouter);
 
 module.exports = app;

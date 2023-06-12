@@ -26,8 +26,13 @@ router.post('/', function (req, res) {
 
     //console.log("RE_DATA:", re_data)
 
-    // if field is undefined, delete it from object
-    Object.keys(re_data).forEach(key => re_data[key] === undefined ? delete re_data[key] : '');
+    // if field is undefined or null, delete it from object
+    //Object.keys(re_data).forEach(key => re_data[key] === undefined ? delete re_data[key] : '');
+    Object.keys(re_data).forEach(key => {
+        if(re_data[key] === undefined || re_data[key] === null) {
+            delete re_data[key];
+        }
+    });
 
     //console.log("RE_DATA FILTRADA:", re_data)
 

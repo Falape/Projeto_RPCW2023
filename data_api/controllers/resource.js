@@ -97,3 +97,22 @@ module.exports.deleteResourceMEGA = async (id) => {
       throw error;
     }
 };
+
+/*This controller deletes every document related to the resource on ther other collections*/
+// ESTA VERSÃO NÃO APGAR OS RATINGS
+module.exports.deleteResourceMEGA2 = async (id) => {
+    try {
+      // Remove associated comments and ratings
+      await commentModel.deleteMany({ resourceId: id });
+      //await ratingModel.deleteMany({ resourceId: id });
+      await fileModel.deleteMany({ resourceId: id });
+  
+      // Remove the resource
+      const result = await Resource.deleteOne({ _id: id });
+  
+      // Return the result of the resource deletion
+      return result;
+    } catch (error) {
+      throw error;
+    }
+};
