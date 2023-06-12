@@ -22,7 +22,13 @@ router.post('/', function (req, res) {
     }
 
     // if field is undefined, delete it from object
-    Object.keys(ra_data).forEach(key => ra_data[key] === undefined ? delete ra_data[key] : '');
+    //Object.keys(ra_data).forEach(key => ra_data[key] === undefined ? delete ra_data[key] : '');
+
+    Object.keys(ra_data).forEach(key => {
+        if(ra_data[key] === undefined || ra_data[key] === null) {
+            delete ra_data[key];
+        }
+    });
 
     ratingController.list(ra_data)
         .then(ratings => {
