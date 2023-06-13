@@ -28,7 +28,7 @@ router.delete('/delete/hard/user/:id', function (req, res) {
         console.log(resources)
         // while resource_list is not empty then delete one by one
         for(let resource of resources){
-            resourceController.deleteResourceMEGA2(resource._id)
+            resourceController.deleteResourceMEGA(resource._id)
             .then(res => {
                 console.log("deleted resource: " + resource._id)
                 //res.status(205).jsonp(resources)
