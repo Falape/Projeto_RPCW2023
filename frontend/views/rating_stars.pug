@@ -1,0 +1,23 @@
+extends layout 
+
+mixin rating(rating)
+  - var fullStars = Math.floor(rating);
+  - var halfStar = (rating % 1) >= 0.5;
+  - var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+  
+  each val in Array(fullStars).fill(0)
+    i.fas.fa-star
+  if halfStar
+    i.fas.fa-star-half-alt
+  each val in Array(emptyStars).fill(0)
+    i.far.fa-star
+
+//- Usage:
+
+//- SEM ARGUMENTO
+//- +rating(3.576345) 
+//- | (3.576345)
+
+//- COM ARGUMENTO
+//- +rating(ratingValue)
+//- |  (#{ratingValue})
