@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  h1 Recursos disponíveis:
+  table.w3-table.w3-bordered.w3-striped.w3-centered
+    thead
+      tr
+        th Titulo 
+        th Autor
+        th Data de submissão
+        th Tipo de Recurso
+        th 
+    tbody
+      each resource in resources
+        tr
+          td= resource.title
+          td= resource.uploadedByUsername
+          td= resource.creationDate
+          td= resource.type
+          td
+            a.w3-button.w3-green(href=`/resource/${resource.id}`) View Details
