@@ -34,4 +34,23 @@ router.get('/files', function(req, res, next) {
   res.render('tabelaFiles', { files: fls });
 });
 
+
+router.get('/recursos', function(req, res, next) {
+
+  rcs = [
+    {title: "rec1", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec2", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec3", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec4", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec5", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec6", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec7", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec8", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec9", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+    {title: "rec10", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
+  ]
+
+  res.render('list_resources2', { resources: rcs});
+});
+
 module.exports = router;

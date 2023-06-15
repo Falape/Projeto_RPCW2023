@@ -1,0 +1,19 @@
+extends layout 
+
+block content
+  //- NAVBAR
+  h1 Recursos disponíveis:
+  each resource in resources
+    div.w3-container.w3-card-4.w3-margin
+      h2= resource.title
+      p
+        strong Autor: 
+        | #{resource.uploadedByUsername}
+      p
+        strong Data de submissão: 
+        | #{resource.creationDate}
+      p
+        strong Tipo de Recurso: 
+        | #{resource.type}
+      a.w3-button.w3-green(href=`/resource/${resource.id}`) View Details
+
