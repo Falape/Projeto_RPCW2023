@@ -1,0 +1,21 @@
+extends layout 
+
+block content
+  //- h1 File List
+  table.w3-table.w3-striped.w3-bordered
+    thead
+      tr
+        th Name
+        th Type
+        th Actions
+    tbody
+      each file in files
+        tr
+          td= file.name
+          td= file.type
+          td
+            if file.browserSupported
+              a(href=`/download/${file._id}`, class='w3-btn w3-blue') Download
+              a(href=`/view/${file._id}`, class='w3-btn w3-green') View
+            else
+              a(href=`/download/${file.name}`, class='w3-btn w3-blue') Download
