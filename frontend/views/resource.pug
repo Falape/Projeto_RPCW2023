@@ -1,0 +1,29 @@
+extends layout 
+
+block content
+  h1
+    | #{resource.title}
+    span(style="margin-left: 10px;")
+      include rating_stars
+      +rating(resource.rating)
+      |  (#{resource.rating})
+  p
+    strong Submetido por: 
+    | #{resource.uploadedByUsername}
+  p
+    strong Tipo de Recurso: 
+    | #{resource.type}
+  p
+    strong Público: 
+    | #{resource.public ? 'Sim' : 'Não'}
+  p
+    strong Data de submissão: 
+    | #{resource.creationDate}
+  p
+    strong Data da última atualização: 
+    | #{resource.updateDate}
+
+  h2 Ficheiros do Recurso:
+  include tabelaFiles
+  p
+    button.w3-button.w3-green(onclick=`window.location.href='${resource.downloadUrl}'`) Download do Recurso
