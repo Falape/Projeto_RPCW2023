@@ -4,7 +4,7 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('header', { title: 'Express' });
 });
 
 router.get('/recurso', function(req, res, next) {
@@ -51,6 +51,10 @@ router.get('/recursos', function(req, res, next) {
   ]
 
   res.render('list_resources2', { resources: rcs});
+});
+
+router.get('/navbar', function(req, res, next) {
+  res.render('navbar', { title: 'Express' });
 });
 
 module.exports = router;
