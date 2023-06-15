@@ -7,6 +7,10 @@ router.get('/', function(req, res, next) {
   res.render('header', { title: 'Express' });
 });
 
+router.get('/login', function(req, res, next) {
+  res.render('login', { title: 'Express' });
+});
+
 router.get('/recurso', function(req, res, next) {
   resourcee = {
     title: "Recurso 1",
