@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  include header
+  div.page-container
+    h1.page-heading Welcome, #{user.username}!
+    div.user-info
+      p Role: #{user.role}
+      p Token: #{user.token}
