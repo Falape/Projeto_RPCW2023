@@ -12,6 +12,18 @@ services:
     # volumes:
     #   - /tmp/mongo-data:/data/db mongo:6-jammy
     restart: unless-stopped
+  
+  mongodb_user:
+    image: mongo:5.0.16-focal
+    container_name: mongodb-user
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=admin
+    #   - MONGO_INITDB_ROOT_PASSWORD=12345
+    ports:
+      - 4002:27017
+    # volumes:
+    #   - /tmp/mongo-data:/data/db mongo:6-jammy
+    restart: unless-stopped
 
   mongodb_data:
     image: mongo:5.0.16-focal
