@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  include header
+  header.w3-container.w3-black
+    h2.w3-center Sign Up
+  div.w3-container(style="display: flex; justify-content: center;")
+    form.w3-container.w3-card-4.w3-light-grey.w3-text-black.w3-margin(style='min-width: 500px;')
+      h3.w3-center Create an account
+
+      label Username
+      input.w3-input.w3-border.w3-margin-bottom(type='text', name='username', required)
+
+      label Name
+      input.w3-input.w3-border.w3-margin-bottom(type='text', name='name', required)
+
+      label Email
+      input.w3-input.w3-border.w3-margin-bottom(type='email', name='email', required)
+
+      label Filiation
+      input.w3-input.w3-border.w3-margin-bottom(type='text', name='filiation', required)
+
+      label Password
+      input.w3-input.w3-border.w3-margin-bottom(type='password', name='password', pattern='.{8,}', title='Password must have at least 8 characters', required)
+
+      button.w3-button.w3-block.w3-black.w3-margin-bottom(type='submit') Sign Up
