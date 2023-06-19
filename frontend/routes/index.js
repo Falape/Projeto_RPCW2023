@@ -112,21 +112,53 @@ router.get('/files', function(req, res, next) {
 
 
 router.get('/recursos', function(req, res, next) {
+  // make request to daa api to get all resources
+  axios.post(process.env.API_DATA_URL + '/resource')
+  .then((response) => {
+    console.log(response.data);
+    res.render('list_resources2', { resources: response.data});
+  })
+  .catch((error) => {
+    console.log(error.response.data);
+    res.render('error_page', { message: error.response.data.error });
+  });
+});
 
-  rcs = [
-    {title: "rec1", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec2", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec3", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec4", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec5", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec6", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec7", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec8", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec9", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-    {title: "rec10", uploadedByUsername: "admin", type: "video", creationDate: "2021-05-01"},
-  ]
+router.get('/recurso/:id', function(req, res, next) {
+  // make request to daa api to get all resources
+  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id)
+  .then((response) => {
+    console.log(response.data);
+    // need to get resource rating
+    axios.get(process.env.API_DATA_URL + '/rating/resource/' + req.params.id, 
+    {
+      headers: { 
+        Authorization: `Bearer ${req.session.user.token}`
+      }
+    })
+    .then((response2) => {
+      console.log(response2.data);
 
-  res.render('list_resources2', { resources: rcs});
+      // need to get resource files
+      axios.get(process.env.API_DATA_URL + '/file/resource/' + req.params.id)
+      .then((response3) => {
+        console.log(response3.data);
+        res.render('resource', { resource: response.data, rating: response2.data, files: response3.data});
+      })
+      .catch((error) => {
+        console.log(error);
+        res.render('error_page', { message: error });
+      })
+    })
+    .catch((error) => {
+      console.log(error);
+      res.render('error_page', { message: error });
+    })
+  })
+  .catch((error) => {
+    console.log(error);
+    res.render('error_page', { message: error });
+  });
 });
 
 router.get('/navbar', function(req, res, next) {

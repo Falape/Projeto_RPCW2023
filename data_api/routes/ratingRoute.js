@@ -51,8 +51,9 @@ router.get('/:id', function (req, res) {
         })
 });
 
-/* Get ratings resource*/
-router.get('/resource/:id', checkValidToken,function (req, res) {
+
+/* Get ratings list resource*/
+router.get('/resource/list/:id', checkValidToken, function (req, res) {
     ra_id = req.params.id
     ratingController.getRatingOfResource(ra_id)
         .then(ratings => {
@@ -62,6 +63,25 @@ router.get('/resource/:id', checkValidToken,function (req, res) {
             res.status(503).jsonp({ error: error, message: "Error getting ratings of resource..." })
         })
 });
+
+/* Get TOTAL rating of a resource*/
+router.get('/resource/:id', checkValidToken, function (req, res) {
+    ra_id = req.params.id
+    ratingController.getRatingOfResource(ra_id)
+        .then(ratings => {
+            rating_value = 0
+            for (let i = 0; i < ratings.length; i++) {
+                rating_value += ratings[i].value
+            }
+            res.status(203).jsonp(rating_value)
+        })
+        .catch(error => {
+            res.status(503).jsonp({ error: error, message: "Error getting ratings of resource..." })
+        })
+});
+
+
+
 
 /* Add new rating */
 router.post('/add/:id', checkValidToken, function (req, res) {
