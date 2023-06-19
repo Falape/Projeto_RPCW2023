@@ -53,11 +53,15 @@ router.post("/signup", function (req, res) {
                       axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
                     }catch(e){  
                       console.log(e)
-                    }
-                      
-                    res.status(201).jsonp({token:token})
-                  }
-                    
+                    }    
+                    res.status(201).jsonp(
+                      {
+                        token:token,
+                        username: user.username,
+                        role: user.role
+                      }
+                    )
+                  }    
         });
       });
     })(req, res);
@@ -72,12 +76,13 @@ router.post("/login", function (req, res) {
       res.status(400).json({
         error: 'Username or password are wrong'
       });
-    }
+    }else{
     req.login(user, { session: false }, (err) => {
       if (err) {
         res.status(500).jsonp({error:"Erro no login"});
       }
 
+      console.log("passa aqui")
       var userTosend = {}
       userTosend.id = user._id
       userTosend.role = user.role
@@ -89,15 +94,21 @@ router.post("/login", function (req, res) {
                   if(e) res.status(507).jsonp({error:"Error creating token"})
                   else{
                     try{
-                      //axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
                       axios.get(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST +':'+ process.env.USER_SERVER_PORT + '/api/updateLastAccess/'+ user._id)
                     }catch(e){  
                       console.log(e)
                     }
-                    res.status(201).jsonp({token:token})
+                    res.status(201).jsonp(
+                      {
+                        token:token,
+                        username: user.username,
+                        role: user.role
+                      }
+                    )
                   } 
       });
     });
+  }
   })(req, res);
 });
 

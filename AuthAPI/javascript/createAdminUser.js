@@ -5,7 +5,6 @@ var User = require("../controllers/user");
 async function createAdminUser() {
     try {
       const adminUser = await User.findByFilter({username: 'admin'});
-      console.log(adminUser);
       if (adminUser == null || !adminUser) {
         console.log('Creating admin user');
         const newUser = new userModel({
