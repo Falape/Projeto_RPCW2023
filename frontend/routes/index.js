@@ -5,7 +5,11 @@ const axios = require('axios');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.redirect('/login');
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  //render home
+  //res.redirect('/header');
 });
 
 router.get('/login', function(req, res, next) {

@@ -13,15 +13,49 @@ router.get('/getUser', function(req, res, next) {
               }
             })
       .then((response) => {
-        console.log(response);
-  
-      // TODO: Render the home page or redirect to a different route
-      res.render('user_page', { user: response.data, owner:true });
+        
+        // TODO: Render the home page or redirect to a different route
+        res.render('user_page', { user: response.data, owner:true });
       })
       .catch((error) => {
         console.log(error);
         res.render('error_page', { message: error.response.data.error });
   });
+});
+
+router.post('/updatePassword', function(req, res, next) {
+  console.log("updatePassword")
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  console.log(req.body);
+
+   if(req.body.oldPassword == undefined){
+    res.render('error_page', { message: "Old password missing!" });
+   }else 
+      if(req.body.newPassword != req.body.newPasswordConfirm){
+        res.render('error_page', { message: "New password and confimation doesn't match!" });
+      } else{
+
+          axios.post(process.env.API_AUTH_URL + '/updatePassword', {
+              oldPassword: req.body.oldPassword,
+              newPassword: req.body.newPassword
+            }, {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((response) => {
+              //console.log(response);
+            
+            res.render('user_page', { user: response.data, owner:true, admin:false });
+            })
+            .catch((error) => {
+              //console.log(error);
+              res.render('error_page', { message: error.response.data.error });
+          });
+      }
 });
 
 module.exports = router;
