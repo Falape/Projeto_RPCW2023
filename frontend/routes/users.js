@@ -24,4 +24,19 @@ router.get('/getUser', function(req, res, next) {
   });
 });
 
+router.get('/recursos/:id', function(req, res, next) {
+  
+  // make request to daa api to get all resources
+  axios.post(process.env.API_DATA_URL + '/resource', {uploadedBy: req.params.id})
+  .then((response) => {
+    console.log(response.data);
+    res.render('list_resources3', { resources: response.data, user : req.session.user.username});
+  })
+  .catch((error) => {
+    console.log(error);
+    res.render('error_page', { message: error });
+  });
+});
+
+
 module.exports = router;

@@ -7,8 +7,8 @@ block content
     | #{resource.title}
     span(style="margin-left: 10px;")
       include rating_stars
-      +rating(resource.rating)
-      |  (#{resource.rating})
+      +rating(rating)
+      |  (#{rating})
   p
     strong Submetido por: 
     | #{resource.uploadedByUsername}
@@ -20,7 +20,7 @@ block content
     | #{resource.public ? 'Sim' : 'Não'}
   p
     strong Data de submissão: 
-    | #{resource.creationDate}
+    | #{resource.dateCreated}
   p
     strong Data da última atualização: 
     | #{resource.updateDate}
