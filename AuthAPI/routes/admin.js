@@ -118,7 +118,13 @@ router.delete('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) 
           try{
             console.log("delete user from user server, id: "+userr._id)
             axios.delete(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/delete/'+userr._id)  
-            console.log("fez delete")
+              .then((response) => {
+                console.log("Axios request success");
+              })
+              .catch((error) => {
+                console.log("Axios request error:", error.message);
+                // Handle the error without crashing the server
+              });
           }catch(e){  
             console.log(e)
           }

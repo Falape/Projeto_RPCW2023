@@ -3,6 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cookieSession = require('cookie-session');
+
+const crypto = require('crypto');
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,6 +22,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Configure session middleware
+app.use(cookieSession({
+  name: 'session',
+  keys: [ crypto.randomBytes(32).toString('hex'),  crypto.randomBytes(32).toString('hex')],
+  maxAge: process.env.COOKIE_SESSION_EXPIRATION * 60 * 1000, // 24 hours
+}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

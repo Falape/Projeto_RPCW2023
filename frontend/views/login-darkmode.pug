@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  div.page-container.w3-dark
+    include header
+    header.w3-container.dark-mode-bg
+      h2.w3-center.dark-mode-text Login
+    div.w3-container(style="display: flex; justify-content: center;")
+      form.w3-container.w3-card-4.dark-mode-bg.w3-text-white.w3-margin(style='min-width: 500px;', method='post', action='/login')
+        h3.w3-center.dark-mode-text Enter your details
+
+        label.dark-mode-text Username
+        input.w3-input.w3-border.dark-mode-input.w3-margin-bottom(type='text', name='username', required)
+
+        label.dark-mode-text Password
+        input.w3-input.w3-border.dark-mode-input.w3-margin-bottom(type='password', name='password', required)
+
+        button.w3-button.w3-block.dark-mode-btn.w3-margin-bottom(type='submit') Login
+
+        a.w3-button.w3-block.w3-blue.dark-mode-text.w3-margin-bottom(href='/signup') Sign Up
