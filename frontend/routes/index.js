@@ -12,6 +12,11 @@ router.get('/login', function(req, res, next) {
   res.render('login', { title: 'Express' });
 });
 
+
+router.get('/signup', function(req, res, next) {
+  res.render('signup', { title: 'Express' });
+});
+
 router.post('/login', function(req, res, next) {
   //console.log(req.body.password)
   body ={
@@ -37,6 +42,7 @@ router.post('/login', function(req, res, next) {
     res.render('error_page', { message: err.response.data.error })
   });
 });
+
 router.get('/recurso', function(req, res, next) {
   resourcee = {
     title: "Recurso 1",
