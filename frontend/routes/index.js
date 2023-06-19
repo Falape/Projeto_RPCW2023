@@ -1,16 +1,42 @@
 var express = require('express');
 const resource = require('../../data_api/models/resource');
 var router = express.Router();
+const axios = require('axios');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('header', { title: 'Express' });
+  res.redirect('/login');
 });
 
 router.get('/login', function(req, res, next) {
   res.render('login', { title: 'Express' });
 });
 
+router.post('/login', function(req, res, next) {
+  //console.log(req.body.password)
+  body ={
+    username: req.body.username,
+    password: req.body.password
+  }
+  axios.post(process.env.API_AUTH_URL + '/login',body)
+  .then((rep) => {
+    console.log(rep.data.token)
+    if (!req.session) {
+      return res.status(500).send('Session object is undefined');
+    }
+    req.session.user = {
+      username: rep.data.username, 
+      role: rep.data.role,
+      token: rep.data.token,
+      userId: rep.data.userId
+    };
+    //TODO: render home page
+    res.render('test', {user:req.session.user});
+  }).catch((err) => {
+    console.log(err)
+    res.render('error_page', { message: err.response.data.error })
+  });
+});
 router.get('/recurso', function(req, res, next) {
   resourcee = {
     title: "Recurso 1",
