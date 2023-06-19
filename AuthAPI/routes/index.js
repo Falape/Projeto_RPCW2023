@@ -51,6 +51,13 @@ router.post("/signup", function (req, res) {
                     }
                     try{
                       axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
+                      .then((response) => {
+                        console.log("Axios request success");
+                      })
+                      .catch((error) => {
+                        console.log("Axios request error:", error.message);
+                        // Handle the error without crashing the server
+                      });
                     }catch(e){  
                       console.log(e)
                     }    
@@ -95,7 +102,6 @@ router.post("/login", function (req, res) {
                   if(e) res.status(507).jsonp({error:"Error creating token"})
                   else{
                     try{
-                      console.log("ERROR")
                       axios.get(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST +':'+ process.env.USER_SERVER_PORT + '/api/updateLastAccess/'+ user._id)
                       .then((response) => {
                         console.log("Axios request success");
