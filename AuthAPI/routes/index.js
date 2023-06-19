@@ -9,6 +9,7 @@ const passport = require("passport"),
     requestUpdateRole = require("../models/requestUpdateRole");
 
 const { checkValidToken } = require('../javascript/validateToken');
+const e = require('express');
 
 var router = express.Router();
 
@@ -22,18 +23,19 @@ router.post("/signup", function (req, res) {
   var newUser = new userModel({email: req.body.email, role : 'consumer', username : req.body.username})
   userModel.register(newUser, req.body.password, function (err, nUser) {
     if (err) {
+      console.log(err)
       res.status(500).jsonp({
-        message: 'Error signing up', user: nUser
+        error: 'Error signing up, \n' + err
       });
     }
     passport.authenticate('local', { session: false }, (err, user, info) => {
       if (err || !user) {
         res.status(500).jsonp({error:"Erro na Autentificação", err:err})
-      }
+      }else{
       req.login(user, { session: false }, (err) => {
         if (err) {
           res.status(500).jsonp({error:"Erro no login"})
-        }
+        }else{
         // generate a signed son web token with the contents of user object and return it in the response
         var userTosend = {}
         userTosend.id = user._id
@@ -60,18 +62,20 @@ router.post("/signup", function (req, res) {
                       });
                     }catch(e){  
                       console.log(e)
-                    }    
+                    }                    
                     res.status(201).jsonp(
                       {
                         token:token,
-                        username: user.username,
-                        role: user.role,
-                        userId: user._id
+                          username: user.username,
+                          role: user.role,
+                          userId: user._id
                       }
                     )
                   }    
         });
-      });
+      }
+      })
+    };
     })(req, res);
   });
 });
