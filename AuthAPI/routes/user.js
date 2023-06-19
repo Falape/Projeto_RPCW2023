@@ -9,6 +9,7 @@ const passport = require("passport"),
     requestUpdateRole = require("../models/requestUpdateRole");
 
 const { checkValidToken } = require('../javascript/validateToken');
+const user = require('../models/user');
 
 var router = express.Router();
 
@@ -23,13 +24,13 @@ router.post("/requestUpdateRole", checkValidToken, async function (req, res){
 
     await RequestUpdateRole.insert(reqUp)
     //await reqUp.save();
-    res.status(200).json(reqUp);
+    res.status(200).jsonp(reqUp);
   }
 
 })
 
 router.get('/getUser', checkValidToken, function(req, res, next) {
-  console.log("get_updateRole_id")
+  console.log("get_user")
   User.lookup(req.payload._id)
     .then(userr => {
       userResp = {};
@@ -49,15 +50,18 @@ router.get('/getUser', checkValidToken, function(req, res, next) {
           userResp.last_access = response.data.last_access;
           console.log(userResp);
   
-          res.status(200).json(userResp);
+          res.status(200).jsonp(userResp);
         })
         .catch(error => {
           console.log(error);
           // Handle the error, e.g., log the error or set default values for userResp properties
-  
-          res.status(200).json(userResp);
+          //console.log(userResp);
+          res.status(200).jsonp(userResp);
         });
     })
+    .catch(err => {
+      res.status(500).jsonp({error: "Error getting user", err:err});
+    });
 });
 
 
@@ -82,7 +86,7 @@ router.delete('/deleteUser', checkValidToken, function(req, res, next) {
             console.log(e)
           }
           
-          res.status(200).json(resp);
+          res.status(200).jsonp(resp);
         })
     })
     .catch(err => {

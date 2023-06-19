@@ -1,0 +1,26 @@
+extends layout
+
+block content
+    include header
+    include navbar
+
+    div.page-container
+        div.page-header(style="display: flex; align-items: center;")
+            h1(style="margin-right: 30px;").page-heading Welcome, #{user.username}!
+            if owner
+                div
+                    a.w3-button.w3-red.delete-button(href='/user/delete') Delete
+                    a.w3-button.w3-blue(href='/user/updatePassword') Update Password
+                    a.w3-button.w3-green(href='/user/update') Update User
+        div.user-info
+            p Email: #{user.email}
+            if user.name
+                p Name: #{user.name}
+            if user.filiation
+                p Filiation: #{user.filiation}
+            div(style="display: flex; align-items: center;")
+                p(style="margin-right: 10px;") Role: #{user.role}
+                if owner
+                    a.w3-button.w3-orange(href='/user/requestUpdate') Request Update
+
+    a.w3-button.w3-yellow(href='/resources') Show Resources
