@@ -27,7 +27,8 @@ router.post('/login', function(req, res, next) {
     req.session.user = {
       username: rep.data.username, 
       role: rep.data.role,
-      token: rep.data.token 
+      token: rep.data.token,
+      userId: rep.data.userId
     };
     //TODO: render home page
     res.render('test', {user:req.session.user});
