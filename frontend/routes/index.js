@@ -8,8 +8,7 @@ router.get('/', function(req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
-  //render home
-  //res.redirect('/header');
+  res.redirect('/recursos')
 });
 
 router.get('/login', function(req, res, next) {
