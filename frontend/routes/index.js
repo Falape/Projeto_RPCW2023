@@ -12,11 +12,6 @@ router.get('/login', function(req, res, next) {
   res.render('login', { title: 'Express' });
 });
 
-
-router.get('/signup', function(req, res, next) {
-  res.render('signup', { title: 'Express' });
-});
-
 router.post('/login', function(req, res, next) {
   //console.log(req.body.password)
   body ={
@@ -42,6 +37,47 @@ router.post('/login', function(req, res, next) {
     res.render('error_page', { message: err.response.data.error })
   });
 });
+
+
+router.get('/signup', function(req, res, next) {
+  res.render('signup', { title: 'Express' });
+});
+
+router.post('/signup', function(req, res, next) {
+  const { username, name, email, filiation, password } = req.body;
+
+  // Perform validation on the input fields as needed
+
+  // Make an axios request to the authentication API's signup endpoint
+  axios.post(process.env.API_AUTH_URL + '/signup', {
+    username: username,
+    name: name,
+    email: email,
+    filiacao: filiation,
+    password: password
+  })
+  .then((response) => {
+    console.log(response.data);
+    if (!req.session) {
+      return res.status(500).send('Session object is undefined');
+    }
+    req.session.user = {
+      username: response.data.username,
+      role: response.data.role,
+      token: response.data.token,
+      userId: response.data.userId
+    };
+
+    // TODO: Render the home page or redirect to a different route
+    res.render('test', { user: req.session.user });
+  })
+  .catch((error) => {
+    console.log(error.response.data);
+    res.render('error_page', { message: error.response.data.error });
+  });
+});
+
+
 
 router.get('/recurso', function(req, res, next) {
   resourcee = {

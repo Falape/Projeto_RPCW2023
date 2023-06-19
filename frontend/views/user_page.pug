@@ -1,0 +1,80 @@
+extends layout
+
+block content
+    include header
+    include navbar
+
+    style.
+        .modal-dialog {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal {
+            margin: 0 auto;
+        }
+    script.
+        function validatePasswordForm(form) {
+            var newPassword = form.newPassword.value;
+            var newPasswordConfirm = form.newPasswordConfirm.value;
+            var passwordWarning = document.getElementById('passwordWarning');
+
+            if (newPassword !== newPasswordConfirm) {
+                passwordWarning.style.display = 'block';
+                return false;
+            } else {
+                passwordWarning.style.display = 'none';
+                return true;
+            }
+        }
+
+
+    div.page-container
+        div.page-header(style="display: flex; align-items: center;")
+            h1(style="margin-right: 30px;").page-heading Welcome, #{user.username}!
+            if owner
+                div
+                    a.w3-button.w3-red.delete-button(href='/user/delete') Delete
+                    button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordModal") Update Password
+                    a.w3-button.w3-green(href='/user/update') Update User
+        div.user-info
+            p Email: #{user.email}
+            if user.name
+                p Name: #{user.name}
+            if user.filiation
+                p Filiation: #{user.filiation}
+            div(style="display: flex; align-items: center;")
+                p(style="margin-right: 10px;") Role: #{user.role}
+                if owner
+                    a.w3-button.w3-orange(href='/user/requestUpdate') Request Update
+
+    a.w3-button.w3-yellow(href='/resources') Show Resources
+
+    // Update Password Modal
+    div.modal.fade(id="updatePasswordModal" tabindex="-1" aria-labelledby="updatePasswordModalLabel" aria-hidden="true")
+        div.modal-dialog.modal-dialog-centered
+            div.modal-content
+                div.modal-header
+                    h5.modal-title#updatePasswordModalLabel Update Password
+                    button.close.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
+                        span(aria-hidden="true") ×
+                div.modal-body
+                    form(action=`/users/updatePassword` method="POST" onsubmit="return validatePasswordForm(this)")
+                        div.form-group
+                            label(for="oldPassword") Old Password
+                            input.form-control(type="password" name="oldPassword" required)
+                        div.form-group
+                            label(for="newPassword") New Password
+                            input.form-control(type="password" name="newPassword" id="newPassword" pattern='.{8,}' title='Password must have at least 8 characters' required)
+                        div.form-group
+                            label(for="newPasswordConfirm") Confirm New Password
+                            input.form-control(type="password" name="newPasswordConfirm" id="newPasswordConfirm" required)
+                            small#passwordWarning(style="display: none; color: red") Password do not match new password
+                
+                        button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Close
+                        button.w3-green(type="submit") Save Changes
+    script.
+        var myModal = new bootstrap.Modal(document.getElementById('updatePasswordModal'), options)
+        myModal.show()
+        
+

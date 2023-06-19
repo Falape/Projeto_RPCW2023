@@ -2,9 +2,12 @@ extends layout
 
 block content
   include header
+  include navbar
   div.page-container
     h1.page-heading Welcome, #{user.username}!
     div.user-info
       p Role: #{user.role}
       p UserId: #{user.userId}
       p Token: #{user.token}
+    a.w3-button.w3-blue(href='/users/getUser') Get User
+
