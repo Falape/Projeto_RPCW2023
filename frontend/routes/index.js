@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/login', function(req, res, next) {
-  res.render('login', { title: 'Express' });
+  res.render('login');
 });
 
 router.post('/login', function(req, res, next) {
@@ -37,8 +37,12 @@ router.post('/login', function(req, res, next) {
     //TODO: render home page
     res.render('test', {user:req.session.user});
   }).catch((err) => {
-    console.log(err)
-    res.render('error_page', { message: err.response.data.error })
+
+    if (err.response.data.error != undefined){
+      res.render('login', {wrong_data:true, error:  err.response.data.error});
+    }else{
+      res.render('error_page', { message: err.response.data.error });
+    }
   });
 });
 
