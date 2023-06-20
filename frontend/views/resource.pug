@@ -27,5 +27,7 @@ block content
 
   h2 Ficheiros do Recurso:
   include tabelaFiles
-  p
-    button.w3-button.w3-green(onclick=`window.location.href='${resource.downloadUrl}'`) Download do Recurso
+  
+  if resource.downloadUrl
+    p
+      button.w3-button.w3-green(onclick=`window.location.href='${resource.downloadUrl}'`) Download do Recurso

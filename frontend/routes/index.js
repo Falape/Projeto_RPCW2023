@@ -12,8 +12,13 @@ const sip_store = require('../public/javascripts/store');
 
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
-  res.redirect('/login');
+router.get('/', function(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  //render home
+  //res.redirect('/header');
+
 });
 
 router.get('/login', function (req, res, next) {
