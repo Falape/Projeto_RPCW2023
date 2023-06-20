@@ -2,7 +2,7 @@ extends layout
 
 block content
   //- h1 File List
-  table.w3-table.w3-striped.w3-bordered
+  table.w3-table.w3-striped.w3-bordered.w3-centered
     thead
       tr
         th Nome
@@ -11,7 +11,7 @@ block content
     tbody
       each file in files
         tr
-          td= file.name
+          td= file.fileName
           td= file.type
           td
             if file.browserSupported

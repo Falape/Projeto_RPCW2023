@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "md5-file": "^5.0.0",
-    "node-stream": "^1.7.0",
-    "node-stream-zip": "^1.15.0"
-  }
-}
