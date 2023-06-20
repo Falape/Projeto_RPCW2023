@@ -13,16 +13,16 @@ const sip_store = require('../public/javascripts/store');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  if (!req.session.user) {
+  console.log(req.session.user)
+  if (req.session.user == undefined || req.session.user.token == null) {
     return res.redirect('/login');
   }
-  //render home
-  //res.redirect('/header');
-
+  res.redirect('/recursos')
 });
 
-router.get('/login', function (req, res, next) {
-  res.render('login', { title: 'Express' });
+router.get('/login', function(req, res, next) {
+  res.render('login');
+
 });
 
 router.post('/login', function (req, res, next) {
@@ -31,29 +31,34 @@ router.post('/login', function (req, res, next) {
     username: req.body.username,
     password: req.body.password
   }
-  axios.post(process.env.API_AUTH_URL + '/login', body)
-    .then((rep) => {
-      console.log(rep.data.token)
-      if (!req.session) {
-        return res.status(500).send('Session object is undefined');
-      }
-      req.session.user = {
-        username: rep.data.username,
-        role: rep.data.role,
-        token: rep.data.token,
-        userId: rep.data.userId
-      };
-      //TODO: render home page
-      res.render('test', { user: req.session.user });
-    }).catch((err) => {
-      console.log(err)
-      res.render('error_page', { message: err.response.data.error })
-    });
+  axios.post(process.env.API_AUTH_URL + '/login',body)
+  .then((rep) => {
+    console.log(rep.data.token)
+    if (!req.session) {
+      return res.redirect('/login')//res.status(500).send('Session object is undefined');
+    }
+    req.session.user = {
+      username: rep.data.username, 
+      role: rep.data.role,
+      token: rep.data.token,
+      userId: rep.data.userId
+    };
+    //TODO: render home page
+    res.render('test', {user:req.session.user});
+  }).catch((err) => {
+
+    if (err.response.data.error != undefined){
+      res.render('login', {wrong_data:true, error:  err.response.data.error});
+    }else{
+      res.render('error_page', { message: err.response.data.error });
+    }
+  });
 });
 
 
-router.get('/signup', function (req, res, next) {
-  res.render('signup', { title: 'Express' });
+
+router.get('/signup', function(req, res, next) {
+  res.render('signup');
 });
 
 router.post('/signup', function (req, res, next) {
@@ -81,13 +86,20 @@ router.post('/signup', function (req, res, next) {
         userId: response.data.userId
       };
 
-      // TODO: Render the home page or redirect to a different route
-      res.render('test', { user: req.session.user });
-    })
-    .catch((error) => {
-      console.log(error.response.data);
+    // TODO: Render the home page or redirect to a different route
+    res.render('test', { user: req.session.user });
+  })
+  .catch((error) => {
+    console.log(error.response);
+    if (error.response.data.error != undefined){
+      console.log("error")
+      console.log(error.response.data.error)
+      res.render('signup', {wrong_data:true, error:  error.response.data.error});
+    }else{
       res.render('error_page', { message: error.response.data.error });
-    });
+    }
+   
+  });
 });
 
 

@@ -28,3 +28,12 @@ block content
       div.w3-container.w3-text-center.w3-margin-bottom(style='justify-content: center; display: flex; flex-direction: column; align-items: center;')
         span.w3-small Return to  
           a.w3-link(href='/login') Login
+
+    script.
+      var wrong_data = null 
+
+      var wrong_data = "#{wrong_data}"
+      if (wrong_data === "true") {
+        var error = "#{error}"
+        alert('Signup failed: ' + error);
+      }

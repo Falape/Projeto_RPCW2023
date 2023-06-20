@@ -23,9 +23,9 @@ router.post("/signup", function (req, res) {
   var newUser = new userModel({email: req.body.email, role : 'consumer', username : req.body.username})
   userModel.register(newUser, req.body.password, function (err, nUser) {
     if (err) {
-      console.log(err)
       res.status(500).jsonp({
-        error: 'Error signing up, \n' + err
+        errorMessage: 'Error signing up',
+        error:err.message
       });
     }
     passport.authenticate('local', { session: false }, (err, user, info) => {
