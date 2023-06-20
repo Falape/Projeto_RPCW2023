@@ -369,7 +369,9 @@ router.post('/rate', function (req, res, next) {
   })
     .then((response) => {
       console.log(response.data);
-      //res.redirect('/recurso/' + req.body.resourceId)
+      console.log("RATE ALTERADO COM SUCESSO!")
+      res.redirect('/recurso/' + req.body.resourceId)
+      return
     })
     .catch((error) => {
       console.log(error);
