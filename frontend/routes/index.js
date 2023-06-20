@@ -26,7 +26,7 @@ router.post('/login', function(req, res, next) {
   .then((rep) => {
     console.log(rep.data.token)
     if (!req.session) {
-      return res.status(500).send('Session object is undefined');
+      return res.redirect('/login')//res.status(500).send('Session object is undefined');
     }
     req.session.user = {
       username: rep.data.username, 
@@ -48,7 +48,7 @@ router.post('/login', function(req, res, next) {
 
 
 router.get('/signup', function(req, res, next) {
-  res.render('signup', { title: 'Express' });
+  res.render('signup');
 });
 
 router.post('/signup', function(req, res, next) {
@@ -80,8 +80,15 @@ router.post('/signup', function(req, res, next) {
     res.render('test', { user: req.session.user });
   })
   .catch((error) => {
-    console.log(error.response.data);
-    res.render('error_page', { message: error.response.data.error });
+    console.log(error.response);
+    if (error.response.data.error != undefined){
+      console.log("error")
+      console.log(error.response.data.error)
+      res.render('signup', {wrong_data:true, error:  error.response.data.error});
+    }else{
+      res.render('error_page', { message: error.response.data.error });
+    }
+   
   });
 });
 
