@@ -8,3 +8,11 @@ frontend/node_modules/
 .vscode/
 
 ngrok
+
+frontend/public/storage/
+
+frontend/uploads/
+
+ingestion_storing/storing/storage/
+
+ingestion_storing/storing/

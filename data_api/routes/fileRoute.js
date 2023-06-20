@@ -33,8 +33,9 @@ router.get('/resource/:id', function (req, res) {
 
 /* Add new file, com o id do recurso */
 router.post('/add/:id', checkValidToken, function (req, res) {
+    console.log("req.body: ", req.body)
     //check for required fields
-    const requiredFields = ['fileName', 'type', 'path', 'browserSupported'];
+    const requiredFields = ['fileName', 'type', 'path'];
     const missingFields = [];
     for (let field of requiredFields) {
         if (!req.body[field]) 
