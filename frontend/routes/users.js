@@ -35,9 +35,11 @@ router.post('/updatePassword', function(req, res, next) {
 
    if(req.body.oldPassword == undefined){
     res.render('error_page', { message: "Old password missing!" });
+    renderUserPage(req, res, true, false, false, null, null,"Old password missing!" );
    }else 
       if(req.body.newPassword != req.body.newPasswordConfirm){
         res.render('error_page', { message: "New password and confimation doesn't match!" });
+        renderUserPage(req, res, true, false, false, null, null, "New password and confimation doesn't match!" );
       } else{
 
           axios.post(process.env.API_AUTH_URL + '/updatePassword', {
