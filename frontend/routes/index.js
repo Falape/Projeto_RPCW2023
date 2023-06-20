@@ -356,4 +356,25 @@ router.post('/comment', function (req, res, next) {
     })
 });
 
+router.post('/rate', function (req, res, next) {
+  console.log("CHEGUEI AO RATE")
+  body = {
+    value : req.body.rating,
+  }
+  console.log("BODY:", body);
+  axios.post(process.env.API_DATA_URL + '/rating/add/' + req.body.resourceId, body, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      //res.redirect('/recurso/' + req.body.resourceId)
+    })
+    .catch((error) => {
+      console.log(error);
+      res.render('error_page', { message: error });
+    })
+})
+
 module.exports = router;

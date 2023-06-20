@@ -1,23 +1,40 @@
-extends layout 
+div#rating.rateyo
 
-mixin rating(rating)
-  - var fullStars = Math.floor(rating);
-  - var halfStar = (rating % 1) >= 0.5;
-  - var emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-  
-  each val in Array(fullStars).fill(0)
-    i.fas.fa-star
-  if halfStar
-    i.fas.fa-star-half-alt
-  each val in Array(emptyStars).fill(0)
-    i.far.fa-star
+script.
+  $(document).ready(function() {
+    var rat = #{rating}; // Replace #{rating} with the actual rating value
 
-//- Usage:
+    $("#rating").rateYo({
+      rating: rat, // Set the initial rating value here
+      fullStar: true, // Enable full star mode
+      onChange: function(rating, rateYoInstance) {
+        // Handle the rating change event here
+        console.log("New rating: " + rating);
+        submitRating(rating);
+      }
+    });
 
-//- SEM ARGUMENTO
-//- +rating(3.576345) 
-//- | (3.576345)
+    function updateRatingValue(rating) {
+      $("#rating-value").text("Stars (" + rating + ")"); // Update the rating value next to the stars
+    }
 
-//- COM ARGUMENTO
-//- +rating(ratingValue)
-//- |  (#{ratingValue})
+    function submitRating(rating) {
+      $.ajax({
+        url: "/rate",
+        type: "POST",
+        data: {
+          rating: rating,
+          resourceId: "#{resource._id}" // Replace with the actual resource ID variable
+        },
+        success: function(response){
+          console.log(response);
+          location.reload();
+          // Optionally, update the UI or provide feedback to the user upon successful rating submission
+        },
+        error: function(error){
+          console.log("Error: " + error);
+          // Optionally, handle error response and provide feedback to the user
+        }
+      });
+    }
+  });

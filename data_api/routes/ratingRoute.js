@@ -73,6 +73,7 @@ router.get('/resource/:id', checkValidToken, function (req, res) {
             for (let i = 0; i < ratings.length; i++) {
                 rating_value += ratings[i].value
             }
+            rating_value = rating_value / ratings.length
             res.status(203).jsonp(rating_value)
         })
         .catch(error => {
