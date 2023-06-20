@@ -186,12 +186,11 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
 
   console.log(body);
 
-  //res.render('upload', { title: 'Express' });
   console.log(`Received file ${req.file.originalname}`);
   let oldPath = __dirname + '/../' + req.file.path
-  //console.log('oldPath: ' + oldPath)
+  console.log('oldPath: ' + oldPath)
   let newPath = __dirname + '/../uploads/' + req.file.originalname
-  //console.log('newPath: ' + newPath)
+  console.log('newPath: ' + newPath)
   //console.dir(req.file)
   fs.rename(oldPath, newPath, (erro) => {
     if (erro) {
@@ -203,11 +202,11 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
         console.log('is a zip')
         sip_read.readZipArchive(__dirname + '/../uploads/' + req.file.originalname)
           .then((resp) => {
-            if (resp == false){
+            if (resp == false) {
               // zip não se encontra no formato correcto.
               res.render('error_page', { message: "ZIP is invalid." });
             }
-            else{
+            else {
               axios.post(process.env.API_DATA_URL + '/resource/add', body, {
                 headers: {
                   Authorization: `Bearer ${req.session.user.token}`
@@ -215,7 +214,67 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
               })
                 .then((response) => {
                   resource_id = response.data._id;
-                  sip_store.StoreSIP(__dirname + '/../uploads/' + req.file.originalname, resource_id)
+                  sip_store.StoreSIP(__dirname + '/../uploads/' + req.file.originalname)
+                    .then((files) => {
+                      console.log(files);
+                      // mandar files para a bd
+                      for (let i = 0; i < files.length; i++) {
+                        let file_body = {
+                          fileName: files[i].fileName,
+                          type: files[i].type,
+                          path: files[i].path,
+                          browserSupported: files[i].browserSupported,
+                        }
+                        console.log("vou adicionar: ", file_body);
+                        axios.post(process.env.API_DATA_URL + '/file/add/' + resource_id, file_body, {
+                          headers: {
+                            Authorization: `Bearer ${req.session.user.token}`
+                          }
+                        })
+                          .then((response) => {
+                            console.log(response.data);
+                          })
+                          .catch((error) => {
+                            console.log(error);
+                            res.render('error_page', { message: error });
+                          });
+                      }
+                      res.redirect('/recursos');
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                      res.render('error_page', { message: error });
+                    })
+
+                })
+                .catch((error) => {
+                  console.log(error);
+                  res.render('error_page', { message: error });
+                })
+            }
+          })
+      }
+      else { // se não for um zip, create Sip --> store
+
+        console.log('not a zip');
+        //make request to data api to create resource
+        axios.post(process.env.API_DATA_URL + '/resource/add', body, {
+          headers: {
+            Authorization: `Bearer ${req.session.user.token}`
+          }
+        })
+          .then((response) => {
+            console.log(response.data);
+            resource_id = response.data._id;
+
+            console.log("adicionaei o recurso, agora vou ao async");
+            (async () => {
+              try {
+                //console.log("PATH:", __dirname + '/../uploads/' + req.file.originalname)
+                await sip_creation.createSIP(__dirname + '/../uploads/' + req.file.originalname);
+                console.log('--- ZIP CREATED ---');
+
+                sip_store.StoreSIP(__dirname + '/../uploads/output.zip')
                   .then((files) => {
                     console.log(files);
                     // mandar files para a bd
@@ -234,6 +293,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                       })
                         .then((response) => {
                           console.log(response.data);
+                          res.redirect('/recursos')
                         })
                         .catch((error) => {
                           console.log(error);
@@ -241,60 +301,14 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                         });
                     }
                   })
-                  
-                })
-                .catch((error) => {
-                  console.log(error);
-                  res.render('error_page', { message: error });
-                })
-            }
-          })
-      }
-      else { // se não for um zip, create Sip --> store
-
-        //make request to data api to create resource
-        axios.post(process.env.API_DATA_URL + '/resource/add', body, {
-          headers: {
-            Authorization: `Bearer ${req.session.user.token}`
-          }
-        })
-          .then((response) => {
-            console.log(response.data);
-            resource_id = response.data._id;
-            
-            console.log('not a zip');
-
-            (async () => {
-              try {
-                await sip_creation.createSIP(__dirname + '/../uploads/' + req.file.originalname);
-                console.log('--- ZIP CREATED ---');
-                sip_store.StoreSIP(__dirname + '/../uploads/output.zip')
-                  .then((files) => {
-                    console.log(files);
-                    // mandar files para a bd
-                    for (let i = 0; i < files.length; i++) {
-                      let file_body = {
-                        fileName: files[i].fileName,
-                        type: files[i].type,
-                        path: files[i].path,
-                        browserSupported: files[i].browserSupported,
-                      }
-                      axios.post(process.env.API_DATA_URL + '/file/add/' + resource_id, file_body, {
-                        headers: {
-                          Authorization: `Bearer ${req.session.user.token}`
-                        }
-                      })
-                        .then((response) => {
-                          console.log(response.data);
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                          res.render('error_page', { message: error });
-                        });
-                    }
+                  .catch((error) => {
+                    console.log(error);
+                    res.render('error_page', { message: error });
                   })
-              } catch (err) {
-                console.error('An error occurred:', err);
+
+              } catch (error) {
+                console.error('An error occurred:', error);
+                res.render('error_page', { message: error });
               }
             })();
 
@@ -306,7 +320,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
       }
     }
   })
-  res.redirect('/recursos')
+  //res.redirect('/recursos')
 })
 
 module.exports = router;

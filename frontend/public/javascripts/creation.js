@@ -34,34 +34,39 @@ async function processPath(itemPath, prefix, zip, manifest) {
 // Main function to create the SIP
 function createSIP(inputPath) {
   return new Promise(async (resolve, reject) => {
-      // Create a write stream for the output zip file
-      const output = fs.createWriteStream('./uploads/output.zip');
-      // Create a zip archiver instance with the specified compression level
-      const zip = archiver('zip', { zlib: { level: 9 } });
+      try {
+        // Create a write stream for the output zip file
+        const output = fs.createWriteStream('./uploads/output.zip');
+        // Create a zip archiver instance with the specified compression level
+        const zip = archiver('zip', { zlib: { level: 9 } });
 
-      output.on('close', () => {
-          console.log('Archive created:', zip.pointer() + ' total bytes');
-          resolve();
-      });
+        output.on('close', () => {
+            console.log('Archive created:', zip.pointer() + ' total bytes');
+            resolve();
+        });
 
-      output.on('error', err => {
-          console.log('Error during archive creation:', err);
-          reject(err);
-      });
+        output.on('error', err => {
+            console.log('Error during archive creation:', err);
+            reject(err);
+        });
 
-      // Pipe the archiver's output to the write stream
-      zip.pipe(output);
+        // Pipe the archiver's output to the write stream
+        zip.pipe(output);
 
-      // Process the input path (file or directory) and generate the manifest
-      const manifest = [];
-      await processPath(inputPath, path.dirname(inputPath), zip, manifest);
+        // Process the input path (file or directory) and generate the manifest
+        const manifest = [];
+        await processPath(inputPath, path.dirname(inputPath), zip, manifest);
 
-      // Append the manifest to the zip archive as 'manifest.json'
-      const manifestFile = 'manifest.json';
-      zip.append(JSON.stringify(manifest, null, 2), { name: manifestFile });
+        // Append the manifest to the zip archive as 'manifest.json'
+        const manifestFile = 'manifest.json';
+        zip.append(JSON.stringify(manifest, null, 2), { name: manifestFile });
 
-      // Finalize the archive, indicating that there are no more files to append
-      zip.finalize();
+        // Finalize the archive, indicating that there are no more files to append
+        zip.finalize();
+      } catch (err) {
+        console.log('Error during processing path:', err);
+        reject(err);
+      }
   });
 }
 
