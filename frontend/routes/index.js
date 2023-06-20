@@ -5,7 +5,8 @@ const axios = require('axios');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  if (!req.session.user) {
+  console.log(req.session.user)
+  if (req.session.user == undefined || req.session.user.token == null) {
     return res.redirect('/login');
   }
   res.redirect('/recursos')

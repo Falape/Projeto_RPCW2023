@@ -18,6 +18,10 @@ block content
         }
 
     script.
+        var passwordFlag = null 
+        var requestRoleUpdateFlag = null
+        var updateUserFlag = null
+
         function validatePasswordForm(form) {
             var newPassword = form.newPassword.value;
             var newPasswordConfirm = form.newPasswordConfirm.value;
@@ -32,13 +36,34 @@ block content
             }
         }
 
-        var passwordFlag = #{passwordFlag};
-        if (passwordFlag === true) {
-            alert('Password updated successfully!');
-        } else if (passwordFlag === false) {
-            var error = "#{error}";
-            alert('Password update failed: ' + error);
-        }
+       var passwordFlag = #{passwordFlag}
+        console.log(passwordFlag);
+            if (passwordFlag === true) {
+                alert('Password updated successfully!');
+            } else if (passwordFlag === false) {
+                var error = "#{error}";
+                alert('Password update failed: ' + error);
+            }
+
+            var requestRoleUpdateFlag = #{requestRoleUpdateFlag} 
+            console.log(requestRoleUpdateFlag);
+            if (requestRoleUpdateFlag === true) {
+                alert('Request Role Update successfully!');
+            } else if (requestRoleUpdateFlag === false) {
+                var error = "#{error}";
+                alert('Request Role Update failed: ' + error);
+            }
+
+            var updateUserFlag = #{updateUserFlag}
+            console.log(updateUserFlag);
+            if (updateUserFlag === true) {
+                alert('User updated successfully!');
+            } else if (updateUserFlag === false) {
+                var error = "#{error}";
+                alert('User update failed: ' + error);
+            }
+        
+        
 
     div.page-container
         div.page-header(style="display: flex; align-items: center;")
@@ -85,7 +110,7 @@ block content
                         button.w3-button.w3-green.w3-right(type="submit") Save Changes
                         button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
 
-    // Update Password Modal
+    // Request Role Update Modal
     div.modal.fade(id="requestRoleUpdateModal" tabindex="-1" aria-labelledby="requestRoleUpdateLabel" aria-hidden="true")
         div.modal-dialog.modal-dialog-centered
             div.w3-modal-content
@@ -94,17 +119,27 @@ block content
                     //- button.w3-closebtn.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
                         span(aria-hidden="true") ×
                 div.w3-container
-                  form(action=`/users/updatePassword` method="POST" onsubmit="return validatePasswordForm(this)")
-                      div.form-group
+                    form(action=`/users/requestRoleUpdate` method="POST")
+                    
+                        div.form-group
                             label(for="role") New Role
-                            select.form-select(name="role")
-                                option(value="Consumer" "#{user.role === 'Consumer' ? 'disabled' : ''}") Consumer
-                                option(value="Producer" "#{user.role === 'Producer' ? 'disabled' : ''}") Producer
-                                option(value="Admin" "#{user.role === 'Admin' ? 'disabled' : ''}") Admin
-                      button.w3-button.w3-green.w3-right(type="submit") Save Changes
-                      button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
 
-            
+                            select.form-select(name="role")
+                                if user.role === 'consumer'
+                                    option(value="producer") Producer
+                                    option(value="admin") Admin
+                                else
+                                    if user.role === 'producer'
+                                        option(value="consumer") Consumer
+                                        option(value="admin") Admin
+                                    else
+                                        if user.role === 'admin'
+                                            option(value="consumer") Consumer
+                                            option(value="producer") Producer
+                        button.w3-button.w3-green.w3-right(type="submit") Save Changes
+                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+
+
     script.
         var myModalPasswordUpdate = new bootstrap.Modal(document.getElementById('updatePasswordModal'), options)
         myModalPasswordUpdate.show()

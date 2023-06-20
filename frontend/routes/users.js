@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
+const renderUserPage = require('../public/javascripts/renderUserPage')
 
 /* GET users listing. */
 router.get('/getUser', function(req, res, next) {
@@ -49,33 +50,58 @@ router.post('/updatePassword', function(req, res, next) {
             })
             .then((response) => {
               //console.log(response);
-              
+            
               //res.render('user_page', { user: response.data, owner:true, admin:false, passwordFlag:true });
               renderUserPage(req, res, true, false, true);
             })
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
-              renderUserPage(req, res, true, false, false,undefined,undefined,error.response.data.error);
+              if (error.response.data.error != undefined){
+                renderUserPage(req, res, true, false, false,null,null,error.response.data.error);
+              }else{
+                res.render('error_page', { message: error });
+              }
           });
       }
 });
 
-function renderUserPage(req, res, owner=null, admin=null, passwordFlag=null, requestRoleUpdateFlag=null, updateUserFlag=null, error=null){
-  axios.get(process.env.API_AUTH_URL + '/user/getUser',{
+router.post('/requestRoleUpdate', function(req, res, next) {
+  console.log("requestRoleUpdate")
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  console.log(req.body);
+
+    if(req.body.role == undefined){
+      //(req, res, owner=null, admin=null, passwordFlag=null, requestRoleUpdateFlag=null, updateUserFlag=null, error=null)
+      renderUserPage(req, res, true, false, null, false, null, "Role missing!");
+    }else{
+      axios.post(process.env.API_AUTH_URL + '/user/requestUpdateRole', {
+            required_Role: req.body.role
+            }, {
               headers: {
                 Authorization: `Bearer ${req.session.user.token}`
               }
             })
-      .then((response) => {
-        console.log(error)
-        res.render('user_page', { user: response.data, owner:owner, admin:admin, passwordFlag:passwordFlag, requestRoleUpdateFlag:requestRoleUpdateFlag, updateUserFlag:updateUserFlag, error:error });
-      })
-      .catch((error) => {
-        //console.log(error);
-        res.render('error_page', { message: error.response.data.error });
-  });
-}
+            .then((response) => {
+              //console.log(response);
+            
+              //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
+              renderUserPage(req, res, true, false, null, true);
+            })
+            .catch((error) => {
+              console.log(error);
+              //res.render('error_page', { message: error.response.data.error });
+              if (error.response.data.error != undefined){
+                renderUserPage(req, res, true, false, undefined, false, undefined, error.response.data.error);
+              }else{
+                res.render('error_page', { message: error });
+              }
+          });
+    }
+});
 
 
 
