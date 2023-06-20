@@ -151,8 +151,15 @@ router.get('/recurso/:id', function (req, res, next) {
           // need to get resource files
           axios.get(process.env.API_DATA_URL + '/file/resource/' + req.params.id)
             .then((response3) => {
-              console.log(response3.data);
-              res.render('resource', { resource: response.data, rating: response2.data, files: response3.data });
+
+              axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id)
+                .then((response4) => {
+                  console.log(response4.data);
+                  res.render('resource', { resource: response.data, rating: response2.data, files: response3.data, comments: response4.data });
+                })
+                .catch((error) => {
+                  res.render('error_page', { message: error });
+                })
             })
             .catch((error) => {
               console.log(error);
@@ -327,5 +334,26 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
   })
   //res.redirect('/recursos')
 })
+
+router.post('/comment', function (req, res, next) {
+  body = {
+    content : req.body.comment,
+    id : req.body.resourceId
+  }
+  console.log("BODY:", body);
+  axios.post(process.env.API_DATA_URL + '/comment/add/' + req.body.resourceId, body, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      res.redirect('/recurso/' + req.body.resourceId)
+    })
+    .catch((error) => {
+      console.log(error);
+      res.render('error_page', { message: error });
+    })
+});
 
 module.exports = router;
