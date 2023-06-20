@@ -15,13 +15,21 @@ function changePath(new_path){
 
 
 function StoreSIP(zip_name){
+    // if given a path, get the name of the file
+    zip_path = ""
+    if (zip_name.includes('/')){
+        zip_path = zip_name
+        zip_name = zip_name.split('/').pop()
+    }
+
     console.log("ZIP NAME:", zip_name)
-    const base = "./storage"; //MUDAR PATH PARA FICAR NA PASTA PUBLIC
+    console.log("ZIP path:", zip_path)
+    const base = "./public/storage"; //MUDAR PATH PARA FICAR NA PASTA PUBLIC
     //var mypath = ""
     var final_info = []
 
     /* versão com promessa (asincrino) */
-    return md5File(zip_name).then((hash) => {
+    return md5File(zip_path).then((hash) => {
         approvedExtensions = ['JPEG', 'JPG', 'PNG', 'GIF', 'SVG', 'MP4', 'WEBM', 'MP3', 'WAV', 'OGG', 'HTML', 'HTM','XML', 'CSS', 'JS', 'JSON', 'TXT', 'PDF']
         console.log(`The MD5 sum is: ${hash}`)
     
@@ -40,12 +48,13 @@ function StoreSIP(zip_name){
         /// VERIFICO QUAIS OS FICHEIROS QUE SÂO PDF/XML/PNG/JGP/ ... 
         unzipedFiles = []
         const zip = new StreamZip({
-            file: zip_name,
+            file: zip_path,
             storeEntries: true
         });
-
+        console.log("Criei o stream com sucesso!")
         return new Promise((resolve, reject) => {
-        // Esta função procura no zip, sem fazer unzip, isto para o caso de não haver nenhum, pouca tempo
+        // Esta função procura no zip, sem fazer unzip, isto para o caso de não haver nenhum, poupa tempo
+            console.log("Vou ler o zip")
             zip.on('ready', () => {
                 // Take a look at the files
                 console.log('Entries read: ' + zip.entriesCount);
@@ -96,11 +105,15 @@ function StoreSIP(zip_name){
                 //zip.close()
                 resolve(final_info);
             })
+            zip.on('error', (err) => {
+                console.log("ERRO: ", err)
+                reject(err)
+            })
         })
     })
     .then((final_info) => {
         // Move the zip file to the final directory
-        return fs.promises.rename('./' + zip_name, final_dir + '/' + zip_name)
+        return fs.promises.rename(zip_path, final_dir + '/' + zip_name)
             .then(() => {
                 console.log('Successfully renamed - AKA moved!');
                 return final_info;
@@ -113,14 +126,17 @@ function StoreSIP(zip_name){
 
 // Executar desta forma:
 //receive from stdin
+module.exports = {
+    StoreSIP : StoreSIP
+}
 
-
+/*
 var args = process.argv.slice(2);
 StoreSIP(args[0]).then(x=>{
     console.log("FINAL DIR =======================================> ", x)
      // este valor ainda não está a dar correcto.
 })
-
+*/
 
 // Desta forma a promessa fica pendente, desta maneira a variavel não tem o resultado:
 // x = StoreSIP('template4.zip')

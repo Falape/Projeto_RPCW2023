@@ -76,7 +76,7 @@ router.post('/add', checkValidTokenProducer, function (req, res) {
         uploadedBy: req.payload._id,
         uploadedByUsername: req.body.uploadedByUsername,
         type: req.body.type,
-        public: req.body.public || true, // default is public or must come in request
+        public: req.body.public == null ? true : req.body.public, // default is public or must come in request
         dateCreated: new Date().toISOString().substring(0, 16),
         path: req.body.path,
         browserSupported: req.body.browserSupported,
