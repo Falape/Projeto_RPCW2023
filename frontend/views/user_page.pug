@@ -36,32 +36,29 @@ block content
             }
         }
 
-       var passwordFlag = #{passwordFlag}
-        console.log(passwordFlag);
-            if (passwordFlag === true) {
-                alert('Password updated successfully!');
-            } else if (passwordFlag === false) {
-                var error = "#{error}";
-                alert('Password update failed: ' + error);
-            }
+        var passwordFlag = "#{passwordFlag}"
+        if (passwordFlag === "true") {
+            alert('Password updated successfully!');
+        } else if (passwordFlag === "false") {
+            var error = "#{error}";
+            alert('Password update failed: ' + error);
+        }
 
-            var requestRoleUpdateFlag = #{requestRoleUpdateFlag} 
-            console.log(requestRoleUpdateFlag);
-            if (requestRoleUpdateFlag === true) {
-                alert('Request Role Update successfully!');
-            } else if (requestRoleUpdateFlag === false) {
-                var error = "#{error}";
-                alert('Request Role Update failed: ' + error);
-            }
+        var requestRoleUpdateFlag = "#{requestRoleUpdateFlag}"
+        if (requestRoleUpdateFlag === "true") {
+            alert('Request Role Update successfully!');
+        } else if (requestRoleUpdateFlag === "false") {
+            var error = "#{error}";
+            alert('Request Role Update failed: ' + error);
+        }
 
-            var updateUserFlag = #{updateUserFlag}
-            console.log(updateUserFlag);
-            if (updateUserFlag === true) {
-                alert('User updated successfully!');
-            } else if (updateUserFlag === false) {
-                var error = "#{error}";
-                alert('User update failed: ' + error);
-            }
+        var updateUserFlag = "#{updateUserFlag}"
+        if (updateUserFlag === "true") {
+        alert('User updated successfully!');
+        } else if (updateUserFlag === "false") {
+        var error = "#{error}";
+        alert('User update failed: ' + error);
+        }
         
         
 
