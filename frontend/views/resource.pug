@@ -5,13 +5,15 @@ block content
   include navbar
   h1
     | #{resource.title}
-    span(style="margin-left: 10px;")
-      include rating_stars
-      +rating(rating)
-      |  (#{rating})
+  include rating_stars 
+  | (#{rating})
   p
     strong Submetido por: 
     | #{resource.uploadedByUsername}
+  if resource.author 
+    p
+      strong Autor: 
+      | #{resource.author}
   p
     strong Tipo de Recurso: 
     | #{resource.type}
@@ -28,6 +30,8 @@ block content
   h2 Ficheiros do Recurso:
   include tabelaFiles
   
-  if resource.downloadUrl
+  if downloadUrl
     p
-      button.w3-button.w3-green(onclick=`window.location.href='${resource.downloadUrl}'`) Download do Recurso
+      button.w3-button.w3-green(onclick=`window.location.href='${downloadUrl}'`) Download do Recurso
+  include comment_section
+  include footer

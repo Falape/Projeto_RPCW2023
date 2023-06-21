@@ -103,35 +103,6 @@ router.post('/signup', function (req, res, next) {
 });
 
 
-
-router.get('/recurso', function (req, res, next) {
-  resourcee = {
-    title: "Recurso 1",
-    uploadedByUsername: "admin",
-    type: "video",
-    public: true,
-    creationDate: "2021-05-01",
-    updateDate: "2021-05-01",
-    rating: 2.5,
-  }
-  fls = [
-    { name: "file1", type: "video", browserSupported: true },
-    { name: "file2", type: "video", browserSupported: false },
-    { name: "file3", type: "video", browserSupported: true },
-  ]
-  res.render('resource', { resource: resourcee, files: fls });
-});
-
-router.get('/files', function (req, res, next) {
-  fls = [
-    { name: "file1", type: "video", browserSupported: true },
-    { name: "file2", type: "video", browserSupported: false },
-    { name: "file3", type: "video", browserSupported: true },
-  ]
-  res.render('tabelaFiles', { files: fls });
-});
-
-
 router.get('/recursos', function (req, res, next) {
   // make request to daa api to get all resources
   axios.post(process.env.API_DATA_URL + '/resource')
@@ -144,7 +115,7 @@ router.get('/recursos', function (req, res, next) {
         console.log(error.response.data);
         res.render('error_page', { message: error.response.data.error });
       }else{
-        res.render('error_page', { message: "A API não está a responder" });
+        res.render('error_page', { message: "Não foi possivel listar os recursos." });
       }
     });
 });
@@ -167,22 +138,29 @@ router.get('/recurso/:id', function (req, res, next) {
           // need to get resource files
           axios.get(process.env.API_DATA_URL + '/file/resource/' + req.params.id)
             .then((response3) => {
-              console.log(response3.data);
-              res.render('resource', { resource: response.data, rating: response2.data, files: response3.data });
+
+              axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id)
+                .then((response4) => {
+                  console.log(response4.data);
+                  res.render('resource', { resource: response.data, rating: response2.data, files: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id });
+                })
+                .catch((error) => {
+                  res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
+                })
             })
             .catch((error) => {
               console.log(error);
-              res.render('error_page', { message: error });
+              res.render('error_page', { message: "Não foi possivel obter os ficheiros do recurso." });
             })
         })
         .catch((error) => {
           console.log(error);
-          res.render('error_page', { message: error });
+          res.render('error_page', { message: "Não foi possivel obter o rating do recurso." });
         })
     })
     .catch((error) => {
       console.log(error);
-      res.render('error_page', { message: error });
+      res.render('error_page', { message: "Não foi possivel obter o recurso desejado." });
     });
 });
 
@@ -195,6 +173,15 @@ router.get('/submission', function (req, res, next) {
 })
 
 router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
+
+  console.log(`Received file ${req.file.originalname}`);
+  let oldPath = __dirname + '/../' + req.file.path
+  console.log('oldPath: ' + oldPath)
+  let newPath = __dirname + '/../uploads/' + req.file.originalname
+  console.log('newPath: ' + newPath)
+
+  // lançar erro quando não se encontra uma sessão... [IMPORTANTE]
+
   //catch parameters
   body = {
     title: req.body.title,
@@ -202,16 +189,11 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
     uploadedByUsername: req.session.user.username,
     author: req.body.author == "" ? null : req.body.author,
     public: req.body.publicResource == 'yes' ? true : false,
-    type: req.body.type
+    type: req.body.type,
+    path: newPath
   }
 
   console.log(body);
-
-  console.log(`Received file ${req.file.originalname}`);
-  let oldPath = __dirname + '/../' + req.file.path
-  console.log('oldPath: ' + oldPath)
-  let newPath = __dirname + '/../uploads/' + req.file.originalname
-  console.log('newPath: ' + newPath)
   //console.dir(req.file)
   fs.rename(oldPath, newPath, (erro) => {
     if (erro) {
@@ -238,6 +220,27 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                   sip_store.StoreSIP(__dirname + '/../uploads/' + req.file.originalname)
                     .then((files) => {
                       console.log(files);
+                      
+                      // fazer update do resource path
+                      tmp_path = files[0].path;
+                      // need to cut the last 2 parts of the path
+                      tmp_path = tmp_path.split('/');
+                      tmp_path = tmp_path.slice(0, tmp_path.length - 2);
+                      tmp_path = tmp_path.join('/');
+                      console.log(tmp_path);
+                      tmp_path = './' + tmp_path + '/' + req.file.originalname;
+
+                      axios.put(process.env.API_DATA_URL + '/resource/edit/' + resource_id,{ path: tmp_path },{
+                      headers: {
+                        Authorization: `Bearer ${req.session.user.token}`
+                      }}) 
+                        .then((response) => {
+                          console.log(response.data);
+                        })
+                        .catch((error) => {
+                          console.log(error);
+                          res.render('error_page', { message: "Não foi possivel actualizar o path do  recurso." });
+                        });
                       // mandar files para a bd
                       for (let i = 0; i < files.length; i++) {
                         let file_body = {
@@ -257,22 +260,26 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                           })
                           .catch((error) => {
                             console.log(error);
-                            res.render('error_page', { message: error });
+                            res.render('error_page', { message: "Não foi possivel Adicionar o ficheiro: " + file_body.fileName });
                           });
                       }
                       res.redirect('/recursos');
                     })
                     .catch((error) => {
                       console.log(error);
-                      res.render('error_page', { message: error });
+                      res.render('error_page', { message: "Não foi possivel concluir o processo de armazenamento." });
                     })
 
                 })
                 .catch((error) => {
                   console.log(error);
-                  res.render('error_page', { message: error });
+                  res.render('error_page', { message: "Não foi possivel submeter o recurso." });
                 })
             }
+          })
+          .catch((error) => {
+            console.log(error);
+            res.render('error_page', { message: "Não foi possivel verificar o formato/conteudo do zip submetido." });
           })
       }
       else { // se não for um zip, create Sip --> store
@@ -318,30 +325,101 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                         })
                         .catch((error) => {
                           console.log(error);
-                          res.render('error_page', { message: error });
+                          res.render('error_page', { message: "Não foi possivel Adicionar o ficheiro: " + file_body.fileName });
                         });
                     }
                   })
                   .catch((error) => {
                     console.log(error);
-                    res.render('error_page', { message: error });
+                    res.render('error_page', { message: "Não foi possivel concluir o processo de armazenamento." });
                   })
 
               } catch (error) {
                 console.error('An error occurred:', error);
-                res.render('error_page', { message: error });
+                res.render('error_page', { message: "Não foi possivel concluir o processo de criação de um SIP (ficheiro zip)." });
               }
             })();
 
           })
           .catch((error) => {
             console.log(error);
-            res.render('error_page', { message: error });
+            res.render('error_page', { message: "Não foi possivel submeter o recurso." });
           });
       }
     }
   })
   //res.redirect('/recursos')
 })
+
+router.post('/comment', function (req, res, next) {
+  body = {
+    content : req.body.comment,
+    id : req.body.resourceId
+  }
+  console.log("BODY:", body);
+  axios.post(process.env.API_DATA_URL + '/comment/add/' + req.body.resourceId, body, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      res.redirect('/recurso/' + req.body.resourceId)
+    })
+    .catch((error) => {
+      console.log(error);
+      res.render('error_page', { message: "Não foi possivel submeter o seu comentário." });
+    })
+});
+
+router.post('/rate', function (req, res, next) {
+  console.log("CHEGUEI AO RATE")
+  body = {
+    value : req.body.rating,
+  }
+  console.log("BODY:", body);
+  axios.post(process.env.API_DATA_URL + '/rating/add/' + req.body.resourceId, body, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      console.log("RATE ALTERADO COM SUCESSO!")
+      //res.redirect('/recurso/' + req.body.resourceId)
+      res.redirect(req.get('referer'))
+      return
+    })
+    .catch((error) => {
+      console.log(error);
+      res.render('error_page', { message: "Não foi possivel submeter o rating." });
+    })
+})
+
+router.get('/download/:id', function(req, res) {
+  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,)
+  .then((response) => {
+    console.log(response.data);
+    console.log("DOWNLOAD PATH: ",response.data.path);
+    res.download(response.data.path)
+  })
+  .catch((error) => {
+    console.log(error);
+    res.render('error_page', { message: "Não foi possivel fazer download do ficheiro." });
+  })
+});
+
+router.get('/download/resource/:id', function(req, res) {
+  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,)
+  .then((response) => {
+    console.log(response.data);
+    console.log("DOWNLOAD RESOURCE PATH: ",response.data.path);
+    res.download(response.data.path)
+  })
+  .catch((error) => {
+    console.log(error);
+    res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
+  })
+});
 
 module.exports = router;
