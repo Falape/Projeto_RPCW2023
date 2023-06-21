@@ -30,40 +30,4 @@ block content
     p
       button.w3-button.w3-green(onclick=`window.location.href='${resource.downloadUrl}'`) Download do Recurso
   include comment_section
-  script.
-    $(document).ready(function(){
-      $(".rating-star").hover(function(){
-        var starIndex = $(this).data('star');
-        var id = $(this).data('id');
-        $('.rating-star').each(function(){
-          if($(this).data('id') === id && $(this).data('star') <= starIndex){
-            $(this).removeClass('far').addClass('fas');
-          }
-          else{
-            $(this).removeClass('fas').addClass('far');
-          }
-        });
-      });
-
-      $(".rating-star").click(function(){
-        var starIndex = $(this).data('star');
-        var id = $(this).data('id');
-        $.ajax({
-          url: "/rateResource",
-          type: "POST",
-          data: {
-            id: id,
-            rating: starIndex
-          },
-          success: function(response){
-            console.log(response);
-          }
-        });
-      });
-
-      $(".rating-star").mouseleave(function(){
-        location.reload();
-      });
-    });
-
   include footer

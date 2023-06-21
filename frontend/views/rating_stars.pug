@@ -7,16 +7,13 @@ script.
     $("#rating").rateYo({
       rating: rat, // Set the initial rating value here
       fullStar: true, // Enable full star mode
-      onChange: function(rating, rateYoInstance) {
-        // Handle the rating change event here
-        console.log("New rating: " + rating);
-        submitRating(rating);
-      }
     });
 
-    function updateRatingValue(rating) {
-      $("#rating-value").text("Stars (" + rating + ")"); // Update the rating value next to the stars
-    }
+    $("#rating").on('click', function() {
+      var rating = $("#rating").rateYo("rating");
+      console.log("New rating: " + rating);
+      submitRating(rating);
+    });
 
     function submitRating(rating) {
       $.ajax({
@@ -28,7 +25,7 @@ script.
         },
         success: function(response){
           console.log(response);
-          //location.reload();
+          location.reload();
           // Optionally, update the UI or provide feedback to the user upon successful rating submission
         },
         error: function(error){

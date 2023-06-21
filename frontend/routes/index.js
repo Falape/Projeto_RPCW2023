@@ -91,35 +91,6 @@ router.post('/signup', function (req, res, next) {
 });
 
 
-
-router.get('/recurso', function (req, res, next) {
-  resourcee = {
-    title: "Recurso 1",
-    uploadedByUsername: "admin",
-    type: "video",
-    public: true,
-    creationDate: "2021-05-01",
-    updateDate: "2021-05-01",
-    rating: 2.5,
-  }
-  fls = [
-    { name: "file1", type: "video", browserSupported: true },
-    { name: "file2", type: "video", browserSupported: false },
-    { name: "file3", type: "video", browserSupported: true },
-  ]
-  res.render('resource', { resource: resourcee, files: fls });
-});
-
-router.get('/files', function (req, res, next) {
-  fls = [
-    { name: "file1", type: "video", browserSupported: true },
-    { name: "file2", type: "video", browserSupported: false },
-    { name: "file3", type: "video", browserSupported: true },
-  ]
-  res.render('tabelaFiles', { files: fls });
-});
-
-
 router.get('/recursos', function (req, res, next) {
   // make request to daa api to get all resources
   axios.post(process.env.API_DATA_URL + '/resource')
@@ -128,8 +99,8 @@ router.get('/recursos', function (req, res, next) {
       res.render('list_resources2', { resources: response.data });
     })
     .catch((error) => {
-      console.log(error.response.data);
-      res.render('error_page', { message: error.response.data.error });
+      console.log(error);
+      res.render('error_page', { message: "Não foi possivel listar os recursos." });
     });
 });
 
@@ -158,22 +129,22 @@ router.get('/recurso/:id', function (req, res, next) {
                   res.render('resource', { resource: response.data, rating: response2.data, files: response3.data, comments: response4.data });
                 })
                 .catch((error) => {
-                  res.render('error_page', { message: error });
+                  res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
                 })
             })
             .catch((error) => {
               console.log(error);
-              res.render('error_page', { message: error });
+              res.render('error_page', { message: "Não foi possivel obter os ficheiros do recurso." });
             })
         })
         .catch((error) => {
           console.log(error);
-          res.render('error_page', { message: error });
+          res.render('error_page', { message: "Não foi possivel obter o rating do recurso." });
         })
     })
     .catch((error) => {
       console.log(error);
-      res.render('error_page', { message: error });
+      res.render('error_page', { message: "Não foi possivel obter o recurso desejado." });
     });
 });
 
@@ -248,22 +219,26 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                           })
                           .catch((error) => {
                             console.log(error);
-                            res.render('error_page', { message: error });
+                            res.render('error_page', { message: "Não foi possivel Adicionar o ficheiro: " + file_body.fileName });
                           });
                       }
                       res.redirect('/recursos');
                     })
                     .catch((error) => {
                       console.log(error);
-                      res.render('error_page', { message: error });
+                      res.render('error_page', { message: "Não foi possivel concluir o processo de armazenamento." });
                     })
 
                 })
                 .catch((error) => {
                   console.log(error);
-                  res.render('error_page', { message: error });
+                  res.render('error_page', { message: "Não foi possivel submeter o recurso." });
                 })
             }
+          })
+          .catch((error) => {
+            console.log(error);
+            res.render('error_page', { message: "Não foi possivel verificar o formato/conteudo do zip submetido." });
           })
       }
       else { // se não for um zip, create Sip --> store
@@ -309,25 +284,25 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                         })
                         .catch((error) => {
                           console.log(error);
-                          res.render('error_page', { message: error });
+                          res.render('error_page', { message: "Não foi possivel Adicionar o ficheiro: " + file_body.fileName });
                         });
                     }
                   })
                   .catch((error) => {
                     console.log(error);
-                    res.render('error_page', { message: error });
+                    res.render('error_page', { message: "Não foi possivel concluir o processo de armazenamento." });
                   })
 
               } catch (error) {
                 console.error('An error occurred:', error);
-                res.render('error_page', { message: error });
+                res.render('error_page', { message: "Não foi possivel concluir o processo de criação de um SIP (ficheiro zip)." });
               }
             })();
 
           })
           .catch((error) => {
             console.log(error);
-            res.render('error_page', { message: error });
+            res.render('error_page', { message: "Não foi possivel submeter o recurso." });
           });
       }
     }
@@ -352,7 +327,7 @@ router.post('/comment', function (req, res, next) {
     })
     .catch((error) => {
       console.log(error);
-      res.render('error_page', { message: error });
+      res.render('error_page', { message: "Não foi possivel submeter o seu comentário." });
     })
 });
 
@@ -370,12 +345,13 @@ router.post('/rate', function (req, res, next) {
     .then((response) => {
       console.log(response.data);
       console.log("RATE ALTERADO COM SUCESSO!")
-      res.redirect('/recurso/' + req.body.resourceId)
+      //res.redirect('/recurso/' + req.body.resourceId)
+      res.redirect(req.get('referer'))
       return
     })
     .catch((error) => {
       console.log(error);
-      res.render('error_page', { message: error });
+      res.render('error_page', { message: "Não foi possivel submeter o rating." });
     })
 })
 

@@ -73,8 +73,12 @@ router.get('/resource/:id', checkValidToken, function (req, res) {
             for (let i = 0; i < ratings.length; i++) {
                 rating_value += ratings[i].value
             }
-            rating_value = rating_value / ratings.length
-            res.status(203).jsonp(rating_value)
+            if(ratings.length == 0){
+                res.status(203).jsonp(0)
+            }else{
+                rating_value = rating_value / ratings.length
+                res.status(203).jsonp(rating_value)
+            }
         })
         .catch(error => {
             res.status(503).jsonp({ error: error, message: "Error getting ratings of resource..." })

@@ -70,7 +70,7 @@ router.get('/recursos/:id', function(req, res, next) {
   })
   .catch((error) => {
     console.log(error);
-    res.render('error_page', { message: error });
+    res.render('error_page', { message: "Não foi possivel obter os recursos do utilizador." });
   });
 });
 

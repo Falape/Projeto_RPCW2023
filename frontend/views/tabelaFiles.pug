@@ -2,20 +2,24 @@ extends layout
 
 block content
   //- h1 File List
-  table.w3-table.w3-striped.w3-bordered.w3-centered
-    thead
-      tr
-        th Nome
-        th Tipo
-        th Acções
-    tbody
-      each file in files
+  if files.length
+    table.w3-table.w3-striped.w3-bordered.w3-centered
+      thead
         tr
-          td= file.fileName
-          td= file.type
-          td
-            if file.browserSupported
-              a(href=`/download/${file._id}`, class='w3-btn w3-blue') Download
-              a(href=`/view/${file._id}`, class='w3-btn w3-green') View
-            else
-              a(href=`/download/${file.name}`, class='w3-btn w3-blue') Download
+          th Nome
+          th Tipo
+          th Acções
+      tbody
+        each file in files
+          tr
+            td= file.fileName
+            td= file.type
+            td
+              if file.browserSupported
+                a(href=`/download/${file._id}`, class='w3-btn w3-blue') Download
+                a(href=`/view/${file._id}`, class='w3-btn w3-green') Ver
+              else
+                a(href=`/download/${file.name}`, class='w3-btn w3-blue') Download
+  else
+    p Este recurso não tem ficheiros..
+
