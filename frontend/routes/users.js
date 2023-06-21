@@ -16,7 +16,7 @@ router.get('/getUser', function(req, res, next) {
       .then((response) => {
         
         // TODO: Render the home page or redirect to a different route
-        res.render('user_page', { user: response.data, owner:true });
+        res.render('user_page', { user: response.data, owner:true, userInfo:req.session.user});
       })
       .catch((error) => {
         console.log(error);
@@ -34,12 +34,12 @@ router.post('/updatePassword', function(req, res, next) {
   console.log(req.body);
 
    if(req.body.oldPassword == undefined){
-    res.render('error_page', { message: "Old password missing!" });
-    renderUserPage(req, res, true, false, false, null, null, null, "Old password missing!" );
+    //res.render('error_page', { message: "Old password missing!" });
+    renderUserPage(req, res, true, false, null, null, null, "Old password missing!" );
    }else 
       if(req.body.newPassword != req.body.newPasswordConfirm){
-        res.render('error_page', { message: "New password and confimation doesn't match!" });
-        renderUserPage(req, res, true, false, false, null, null, null, "New password and confimation doesn't match!" );
+        //res.render('error_page', { message: "New password and confimation doesn't match!" });
+        renderUserPage(req, res, true, false, null, null, null, "New password and confimation doesn't match!" );
       } else{
 
           axios.post(process.env.API_AUTH_URL + '/updatePassword', {
@@ -54,13 +54,13 @@ router.post('/updatePassword', function(req, res, next) {
               //console.log(response);
             
               //res.render('user_page', { user: response.data, owner:true, admin:false, passwordFlag:true });
-              renderUserPage(req, res, true, false, true);
+              renderUserPage(req, res, true, true, null, null, null, null);
             })
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response.data.error != undefined){
-                renderUserPage(req, res, true, false, false,null,null, null,error.response.data.error);
+                renderUserPage(req, res, true, false, null, null, null,error.response.data.error);
               }else{
                 res.render('error_page', { message: error });
               }
@@ -78,7 +78,7 @@ router.post('/requestRoleUpdate', function(req, res, next) {
 
     if(req.body.role == undefined){
       //(req, res, owner=null, admin=null, passwordFlag=null, requestRoleUpdateFlag=null, updateUserFlag=null, error=null)
-      renderUserPage(req, res, true, false, null, false, null, null, "Role missing!");
+      renderUserPage(req, res, true, null, false, null, null, "Role missing!");
     }else{
       axios.post(process.env.API_AUTH_URL + '/user/requestUpdateRole', {
             required_Role: req.body.role
@@ -91,13 +91,13 @@ router.post('/requestRoleUpdate', function(req, res, next) {
               //console.log(response);
             
               //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
-              renderUserPage(req, res, true, false, null, true);
+              renderUserPage(req, res, true, null, true, null, null, null);
             })
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response.data.error != undefined){
-                renderUserPage(req, res, true, false, null, false, null, null, error.response.data.error);
+                renderUserPage(req, res, true, null, false, null, null, error.response.data.error);
               }else{
                 res.render('error_page', { message: error });
               }
@@ -129,7 +129,7 @@ router.get('/delete', function(req, res, next) {
               //console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response.data.error != undefined){
-                renderUserPage(req, res, true, false, null, null, null, false,error.response.data.error);
+                renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
               }else{
                 res.render('error_page', { message: error });
               }

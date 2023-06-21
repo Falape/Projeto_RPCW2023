@@ -33,5 +33,12 @@ block content
   if downloadUrl
     p
       button.w3-button.w3-green(onclick=`window.location.href='${downloadUrl}'`) Download do Recurso
-  include comment_section
+  if comments != ""
+    include comment_section
   include footer
+
+  script.
+    var error = "#{error}"
+    if (error !== "") {
+        alert(error);
+    }
