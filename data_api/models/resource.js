@@ -8,6 +8,7 @@ var resourceSchema = new Schema({
     uploadedByUsername: { type: String, required: true }, // username do utilizador que fez o upload
     type: { type: String, required: true },  
     public: Boolean, // Se o recurso é público ou não
+    path : String, // caminho para o ficheiro
     dateCreated: String,
     updateDate: String,
     //for soft delete

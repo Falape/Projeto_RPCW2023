@@ -76,8 +76,9 @@ function StoreSIP(zip_name){
                                 file_info["path"] = final_dir + '/' + 'unziped' + '/' + filename
                             }
                             else{
+                                unzipedFiles.push(entry.name)
                                 file_info["browserSupported"] = false
-                                file_info["path"] = final_dir + '/' + filename
+                                file_info["path"] = final_dir + '/' + 'unziped' + '/' + filename
                             }
                             final_info.push(file_info)
                         }
@@ -112,6 +113,7 @@ function StoreSIP(zip_name){
         })
     })
     .then((final_info) => {
+        console.log("FINAL INFO: ", final_info)
         // Move the zip file to the final directory
         return fs.promises.rename(zip_path, final_dir + '/' + zip_name)
             .then(() => {

@@ -30,8 +30,8 @@ block content
   h2 Ficheiros do Recurso:
   include tabelaFiles
   
-  if resource.downloadUrl
+  if downloadUrl
     p
-      button.w3-button.w3-green(onclick=`window.location.href='${resource.downloadUrl}'`) Download do Recurso
+      button.w3-button.w3-green(onclick=`window.location.href='${downloadUrl}'`) Download do Recurso
   include comment_section
   include footer

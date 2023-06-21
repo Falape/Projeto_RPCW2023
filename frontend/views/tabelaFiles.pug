@@ -1,4 +1,4 @@
-extends layout 
+extends layout
 
 block content
   //- h1 File List
@@ -17,9 +17,10 @@ block content
             td
               if file.browserSupported
                 a(href=`/download/${file._id}`, class='w3-btn w3-blue') Download
-                a(href=`/view/${file._id}`, class='w3-btn w3-green') Ver
+                button(class='w3-btn w3-green', onclick=`showFile('${file.path}', '${file.fileName}', '${file.type}')`) Ver
+
               else
-                a(href=`/download/${file.name}`, class='w3-btn w3-blue') Download
+                a(href=`/download/${file._id}`, class='w3-btn w3-blue') Download
   else
     p Este recurso não tem ficheiros..
 

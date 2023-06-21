@@ -110,13 +110,14 @@ router.put('/edit/:id', checkValidTokenProducer, function (req, res) {
         }
     }
 
-    const possibleFields = ['title', 'author', 'public'];
+    const possibleFields = ['title', 'author', 'public', 'path'];
     // get fields from body, if not present in request, it will be changed.
     info = {
         title: req.body.title,
         author: req.body.author,
         public: req.body.public,
         updateDate: new Date().toISOString().substring(0, 16),
+        path: req.body.path
     }
 
     // check if all fields are null
