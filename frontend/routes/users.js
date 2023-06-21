@@ -35,11 +35,11 @@ router.post('/updatePassword', function(req, res, next) {
 
    if(req.body.oldPassword == undefined){
     res.render('error_page', { message: "Old password missing!" });
-    renderUserPage(req, res, true, false, false, null, null,"Old password missing!" );
+    renderUserPage(req, res, true, false, false, null, null, null, "Old password missing!" );
    }else 
       if(req.body.newPassword != req.body.newPasswordConfirm){
         res.render('error_page', { message: "New password and confimation doesn't match!" });
-        renderUserPage(req, res, true, false, false, null, null, "New password and confimation doesn't match!" );
+        renderUserPage(req, res, true, false, false, null, null, null, "New password and confimation doesn't match!" );
       } else{
 
           axios.post(process.env.API_AUTH_URL + '/updatePassword', {
@@ -60,7 +60,7 @@ router.post('/updatePassword', function(req, res, next) {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response.data.error != undefined){
-                renderUserPage(req, res, true, false, false,null,null,error.response.data.error);
+                renderUserPage(req, res, true, false, false,null,null, null,error.response.data.error);
               }else{
                 res.render('error_page', { message: error });
               }
@@ -78,7 +78,7 @@ router.post('/requestRoleUpdate', function(req, res, next) {
 
     if(req.body.role == undefined){
       //(req, res, owner=null, admin=null, passwordFlag=null, requestRoleUpdateFlag=null, updateUserFlag=null, error=null)
-      renderUserPage(req, res, true, false, null, false, null, "Role missing!");
+      renderUserPage(req, res, true, false, null, false, null, null, "Role missing!");
     }else{
       axios.post(process.env.API_AUTH_URL + '/user/requestUpdateRole', {
             required_Role: req.body.role
@@ -97,7 +97,7 @@ router.post('/requestRoleUpdate', function(req, res, next) {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response.data.error != undefined){
-                renderUserPage(req, res, true, false, undefined, false, undefined, error.response.data.error);
+                renderUserPage(req, res, true, false, null, false, null, null, error.response.data.error);
               }else{
                 res.render('error_page', { message: error });
               }
@@ -105,6 +105,36 @@ router.post('/requestRoleUpdate', function(req, res, next) {
     }
 });
 
+router.get('/delete', function(req, res, next) {
+  console.log("delete")
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  //console.log(req.body);
+
+  console.log(req.session.user.token)
+  axios.delete(process.env.API_AUTH_URL + '/user/deleteUser', {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((response) => {
+              //console.log(response);
+              
+              //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
+              res.render('login', { userDeleted: true, msg: "Utilizador apagado!" });
+            })
+            .catch((error) => {
+              //console.log(error);
+              //res.render('error_page', { message: error.response.data.error });
+              if (error.response.data.error != undefined){
+                renderUserPage(req, res, true, false, null, null, null, false,error.response.data.error);
+              }else{
+                res.render('error_page', { message: error });
+              }
+          });
+});
 
 
 router.get('/recursos/:id', function(req, res, next) {

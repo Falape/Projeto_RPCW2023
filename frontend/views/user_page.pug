@@ -59,6 +59,12 @@ block content
         var error = "#{error}";
         alert('User update failed: ' + error);
         }
+
+        var deleteUserFlag = "#{deleteUserFlag}"
+         if (deleteUserFlag === "false") {
+            var error = "#{error}";
+            alert('User update failed: ' + error);
+        }
         
         
 
@@ -67,7 +73,7 @@ block content
             h1(style="margin-right: 30px;").page-heading Welcome, #{user.username}!
             if owner
                 div
-                    a.w3-button.w3-red.delete-button(href='/user/delete') Delete
+                    button.w3-button.w3-red(data-bs-toggle="modal" data-bs-target="#deleteUserModal") Delete
                     button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordModal") Update Password
                     a.w3-button.w3-green(href='/user/update') Update User
         div.user-info
@@ -136,6 +142,22 @@ block content
                         button.w3-button.w3-green.w3-right(type="submit") Save Changes
                         button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
 
+    // Delete User Modal
+    div.modal.fade(id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserLabel" aria-hidden="true")
+        div.modal-dialog.modal-dialog-centered
+            div.w3-modal-content
+                div.w3-container
+                    h5.modal-title#deleteUserLabel Delete User
+                    //- button.w3-closebtn.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
+                        span(aria-hidden="true") ×
+                    p Tem a certeza que pretende eliminar a sua conta?
+                    p Esta ação é irreversível.
+                    p Todos os recursos que tenha criado serão também eliminados.
+
+                div.w3-container
+                    a.w3-button.w3-red.delete-button(href='/users/delete') Delete
+                    button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+
 
     script.
         var myModalPasswordUpdate = new bootstrap.Modal(document.getElementById('updatePasswordModal'), options)
@@ -143,4 +165,9 @@ block content
 
         var myModalRequestRoleUpdate = new bootstrap.Modal(document.getElementById('requestRoleUpdateModal'), options)
         myModalRequestRoleUpdate.show()
+
+        var myModalDeleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'), options)
+        myModalDeleteUserModal.show()
+
     include footer
+

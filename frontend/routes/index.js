@@ -47,10 +47,10 @@ router.post('/login', function (req, res, next) {
     res.render('test', {user:req.session.user});
   }).catch((err) => {
 
-    if (err.response.data.error != undefined){
+    if (err.response && err.response.data){
       res.render('login', {wrong_data:true, error:  err.response.data.error});
     }else{
-      res.render('error_page', { message: err.response.data.error });
+      res.render('error_page', { message: err });
     }
   });
 });
@@ -90,13 +90,13 @@ router.post('/signup', function (req, res, next) {
     res.render('test', { user: req.session.user });
   })
   .catch((error) => {
-    console.log(error.response);
-    if (error.response.data.error != undefined){
-      console.log("error")
-      console.log(error.response.data.error)
+    //console.log(error.response);
+    if (error.response && error.response.data){
+      //console.log("error")
+      //console.log(error.response.data.error)
       res.render('signup', {wrong_data:true, error:  error.response.data.error});
     }else{
-      res.render('error_page', { message: error.response.data.error });
+      res.render('error_page', { message: error });
     }
    
   });
@@ -111,8 +111,12 @@ router.get('/recursos', function (req, res, next) {
       res.render('list_resources2', { resources: response.data });
     })
     .catch((error) => {
-      console.log(error);
-      res.render('error_page', { message: "Não foi possivel listar os recursos." });
+      if(error.response && error.response.data){
+        console.log(error.response.data);
+        res.render('error_page', { message: error.response.data.error });
+      }else{
+        res.render('error_page', { message: "Não foi possivel listar os recursos." });
+      }
     });
 });
 
