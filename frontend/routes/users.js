@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
+const renderUserPage = require('../public/javascripts/renderPages')
 
 /* GET users listing. */
 router.get('/getUser', function(req, res, next) {
@@ -34,9 +35,11 @@ router.post('/updatePassword', function(req, res, next) {
 
    if(req.body.oldPassword == undefined){
     res.render('error_page', { message: "Old password missing!" });
+    renderUserPage(req, res, true, false, false, null, null,"Old password missing!" );
    }else 
       if(req.body.newPassword != req.body.newPasswordConfirm){
         res.render('error_page', { message: "New password and confimation doesn't match!" });
+        renderUserPage(req, res, true, false, false, null, null, "New password and confimation doesn't match!" );
       } else{
 
           axios.post(process.env.API_AUTH_URL + '/updatePassword', {
@@ -50,14 +53,58 @@ router.post('/updatePassword', function(req, res, next) {
             .then((response) => {
               //console.log(response);
             
-            res.render('user_page', { user: response.data, owner:true, admin:false });
+              //res.render('user_page', { user: response.data, owner:true, admin:false, passwordFlag:true });
+              renderUserPage(req, res, true, false, true);
             })
             .catch((error) => {
-              //console.log(error);
-              res.render('error_page', { message: error.response.data.error });
+              console.log(error);
+              //res.render('error_page', { message: error.response.data.error });
+              if (error.response.data.error != undefined){
+                renderUserPage(req, res, true, false, false,null,null,error.response.data.error);
+              }else{
+                res.render('error_page', { message: error });
+              }
           });
       }
 });
+
+router.post('/requestRoleUpdate', function(req, res, next) {
+  console.log("requestRoleUpdate")
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  console.log(req.body);
+
+    if(req.body.role == undefined){
+      //(req, res, owner=null, admin=null, passwordFlag=null, requestRoleUpdateFlag=null, updateUserFlag=null, error=null)
+      renderUserPage(req, res, true, false, null, false, null, "Role missing!");
+    }else{
+      axios.post(process.env.API_AUTH_URL + '/user/requestUpdateRole', {
+            required_Role: req.body.role
+            }, {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((response) => {
+              //console.log(response);
+            
+              //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
+              renderUserPage(req, res, true, false, null, true);
+            })
+            .catch((error) => {
+              console.log(error);
+              //res.render('error_page', { message: error.response.data.error });
+              if (error.response.data.error != undefined){
+                renderUserPage(req, res, true, false, undefined, false, undefined, error.response.data.error);
+              }else{
+                res.render('error_page', { message: error });
+              }
+          });
+    }
+});
+
 
 
 router.get('/recursos/:id', function(req, res, next) {

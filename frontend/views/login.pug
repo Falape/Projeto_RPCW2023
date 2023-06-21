@@ -21,3 +21,11 @@ block content
       a.w3-button.w3-block.w3-blue.w3-margin-bottom(href='/signup') Sign Up
   include footer
 
+  script.
+        var wrong_data = null 
+
+        var wrong_data = "#{wrong_data}"
+        if (wrong_data === "true") {
+            var error = "#{error}"
+            alert('Login failed: ' + error);
+        }
