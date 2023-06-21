@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  #comments.w3-container
+    h2.w3-xlarge Comments
+    each comment, index in comments
+      .comment.w3-card-4.w3-margin
+        .w3-container
+          h3.w3-large= comment.postedByUsername
+          span.w3-small.comment-date= comment.dateCreated
+          span.w3-small.comment-update= comment.updateDate
+        p.w3-margin= comment.content
+    h2.w3-xlarge Leave a comment
+    form(action='/comment', method='POST').w3-container
+      input(type='hidden', name='resourceId', value=resource._id)
+      label(for='comment').w3-text-blue Comment
+      textarea#comment.w3-input.w3-border(name='comment', required)
+      button.w3-btn.w3-blue(type='submit') Submit Comment
+
+

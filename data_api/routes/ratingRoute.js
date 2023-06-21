@@ -73,7 +73,12 @@ router.get('/resource/:id', checkValidToken, function (req, res) {
             for (let i = 0; i < ratings.length; i++) {
                 rating_value += ratings[i].value
             }
-            res.status(203).jsonp(rating_value)
+            if(ratings.length == 0){
+                res.status(203).jsonp(0)
+            }else{
+                rating_value = rating_value / ratings.length
+                res.status(203).jsonp(rating_value)
+            }
         })
         .catch(error => {
             res.status(503).jsonp({ error: error, message: "Error getting ratings of resource..." })
@@ -105,7 +110,14 @@ router.post('/add/:id', checkValidToken, function (req, res) {
             console.log("RAT:", rat)
                 // if rat is an empty list, it means that the user didn't rate this resource yet
             if(rat.length > 0){
-                return res.status(402).jsonp({ message: "You already rated this resource." });
+                ratingController.updateRating(rat[0]._id, {value: req.body.value})
+                .then(rating => {
+                    res.status(200).jsonp(rating)
+                })
+                .catch(error => {
+                    res.status(504).jsonp({ error: error, message: "Error updating rating..." })
+                })
+                //return res.status(402).jsonp({ message: "You already rated this resource." });
             }
             else{
                 // get fields from body
