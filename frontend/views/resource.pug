@@ -10,6 +10,10 @@ block content
   p
     strong Submetido por: 
     | #{resource.uploadedByUsername}
+  if resource.author 
+    p
+      strong Autor: 
+      | #{resource.author}
   p
     strong Tipo de Recurso: 
     | #{resource.type}
