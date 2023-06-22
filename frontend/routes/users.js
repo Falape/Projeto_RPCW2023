@@ -59,7 +59,7 @@ router.post('/updatePassword', function(req, res, next) {
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
-              if (error.response.data.error != undefined){
+              if (error.response && error.response.data){
                 renderUserPage(req, res, true, false, null, null, null,error.response.data.error);
               }else{
                 res.render('error_page', { message: error });
@@ -96,7 +96,7 @@ router.post('/requestRoleUpdate', function(req, res, next) {
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
-              if (error.response.data.error != undefined){
+              if (error.response && error.response.data){
                 renderUserPage(req, res, true, null, false, null, null, error.response.data.error);
               }else{
                 res.render('error_page', { message: error });
@@ -119,16 +119,148 @@ router.get('/delete', function(req, res, next) {
                 Authorization: `Bearer ${req.session.user.token}`
               }
             })
-            .then((response) => {
+            .then((resp) => {
               //console.log(response);
-              
+              axios.delete(process.env.API_DATA_URL + '/api/delete/hard/user/' + req.session.user.userId, {
+                headers: {
+                  Authorization: `Bearer ${req.session.user.token}`
+                }
+              })
+              .then((resp1) => {
+                console.log("Apagou recursos do utilizador e comentários que estes tinha")
+                axios.delete(process.env.API_DATA_URL + '/api/delete/hard/comments/'  + req.session.user.userId, {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                })
+                .then((resp2) => {
+                  console.log("Apagou os comentários")
+                })
+                .catch((error) => {
+                  console.log(error);
+                  //res.render('error_page', { message: error.response.data.error });
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+                //res.render('error_page', { message: error.response.data.error });
+              });
               //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
               res.render('login', { userDeleted: true, msg: "Utilizador apagado!" });
             })
             .catch((error) => {
               //console.log(error);
               //res.render('error_page', { message: error.response.data.error });
-              if (error.response.data.error != undefined){
+              if (error.response && error.response.data){
+                renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
+              }else{
+                res.render('error_page', { message: error });
+              }
+          });
+});
+
+router.get('/delete', function(req, res, next) {
+  console.log("delete")
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  //console.log(req.body);
+
+  console.log(req.session.user.token)
+  axios.delete(process.env.API_AUTH_URL + '/user/deleteUser', {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((resp) => {
+              //console.log(response);
+              axios.delete(process.env.API_DATA_URL + '/api/delete/hard/user/' + req.session.user.userId, {
+                headers: {
+                  Authorization: `Bearer ${req.session.user.token}`
+                }
+              })
+              .then((resp1) => {
+                console.log("Apagou recursos do utilizador e comentários que estes tinha")
+                axios.delete(process.env.API_DATA_URL + '/api/delete/hard/comments/'  + req.session.user.userId, {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                })
+                .then((resp2) => {
+                  console.log("Apagou os comentários")
+                })
+                .catch((error) => {
+                  console.log(error);
+                  //res.render('error_page', { message: error.response.data.error });
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+                //res.render('error_page', { message: error.response.data.error });
+              });
+              //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
+              res.render('login', { userDeleted: true, msg: "Utilizador apagado!" });
+            })
+            .catch((error) => {
+              //console.log(error);
+              //res.render('error_page', { message: error.response.data.error });
+              if (error.response && error.response.data){
+                renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
+              }else{
+                res.render('error_page', { message: error });
+              }
+          });
+});
+
+router.get('/delete/:id', function(req, res, next) {
+  console.log("delete")
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  //console.log(req.body);
+
+  console.log(req.session.user.token)
+  axios.delete(process.env.API_AUTH_URL + '/user/deleteUser', {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((resp) => {
+              //console.log(response);
+              axios.delete(process.env.API_DATA_URL + '/api/delete/hard/user/' + req.params.id, {
+                headers: {
+                  Authorization: `Bearer ${req.session.user.token}`
+                }
+              })
+              .then((resp1) => {
+                console.log("Apagou recursos do utilizador e comentários que estes tinha")
+                axios.delete(process.env.API_DATA_URL + '/api/delete/hard/comments/'  + req.params.id, {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                })
+                .then((resp2) => {
+                  console.log("Apagou os comentários")
+                })
+                .catch((error) => {
+                  console.log(error);
+                  //res.render('error_page', { message: error.response.data.error });
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+                //res.render('error_page', { message: error.response.data.error });
+              });
+              //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
+              renderNoticiasPage(res,req,true, null, null, null);
+              res.render('noticias', { userInfo: req.session.user, userDeletedFlag: true});
+            })
+            .catch((error) => {
+              //console.log(error);
+              //res.render('error_page', { message: error.response.data.error });
+              if (error.response && error.response.data){
                 renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
               }else{
                 res.render('error_page', { message: error });

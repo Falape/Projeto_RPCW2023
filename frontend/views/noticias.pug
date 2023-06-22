@@ -35,3 +35,9 @@ block content
                 .w3-col.s6.w3-text-right
                     a.w3-button.w3-green(href=`/recurso/${noticia.resourceId}`) Ver detalhes
     include footer
+
+    script.
+        var userDeletedFlag = "#{userDeletedFlag}"
+        if (userDeletedFlag === "true") {
+            alert('Utilizador apagado com sucesso!');
+        } 

@@ -155,8 +155,13 @@ block content
                     p Todos os recursos que tenha criado serão também eliminados.
 
                 div.w3-container
-                    a.w3-button.w3-red.delete-button(href='/users/delete') Delete
+                    if owner
+                        a.w3-button.w3-red.delete-button(href='/users/delete') Delete
+                    if userInfo.role == 'admin' && !owner
+                        a.w3-button.w3-red.delete-button(href='/users/delete/' + user._id) Delete
                     button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+
+                    
 
 
     script.
