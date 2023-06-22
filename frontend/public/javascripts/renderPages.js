@@ -124,4 +124,19 @@ function renderListUsers(req, res, flagError=null, error=null){
   });
 }
 
-module.exports = {renderUserPage, renderResourcePage, renderListUsers};
+function renderListRoleUpdateRequests(req, res, acceptedFlag=null, errorFlag=null){
+  axios.get(process.env.API_AUTH_URL + '/admin/updateRoleList',{
+    headers: {
+        Authorization: `Bearer ${req.session.user.token}`
+    }
+    })
+  .then((response) => {
+    console.log(response.data)
+    res.render('listRequestUpdate', { roleUpdatesList: response.data, userInfo:req.session.user, acceptedFlag:acceptedFlag, errorFlag:errorFlag});
+  })
+  .catch((error) => {
+    console.log(error);
+    res.render('error_page', { message: error.response.data.error });
+  });
+}
+module.exports = {renderUserPage, renderResourcePage, renderListUsers, renderListRoleUpdateRequests};
