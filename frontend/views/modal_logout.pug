@@ -1,0 +1,20 @@
+extends layout 
+
+block content
+    div.modal.fade(id="logoutModal" tabindex="-1" aria-labelledby="logoutLabel" aria-hidden="true")
+        div.modal-dialog.modal-dialog-centered
+            div.w3-modal-content
+                div.w3-container
+                    h5.modal-title#logoutLabel Delete User
+                    //- button.w3-closebtn.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
+                        span(aria-hidden="true") ×
+                    p Tem a certeza que pretende sair?
+
+
+                div.w3-container
+                    a.w3-button.w3-red.delete-button(href='/logout') Sim
+                    button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Não
+
+    script.
+        var myModallogoutModal = new bootstrap.Modal(document.getElementById('logoutModal'), options)
+            myModallogoutModal.show()

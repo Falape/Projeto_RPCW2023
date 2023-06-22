@@ -2,7 +2,10 @@ extends layout
 
 block content
   nav.w3-bar.w3-black
-    a.w3-bar-item.w3-button.w3-right(href='/logout') Logout
+    if false
+      a.w3-bar-item.w3-button.w3-right(data-bs-toggle="modal" data-bs-target="#logoutModal") Logout
+    else 
+      a.w3-bar-item.w3-button.w3-right(href='/logout') Logout
     a.w3-bar-item.w3-button.w3-right(href='/users/getUser') Perfil 
     a.w3-bar-item.w3-button.w3-right(href='/listUsers') Utilizadores
     if userInfo.role === 'admin'
@@ -12,3 +15,5 @@ block content
       a.w3-bar-item.w3-button.w3-right(href='/recursos') Meus Recursos
     a.w3-bar-item.w3-button.w3-right(href='/recursos') Recursos
     a.w3-bar-item.w3-button.w3-right(href='/') Home
+
+

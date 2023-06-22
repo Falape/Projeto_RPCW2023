@@ -559,4 +559,13 @@ router.get('/getUser/:id', function (req, res, next) {
 });
 
 
+router.get('/logout', function(req, res) {
+  if (!req.session) {
+    return res.redirect('/login')//res.status(500).send('Session object is undefined');
+  }
+  //req.logout(); // This will clear the user session
+  res.clearCookie('session');
+  res.redirect('/'); // Redirect the user to the home page or any other desired page
+});
+
 module.exports = router;
