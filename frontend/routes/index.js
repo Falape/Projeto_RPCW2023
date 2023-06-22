@@ -29,6 +29,7 @@ router.get('/', function (req, res, next) {
         res.render('noticias', { noticias: notic.data });
       })
       .catch((err) => {
+        console.log(err)
         res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
       });
     //res.redirect('/recursos')
