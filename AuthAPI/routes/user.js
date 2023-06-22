@@ -81,25 +81,24 @@ router.delete('/deleteUser', checkValidToken, function(req, res, next) {
     
   User.lookup(req.payload._id)
     .then(userr => {
-      // User.delete(userr._id)
-      //   .then(resp => {    
+      User.delete(userr._id)
+        .then(resp => {    
           
-      //     try{
-      //       axios.delete(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/delete/'+userr._id)  
-      //       .then((response) => {
-      //         console.log("Axios request success");
-      //       })
-      //       .catch((error) => {
-      //         console.log("Axios request error:", error.message);
-      //         // Handle the error without crashing the server
-      //       });
-      //     }catch(e){  
-      //       console.log(e)
-      //     }
+          try{
+            axios.delete(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/delete/'+userr._id)  
+            .then((response) => {
+              console.log("Axios request success");
+            })
+            .catch((error) => {
+              console.log("Axios request error:", error.message);
+              // Handle the error without crashing the server
+            });
+          }catch(e){  
+            console.log(e)
+          }
           
-      //     res.status(200).jsonp(resp);
-      //   })
-      res.status(200).jsonp("fixe");
+          res.status(200).jsonp(resp);
+        })
     })
     .catch(err => {
       res.status(500).jsonp({ error: 'Erro getting user: ' + err })

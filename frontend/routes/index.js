@@ -10,7 +10,7 @@ const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
 
-const { renderResourcePage, renderUserPage, renderListUsers } = require('../public/javascripts/renderPages')
+const { renderResourcePage, renderUserPage, renderListUsers, renderNoticiasPage } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
@@ -31,20 +31,7 @@ router.get('/noticias', function (req, res, next) {
     return res.redirect('/login');
   }
   else {
-    body = {} // pode ser usado para filtrar
-    axios.post(process.env.API_DATA_URL + '/noticia/', body, {
-      headers: {
-        Authorization: `Bearer ${req.session.user.token}`
-      }
-    })
-      .then((notic) => {
-        console.log(notic.data)
-        res.render('noticias', { noticias: notic.data, userInfo: req.session.user });
-      })
-      .catch((err) => {
-        console.log(err)
-        res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
-      });
+    renderNoticiasPage(res, req, {}, null, null, null, null)
     //res.redirect('/recursos')
   }
 });

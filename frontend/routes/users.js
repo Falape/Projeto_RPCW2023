@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-const {renderUserPage} = require('../public/javascripts/renderPages')
+const {renderUserPage, renderNoticiasPage} = require('../public/javascripts/renderPages')
 
 /* GET users listing. */
 router.get('/getUser', function(req, res, next) {
@@ -254,8 +254,8 @@ router.get('/delete/:id', function(req, res, next) {
                 //res.render('error_page', { message: error.response.data.error });
               });
               //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
-              renderNoticiasPage(res,req,true, null, null, null);
-              res.render('noticias', { userInfo: req.session.user, userDeletedFlag: true});
+              renderNoticiasPage(res,req,{},true, null, null, null);
+              //res.render('noticias', { userInfo: req.session.user, userDeletedFlag: true});
             })
             .catch((error) => {
               //console.log(error);

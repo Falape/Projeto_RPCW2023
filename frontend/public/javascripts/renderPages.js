@@ -143,7 +143,21 @@ function renderListRoleUpdateRequests(req, res, acceptedFlag=null, errorFlag=nul
   });
 }
 
-function renderNoticiasPage(res, req, userDeletedFlag =null, resourceDeleted = null, errorFlag= null ,error=null){
+function renderNoticiasPage(res, req, body={}, userDeletedFlag =null, resourceDeleted = null, errorFlag= null ,error=null){
+  body = body// pode ser usado para filtrar
+    axios.post(process.env.API_DATA_URL + '/noticia/', body, {
+      headers: {
+        Authorization: `Bearer ${req.session.user.token}`
+      }
+    })
+      .then((notic) => {
+        console.log(notic.data)
+        res.render('noticias', { noticias: notic.data, userInfo: req.session.user, userDeletedFlag: userDeletedFlag, resourceDeleted: resourceDeleted, errorFlag: errorFlag, error:error });
+      })
+      .catch((err) => {
+        console.log(err)
+        res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
+      });
 }
 
 
