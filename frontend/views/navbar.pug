@@ -12,7 +12,7 @@ block content
       a.w3-bar-item.w3-button.w3-right(href='/admin/updateRequests') Role Update Requests
     if userInfo.role === 'admin' || userInfo.role === 'producer'
       a.w3-bar-item.w3-button.w3-right(href='/submission') Submeter novo recurso
-      a.w3-bar-item.w3-button.w3-right(href='/recursos') Meus Recursos
+      a.w3-bar-item.w3-button.w3-right(href='/users/recursos/' + userInfo._id) Meus Recursos
     a.w3-bar-item.w3-button.w3-right(href='/recursos') Recursos
     a.w3-bar-item.w3-button.w3-right(href='/') Home
 

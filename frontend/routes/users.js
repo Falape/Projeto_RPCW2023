@@ -143,7 +143,7 @@ router.get('/recursos/:id', function(req, res, next) {
   axios.post(process.env.API_DATA_URL + '/resource', {uploadedBy: req.params.id})
   .then((response) => {
     console.log(response.data);
-    res.render('list_resources3', { resources: response.data, user : req.session.user.username});
+    res.render('list_resources3', {userInfo:req.session.user, resources: response.data, user : req.session.user.username});
   })
   .catch((error) => {
     console.log(error);
