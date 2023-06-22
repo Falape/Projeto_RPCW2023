@@ -99,12 +99,8 @@ router.get('/getUser/:id', checkValidTokenAdmin, async function(req, res, next) 
 router.post('/listUsers', checkValidTokenAdmin,async function(req, res, next) {
   console.log("listUsers")
 
-  if(req.body.deleted == undefined || req.body.deleted == null){
-    res.status(200).jsonp(await User.list())
-    
-  }else{
-    res.status(200).json(await User.filter(req.body.deleted));
-  }
+  res.status(200).jsonp(await User.list())
+
 });
 
 router.delete('/deleteUser/:id', checkValidTokenAdmin, function(req, res, next) {
