@@ -16,15 +16,31 @@ const {renderResourcePage, renderUserPage, renderListUsers} = require('../public
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   console.log(req.session.user)
   if (req.session.user == undefined || req.session.user.token == null) {
     return res.redirect('/login');
   }
-  res.redirect('/recursos')
+  else {
+    body = {} // pode ser usado para filtrar
+    axios.post(process.env.API_DATA_URL + '/noticia/', body, {
+      headers: {
+        Authorization: `Bearer ${req.session.user.token}`
+      }
+    })
+      .then((notic) => {
+        console.log(notic.data)
+        res.render('noticias', { noticias: notic.data });
+      })
+      .catch((err) => {
+        console.log(err)
+        res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
+      });
+    //res.redirect('/recursos')
+  }
 });
 
-router.get('/login', function(req, res, next) {
+router.get('/login', function (req, res, next) {
   res.render('login');
 
 });
@@ -35,6 +51,7 @@ router.post('/login', function (req, res, next) {
     username: req.body.username,
     password: req.body.password
   }
+
   axios.post(process.env.API_AUTH_URL + '/login',body)
   .then((rep) => {
     console.log(rep.data.token)
@@ -61,7 +78,7 @@ router.post('/login', function (req, res, next) {
 
 
 
-router.get('/signup', function(req, res, next) {
+router.get('/signup', function (req, res, next) {
   res.render('signup');
 });
 
@@ -89,7 +106,6 @@ router.post('/signup', function (req, res, next) {
         token: response.data.token,
         userId: response.data.userId
       };
-
     // TODO: Render the home page or redirect to a different route
     res.render('test', { userInfo:req.session.user, user: req.session.user });
   })
@@ -120,10 +136,10 @@ router.get('/recursos', function (req, res, next) {
       res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
     })
     .catch((error) => {
-      if(error.response && error.response.data){
+      if (error.response && error.response.data) {
         console.log(error.response.data);
         res.render('error_page', { message: error.response.data.error });
-      }else{
+      } else {
         res.render('error_page', { message: "Não foi possivel listar os recursos." });
       }
     });
@@ -134,84 +150,7 @@ router.get('/recurso/:id', function (req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
-
   renderResourcePage(req, res, req.params.id);
-  // make request to daa api to get all resources
-  // axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,
-  //   {
-  //     headers: {
-  //       Authorization: `Bearer ${req.session.user.token}`
-  //     }
-  //   })
-  //   .then((response) => {
-  //     console.log(response.data);
-  //     // need to get resource files
-  //     axios.get(process.env.API_DATA_URL + '/file/resource/' + req.params.id,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${req.session.user.token}`
-  //         }
-  //       })
-  //       .then((response2) => {
-  //         console.log(response2.data);
-
-  //         // need to get resource rating
-  //         axios.get(process.env.API_DATA_URL + '/rating/resource/' + req.params.id,
-  //           {
-  //             headers: {
-  //               Authorization: `Bearer ${req.session.user.token}`
-  //             }
-  //           })
-  //           .then((response3) => {
-  //             //tries to get the comments
-  //             axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id,
-  //               {
-  //                 headers: {
-  //                   Authorization: `Bearer ${req.session.user.token}`
-  //                 }
-  //               })
-  //               .then((response4) => {
-  //                 console.log(response4.data);
-  //                 res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id });
-  //               })
-  //               .catch((error) => {
-  //                 //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
-  //                 res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: "", downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id, error: "Não foi possivel obter os comentários do recurso."});
-  //               })
-  //           })
-  //           .catch((error) => {
-  //             console.log(error);
-              
-  //             //failed to get the rating, it will try to get the comments
-  //             axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id,
-  //               {
-  //                 headers: {
-  //                   Authorization: `Bearer ${req.session.user.token}`
-  //                 }
-  //               })
-  //               //got the comments
-  //               .then((response4) => {
-  //                 console.log(response4.data);
-  //                 //res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id });
-  //                 res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id, error:"Não foi possivel obter o rating do recurso."});
-  //               })
-  //               //failed to get the comments
-  //               .catch((error) => {
-  //                 //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
-  //                 res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: "", downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id, error: "Não foi possivel obter o rating nem os comentários do recurso."});
-  //               })
-
-  //           })
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //         res.render('error_page', { message: "Não foi possivel obter os ficheiros do recurso." });
-  //       })
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //     res.render('error_page', { message: "Não foi possivel obter o recurso desejado." });
-  //   });
 });
 
 router.get('/navbar', function (req, res, next) {
@@ -281,7 +220,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                   sip_store.StoreSIP(__dirname + '/../uploads/' + req.file.originalname)
                     .then((files) => {
                       console.log(files);
-                      
+
                       // fazer update do resource path
                       tmp_path = files[0].path;
                       // need to cut the last 2 parts of the path
@@ -291,10 +230,11 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                       console.log(tmp_path);
                       tmp_path = './' + tmp_path + '/' + req.file.originalname;
 
-                      axios.put(process.env.API_DATA_URL + '/resource/edit/' + resource_id,{ path: tmp_path },{
-                      headers: {
-                        Authorization: `Bearer ${req.session.user.token}`
-                      }}) 
+                      axios.put(process.env.API_DATA_URL + '/resource/edit/' + resource_id, { path: tmp_path }, {
+                        headers: {
+                          Authorization: `Bearer ${req.session.user.token}`
+                        }
+                      })
                         .then((response) => {
                           console.log(response.data);
                         })
@@ -429,8 +369,8 @@ router.post('/comment', function (req, res, next) {
   }
 
   body = {
-    content : req.body.comment,
-    id : req.body.resourceId
+    content: req.body.comment,
+    id: req.body.resourceId
   }
   console.log("BODY:", body);
   axios.post(process.env.API_DATA_URL + '/comment/add/' + req.body.resourceId, body, {
@@ -456,7 +396,7 @@ router.post('/rate', function (req, res, next) {
 
   console.log("CHEGUEI AO RATE")
   body = {
-    value : req.body.rating,
+    value: req.body.rating,
   }
   console.log("BODY:", body);
   axios.post(process.env.API_DATA_URL + '/rating/add/' + req.body.resourceId, body, {
@@ -476,6 +416,7 @@ router.post('/rate', function (req, res, next) {
       res.render('error_page', { message: "Não foi possivel submeter o rating." });
     })
 })
+
 
 //Errors Not Tested!!
 router.get('/download/:id', function(req, res) {

@@ -37,6 +37,8 @@ router.post('/', checkValidToken, function (req, res) {
 
     noticiaController.list(noticia_data)
         .then(noticias => {
+            // send at most 10 noticias
+            noticias = noticias.slice(0, 10)
             res.status(201).jsonp(noticias)
         })
         .catch(error => {
@@ -103,6 +105,44 @@ router.post('/add/:id', checkValidTokenProducer, function (req, res) {
             res.status(504).jsonp({ error: error, message: "Error adding noticia..." })
         })
 });
+
+/* Add new noticia, com o id do recurso */
+router.post('/addAviso', checkValidTokenAdmin, function (req, res) {
+    console.log("req.body: ", req.body)
+    //check for required fields
+    const requiredFields = ['title', 'public', 'uploadedByUsername'];
+    const missingFields = [];
+    for (let field of requiredFields) {
+        if (!req.body[field]) 
+            missingFields.push(field);
+    }
+    if (missingFields.length > 0) {
+        res.status(400).jsonp({ error: `Missing required fields: ${missingFields.join(', ')}` });
+        return;
+    }
+
+    // get fields from body
+    ra_data = {
+        title : req.body.title,
+        uploadedBy: req.payload._id,
+        uploadedByUsername: req.body.uploadedByUsername,
+        resourceId: req.params.id,
+        type: req.body.type,
+        public: req.body.public,
+        content : req.body.content,
+        power : req.body.power,
+        dateCreated: new Date().toISOString().substring(0, 16)
+    }
+    noticiaController.addNoticia(ra_data)
+        .then(noticia => {
+            console.log("noticia added: ", noticia)
+            res.status(200).jsonp(noticia)
+        })
+        .catch(error => {
+            res.status(504).jsonp({ error: error, message: "Error adding noticia..." })
+        })
+});
+
 
 
 

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var resourceController = require('../controllers/resource')
+var noticiaController = require('../controllers/noticia')
 const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = require('../javascript/validateToken');
 
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
@@ -29,7 +30,7 @@ router.post('/', function (req, res) {
     // if field is undefined or null, delete it from object
     //Object.keys(re_data).forEach(key => re_data[key] === undefined ? delete re_data[key] : '');
     Object.keys(re_data).forEach(key => {
-        if(re_data[key] === undefined || re_data[key] === null) {
+        if (re_data[key] === undefined || re_data[key] === null) {
             delete re_data[key];
         }
     });
@@ -63,7 +64,7 @@ router.post('/add', checkValidTokenProducer, function (req, res) {
     const requiredFields = ['title', 'type', 'uploadedBy', 'uploadedByUsername'];
     const missingFields = [];
     for (let field of requiredFields) {
-        if (!req.body[field]) 
+        if (!req.body[field])
             missingFields.push(field);
     }
     if (missingFields.length > 0) {
@@ -86,25 +87,30 @@ router.post('/add', checkValidTokenProducer, function (req, res) {
     }
     resourceController.addResource(re_data)
         .then(resource => {
-            res.status(200).jsonp(resource)
             // adicionar noticia
-                ra_data = {
-                    title : resource.title,
-                    uploadedBy: resource.uploadedBy,
-                    uploadedByUsername: resource.uploadedByUsername,
-                    resourceId: resource._id,
-                    type: resource.type,
-                    public: resource.public,
-                    dateCreated: resource.dateCreated
-                }
-                noticiaController.addNoticia(ra_data)
-                    .then(noticia => {
-                        console.log("noticia added: ", noticia)
-                        res.status(200).jsonp(noticia)
-                    })
-                    .catch(error => {
-                        res.status(504).jsonp({ error: error, message: "Error adding noticia..." })
-                    })
+            ra_data = {
+                title: resource.title,
+                uploadedBy: resource.uploadedBy,
+                uploadedByUsername: resource.uploadedByUsername,
+                resourceId: resource._id,
+                type: resource.type,
+                public: resource.public,
+                dateCreated: resource.dateCreated
+            }
+            console.log("NOTICIA_data: ", ra_data)
+            noticiaController.addNoticia(ra_data)
+                .then(noticia => {
+                    console.log("noticia added: ", noticia)
+                    res.status(200).jsonp(resource)
+                    console.log("resource added: ", resource)
+                    //res.status(200).jsonp(noticia)
+                })
+                .catch(error => {
+                    console.log("error adding noticia: ", error)
+                    res.status(200).jsonp(resource)
+                    //res.status(504).jsonp({ error: error, message: "Error adding noticia..." })
+                })
+            
         })
         .catch(error => {
             res.status(503).jsonp({ error: error, message: "Error adding resource..." })
@@ -121,9 +127,9 @@ router.put('/edit/:id', checkValidTokenProducer, function (req, res) {
     re_id = req.params.id
 
     // Se não for admin, tenho que verificar se quem quer editar é o dono do recurso
-    if(req.payload.role != "admin"){
+    if (req.payload.role != "admin") {
         rec = resourceController.getResource(re_id)
-        if(rec.uploadedBy != req.payload._id && rec.uploadedByUsername != req.payload.username){
+        if (rec.uploadedBy != req.payload._id && rec.uploadedByUsername != req.payload.username) {
             return res.status(401).jsonp({ error: `Unauthorized to edit this resource...` });
         }
     }
@@ -177,16 +183,16 @@ router.delete('/delete/hard/:id', checkValidTokenAdmin, function (req, res) {
 });
 
 // delete resource (soft)
-router.delete('/delete/soft/:id', checkValidTokenProducer,function (req, res) {
+router.delete('/delete/soft/:id', checkValidTokenProducer, function (req, res) {
     //user id is in req.payload._id
     //user role is in req.payload.role
     //user username is in req.payload.username
     re_id = req.params.id
 
     // Se não for admin, tenho que verificar se quem quer apagar é o dono do recurso
-    if(req.payload.role != "admin"){
+    if (req.payload.role != "admin") {
         rec = resourceController.getResource(re_id)
-        if(rec.uploadedBy != req.payload._id && rec.uploadedByUsername != req.payload.username){
+        if (rec.uploadedBy != req.payload._id && rec.uploadedByUsername != req.payload.username) {
             return res.status(401).jsonp({ error: `Unauthorized to edit this resource...` });
         }
     }

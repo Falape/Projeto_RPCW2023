@@ -4,6 +4,7 @@ var Noticia = require('../models/noticia')
 module.exports.list = (fields) => {
     return Noticia
         .find(fields)  //filtra por parametros
+        .sort({dateCreated: -1})  // sorts in descending order (noticias mais recentes primeiro)
         .then(resposta => {
             return resposta
         })

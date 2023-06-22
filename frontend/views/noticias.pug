@@ -1,0 +1,37 @@
+extends layout
+
+block content
+    include header
+    include navbar
+    h1 Nóticias:
+    each noticia in noticias
+        .w3-container.w3-card.w3-margin-bottom
+            if noticia.power
+                .w3-container.w3-orange
+                    p 
+                        strong Aviso da administração: 
+                        | #{noticia.title}
+                .w3-row
+                    .w3-col.s6
+                        p #{noticia.content}
+                        p 
+                            strong Autor: 
+                            | #{noticia.uploadedByUsername} 
+                            strong Data: 
+                            | #{noticia.dateCreated}
+            else
+                .w3-container.w3-blue
+                    p Novo recurso adicionado!
+                .w3-row
+                    .w3-col.s6
+                        h2 Titulo: #{noticia.title}
+                        p 
+                            strong Autor da submissão: 
+                            | #{noticia.uploadedByUsername} 
+                            strong Data de submissão: 
+                            | #{noticia.dateCreated} 
+                            strong Tipo de Recurso: 
+                            | #{noticia.type}
+                .w3-col.s6.w3-text-right
+                    a.w3-button.w3-green(href=`/recurso/${noticia.resourceId}`) Ver detalhes
+    include footer
