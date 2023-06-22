@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-const renderUserPage = require('../public/javascripts/renderPages')
+const {renderUserPage} = require('../public/javascripts/renderPages')
 
 /* GET users listing. */
 router.get('/getUser', function(req, res, next) {

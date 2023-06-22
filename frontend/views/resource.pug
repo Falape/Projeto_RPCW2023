@@ -30,10 +30,10 @@ block content
   h2 Ficheiros do Recurso:
   include tabelaFiles
   
-  if downloadUrl
+  if downloadUrl && files.length
     p
       button.w3-button.w3-green(onclick=`window.location.href='${downloadUrl}'`) Download do Recurso
-  if comments != ""
+  if commentsFlag != "false"
     include comment_section
   include footer
 
@@ -41,4 +41,24 @@ block content
     var error = "#{error}"
     if (error !== "") {
         alert(error);
+    }
+
+    var downloadFlag = "#{downloadFlag}"
+    if (downloadFlag === "true") {
+        var flagError = "#{flagError}";
+        alert('Download failed: ' + flagError);
+    }
+
+    var updateFlag = "#{updateFlag}"
+    if (updateFlag === "true") {
+        alert('Resource updated successfully!');
+    } else if (updateFlag === "false") {
+        var flagError = "#{flagError}";
+        alert('Resource update failed: ' + flagError);
+    }
+
+    var deleteFlag = "#{deleteFlag}"
+    if (deleteFlag === "true") {
+        var flagError = "#{flagError}";
+        alert('Download failed: ' + flagError);
     }

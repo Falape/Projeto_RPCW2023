@@ -37,7 +37,12 @@ block content
                     button.w3-button.w3-blue(type='submit') Upload
 
 
-    script.
-        // You can add some client-side validation or other JavaScript here.
     div(style="padding-top: 100px;")
     include footer
+
+    script.
+        var flagAlert = "#{flagAlert}"
+        if (flagAlert === "true") {
+            var flagError = "#{flagError}";
+            alert('Upload do recurso falhou: ' + flagError);
+        }
