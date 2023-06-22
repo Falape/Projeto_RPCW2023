@@ -4,8 +4,8 @@ block content
   nav.w3-bar.w3-black
     a.w3-bar-item.w3-button.w3-right(href='/logout') Logout
     a.w3-bar-item.w3-button.w3-right(href='/users/getUser') Perfil 
+    a.w3-bar-item.w3-button.w3-right(href='/listUsers') Utilizadores
     if userInfo.role === 'admin'
-      a.w3-bar-item.w3-button.w3-right(href='/users') Utilizadores
       a.w3-bar-item.w3-button.w3-right(href='/users') Role Update Requests
     if userInfo.role === 'admin' || userInfo.role === 'producer'
       a.w3-bar-item.w3-button.w3-right(href='/submission') Submeter novo recurso

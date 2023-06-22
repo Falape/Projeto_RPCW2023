@@ -10,7 +10,7 @@ const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
 
-const {renderResourcePage} = require('../public/javascripts/renderPages')
+const {renderResourcePage, renderUserPage, renderListUsers} = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
@@ -517,5 +517,46 @@ router.get('/download/resource/:id', function(req, res) {
     //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
   })
 });
+
+router.get('/listUsers', function (req, res, next) {
+  //console.log(req.body.password)
+  if (!req.session.user) {
+      return res.redirect('/login');
+    }
+
+    renderListUsers(req, res, null, null);
+});
+
+router.get('/getUser/:id', function (req, res, next) {
+  //console.log(req.body.password)
+  if (!req.session.user) {
+      return res.redirect('/login');
+    }
+
+  console.log("topken "+req.session.user.token)
+  axios.get(process.env.API_AUTH_URL + '/getUser/' + req.params.id, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+  .then((response) => {
+
+    if (!req.session) {
+      return res.redirect('/login')//res.status(500).send('Session object is undefined');
+    }
+    var owner = false;
+  
+    if (req.session.user.userId == response.data._id){
+      owner = true;
+    }
+    res.render('user_page', { user: response.data, owner:owner, userInfo:req.session.user });
+  }).catch((err) => {
+    console.log(err)
+
+    renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
+    
+  });
+});
+
 
 module.exports = router;
