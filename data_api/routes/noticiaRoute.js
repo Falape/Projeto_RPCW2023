@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var noticiaController = require('../controllers/noticia')
 const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = require('../javascript/validateToken');
+const noticia = require('../models/noticia');
 
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
 
@@ -27,6 +28,12 @@ router.post('/', checkValidToken, function (req, res) {
         }
     });
 
+    user_role = req.payload.role
+
+    // if user is consumer, only get public noticias
+    if (user_role == "consumer") {
+        noticia_data.public = true
+    }
 
     noticiaController.list(noticia_data)
         .then(noticias => {
@@ -35,6 +42,7 @@ router.post('/', checkValidToken, function (req, res) {
         .catch(error => {
             res.status(501).jsonp({ error: error, message: "Error getting noticias..." })
         })
+
 });
 
 /* Get noticia by id */
@@ -62,7 +70,7 @@ router.get('/resource/:id', checkValidToken, function (req, res) {
 });
 
 /* Add new noticia, com o id do recurso */
-router.post('/add/:id', checkValidToken, function (req, res) {
+router.post('/add/:id', checkValidTokenProducer, function (req, res) {
     console.log("req.body: ", req.body)
     //check for required fields
     const requiredFields = ['title', 'type', 'public', 'uploadedByUsername'];
