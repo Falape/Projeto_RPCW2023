@@ -9,7 +9,6 @@ const passport = require("passport"),
     requestUpdateRole = require("../models/requestUpdateRole");
 
 const { checkValidToken } = require('../javascript/validateToken');
-const e = require('express');
 
 var router = express.Router();
 
@@ -21,20 +20,16 @@ router.post("/signup", function (req, res) {
   }
 
   var newUser = new userModel({email: req.body.email, role : 'consumer', username : req.body.username})
-  userModel.register(newUser, req.body.password, function (err, nUser) {
-    if (err) {
-      res.status(500).jsonp({
-        errorMessage: 'Error signing up',
-        error:err.message
-      });
-    }
+
+  User.register(newUser, req.body.password)
+  .then(nUser => {
     passport.authenticate('local', { session: false }, (err, user, info) => {
       if (err || !user) {
-        res.status(500).jsonp({error:"Erro na Autentificação", err:err})
+        res.status(502).jsonp({error:"Erro na Autentificação", err:err})
       }else{
       req.login(user, { session: false }, (err) => {
         if (err) {
-          res.status(500).jsonp({error:"Erro no login"})
+          res.status(503).jsonp({error:"Erro no login"})
         }else{
         // generate a signed son web token with the contents of user object and return it in the response
         var userTosend = {}
@@ -77,7 +72,19 @@ router.post("/signup", function (req, res) {
       })
     };
     })(req, res);
+  })
+  .catch(err => {
+    if(err.code == 11000){
+      res.status(501).jsonp({error:"Email já está registado!"})
+    }else{
+      console.log(err)
+    res.status(501).jsonp({
+      errorMessage: 'Error signing up',
+      error:err.message
+    });
+  }
   });
+  
 });
 
 // Login
@@ -167,6 +174,51 @@ router.get('/logout', checkValidToken, function(req, res) {
   })
 });
 
+router.get('/listUsers', checkValidToken, function(req, res, next) {
+  console.log("listUsers")
+  User.list()
+    .then(data => {
+      res.status(200).jsonp(data)
+    })
+    .catch(err => {
+      res.status(500).jsonp({error: err})
+    })
+  //res.status(200).jsonp(await User.list())
+
+});
+
+router.get('/getUser/:id', checkValidToken, async function(req, res, next) {
+  console.log("get_user_id")
+
+  User.lookup(req.params.id)
+    .then(userr => {
+      userResp = {};
+      userResp._id = userr._id;
+      userResp.email = userr.email;
+      userResp.role = userr.role;
+      userResp.username = userr.username;
+     
+      const axiosPromise = axios.get(`${process.env.USER_SERVER_PROTOCOL}://${process.env.USER_SERVER_HOST}:${process.env.USER_SERVER_PORT}/api/user/${userr._id}`);
+
+      Promise.all([axiosPromise])
+        .then(([response]) => {
+          console.log(response.data);
+          userResp.name = response.data.name;
+          userResp.filiacao = response.data.filiacao;
+          userResp.created_date = response.data.created_date;
+          userResp.last_access = response.data.last_access;
+          console.log(userResp);
+  
+          res.status(200).json(userResp);
+        })
+        .catch(error => {
+          console.log(error);
+          // Handle the error, e.g., log the error or set default values for userResp properties
+  
+          res.status(200).json(userResp);
+        });
+    })
+});
 
 
 module.exports = router;

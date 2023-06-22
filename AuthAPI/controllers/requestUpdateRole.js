@@ -22,6 +22,11 @@ module.exports.lookup = function(id) {
         .exec()
 }
 
+module.exports.delete = function(id) {
+    return RequestUpdateRole
+        .deleteOne({_id:id})
+        .exec()
+}
 
 module.exports.insert = function(requestUpdateRole) { 
     var newRequestUpdateRole = new RequestUpdateRole(requestUpdateRole)

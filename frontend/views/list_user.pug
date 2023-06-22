@@ -1,0 +1,33 @@
+extends layout
+
+block content
+    include header
+    include navbar
+
+    div.page-container
+        h1.page-heading User List
+        table.w3-table-all
+            thead
+                tr
+                    th Username
+                    th Email
+                    th Role
+            tbody
+                each user in userList
+                        tr
+                            td 
+                                a(href="/getUser/"+user._id) #{user.username}
+                            td #{user.email}
+                            td #{user.role}
+
+
+    div(style="padding-top: 100px;")
+    include footer
+
+
+    script.
+        var flagError = "#{flagError}"
+        if (flagError === "true") {
+            var error = "#{error}";
+            alert('Erro: ' + error);
+        }
