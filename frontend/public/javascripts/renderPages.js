@@ -139,4 +139,11 @@ function renderListRoleUpdateRequests(req, res, acceptedFlag=null, errorFlag=nul
     res.render('error_page', { message: error.response.data.error });
   });
 }
-module.exports = {renderUserPage, renderResourcePage, renderListUsers, renderListRoleUpdateRequests};
+
+function renderNoticiasPage(res, req, userDeletedFlag =null, resourceDeleted = null, errorFlag= null ,error=null){
+}
+
+
+
+
+module.exports = {renderUserPage, renderResourcePage, renderListUsers, renderListRoleUpdateRequests, renderNoticiasPage};
