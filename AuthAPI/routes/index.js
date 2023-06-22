@@ -20,20 +20,16 @@ router.post("/signup", function (req, res) {
   }
 
   var newUser = new userModel({email: req.body.email, role : 'consumer', username : req.body.username})
-  userModel.register(newUser, req.body.password, function (err, nUser) {
-    if (err) {
-      res.status(500).jsonp({
-        errorMessage: 'Error signing up',
-        error:err.message
-      });
-    }
+
+  User.register(newUser, req.body.password)
+  .then(nUser => {
     passport.authenticate('local', { session: false }, (err, user, info) => {
       if (err || !user) {
-        res.status(500).jsonp({error:"Erro na Autentificação", err:err})
+        res.status(502).jsonp({error:"Erro na Autentificação", err:err})
       }else{
       req.login(user, { session: false }, (err) => {
         if (err) {
-          res.status(500).jsonp({error:"Erro no login"})
+          res.status(503).jsonp({error:"Erro no login"})
         }else{
         // generate a signed son web token with the contents of user object and return it in the response
         var userTosend = {}
@@ -76,7 +72,19 @@ router.post("/signup", function (req, res) {
       })
     };
     })(req, res);
+  })
+  .catch(err => {
+    if(err.code == 11000){
+      res.status(501).jsonp({error:"Email já está registado!"})
+    }else{
+      console.log(err)
+    res.status(501).jsonp({
+      errorMessage: 'Error signing up',
+      error:err.message
+    });
+  }
   });
+  
 });
 
 // Login
