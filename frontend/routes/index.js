@@ -158,7 +158,10 @@ router.get('/recurso/:id', function (req, res, next) {
               axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id)
                 .then((response4) => {
                   console.log(response4.data);
-                  res.render('resource', { resource: response.data, rating: response2.data, files: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/' + req.params.id });
+                  res.render('resource', { resource: response.data, rating: response2.data, 
+                    files: response3.data, comments: response4.data, 
+                    downloadUrl: process.env.FRONT_URL + '/download/resource/' + req.params.id, 
+                    deleteUrl: process.env.FRONT_URL + '/delete/resource/' + req.params.id });
                 })
                 .catch((error) => {
                   res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });

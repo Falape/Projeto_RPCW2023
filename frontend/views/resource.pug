@@ -33,5 +33,7 @@ block content
   if downloadUrl && files && files.length > 1
     p
       button.w3-button.w3-green(onclick=`window.location.href='${downloadUrl}'`) Download do Recurso
+  p
+      button.w3-button.w3-red(onclick=`window.location.href='${deleteUrl}'`) Apagar Recurso
   include comment_section
   include footer
