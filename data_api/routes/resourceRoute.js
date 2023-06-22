@@ -87,8 +87,6 @@ router.post('/add', checkValidTokenProducer, function (req, res) {
     }
     resourceController.addResource(re_data)
         .then(resource => {
-            res.status(200).jsonp(resource)
-            console.log("resource added: ", resource)
             // adicionar noticia
             ra_data = {
                 title: resource.title,
@@ -103,12 +101,16 @@ router.post('/add', checkValidTokenProducer, function (req, res) {
             noticiaController.addNoticia(ra_data)
                 .then(noticia => {
                     console.log("noticia added: ", noticia)
+                    res.status(200).jsonp(resource)
+                    console.log("resource added: ", resource)
                     //res.status(200).jsonp(noticia)
                 })
                 .catch(error => {
                     console.log("error adding noticia: ", error)
+                    res.status(200).jsonp(resource)
                     //res.status(504).jsonp({ error: error, message: "Error adding noticia..." })
                 })
+            
         })
         .catch(error => {
             res.status(503).jsonp({ error: error, message: "Error adding resource..." })
