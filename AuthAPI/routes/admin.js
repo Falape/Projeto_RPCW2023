@@ -13,16 +13,17 @@ const { checkValidTokenAdmin } = require('../javascript/validateToken');
 var router = express.Router();
 
 //gets the list of requests for role update
-router.post('/updateRoleList', checkValidTokenAdmin, async function(req, res, next) {
+router.get('/updateRoleList', checkValidTokenAdmin, function(req, res, next) {
   console.log("updateRoleList")
 
-  if(req.body.accepted == undefined || req.body.accepted == null){
-    res.status(200).jsonp(await RequestUpdateRole.list())
-
-  }else{
-    res.status(200).json(await RequestUpdateRole.filter(req.body.accepted));
-  }
-
+  //if(req.body.accepted == undefined || req.body.accepted == null){
+    RequestUpdateRole.list()
+      .then(list => {
+        res.status(200).jsonp(list);
+      })
+      .catch(error => {
+        res.status(400).jsonp({ error: error.message });
+      });
 });
 
 //gets the request for role update by id
@@ -61,6 +62,39 @@ router.post('/updateRole/:id', checkValidTokenAdmin, async function(req, res, ne
     }
   }
 });
+
+router.get('/updateRole/accept/:id', checkValidTokenAdmin, function(req, res, next) {
+  console.log("accept_updateRole_id")
+
+  RequestUpdateRole.lookup(req.params.id)
+  .then(updateRole => {
+    User.lookup(updateRole.user_id)
+      .then(userToUpdate => {
+        userToUpdate.role = updateRole.required_Role;
+        userToUpdate.save()
+        .then(savedUser => {
+          RequestUpdateRole.delete(req.params.id)
+          res.status(200).json(savedUser);
+        });
+      });
+  })
+  .catch(error => {
+    res.status(400).jsonp({ error: "Não encontrou o pedido!" });
+  });
+});
+
+router.get('/updateRole/refuse/:id', checkValidTokenAdmin, function(req, res, next) {
+  console.log("refuse_updateRole_id")
+
+  RequestUpdateRole.delete(req.params.id)
+  .then(() => {
+    res.status(200).json({message: "Pedido apagado com sucesso!"});
+  })
+  .catch(error => {
+    res.status(400).jsonp({ error: "Não encontrou o pedido!" });
+  })
+});
+
 
 //Get user by id
 router.get('/getUser/:id', checkValidTokenAdmin, async function(req, res, next) {
