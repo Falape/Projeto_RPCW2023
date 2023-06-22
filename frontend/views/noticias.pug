@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  include header
+  include navbar
+  h1 Nóticias:
+  each noticia in noticias
+    .w3-container.w3-card.w3-margin-bottom
+      .w3-container.w3-blue
+        p Novo recurso adicionado!
+      .w3-row
+        .w3-col.s6
+          h2 Titulo: #{noticia.title}
+          p Autor da submissão: #{noticia.uploadedByUsername}
+          p Data de submissão: #{noticia.dateCreated}
+          p Tipo de Recurso: #{noticia.type}
+      .w3-col.s6.w3-text-right
+        a.w3-button.w3-green(href=`/recurso/${noticia.resourceId}`) Ver detalhes
+  include footer

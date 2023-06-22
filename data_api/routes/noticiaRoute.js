@@ -37,6 +37,8 @@ router.post('/', checkValidToken, function (req, res) {
 
     noticiaController.list(noticia_data)
         .then(noticias => {
+            // send at most 10 noticias
+            noticias = noticias.slice(0, 10)
             res.status(201).jsonp(noticias)
         })
         .catch(error => {
