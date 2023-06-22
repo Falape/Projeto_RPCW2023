@@ -8,6 +8,7 @@ var noticiaModel = require('../models/noticia')
 module.exports.list = (fields) => {
     return Resource
         .find(fields)  //filtra por parametros
+        .sort({dateCreated: -1})
         .then(resposta => {
             return resposta
         })

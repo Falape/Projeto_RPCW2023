@@ -55,7 +55,10 @@ function renderResourcePage(req, res, resourceId, downloadFlag=null, updateFlag 
                 })
                 .then((response4) => {
                   console.log(response4.data);
-                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+resourceId, downloadFlag:downloadFlag, updateFlag:updateFlag, deleteFlag:deleteFlag, flagError:flagError});
+                  res.render('resource', { resource: response.data, userInfo:req.session.user 
+                    ,files: response2.data ,rating: response3.data, comments: response4.data, 
+                    downloadFlag:downloadFlag, updateFlag:updateFlag, deleteFlag:deleteFlag, 
+                    flagError:flagError});
                 })
                 .catch((error) => {
                   //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });

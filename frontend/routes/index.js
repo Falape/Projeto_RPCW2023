@@ -10,7 +10,7 @@ const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
 
-const {renderResourcePage, renderUserPage, renderListUsers} = require('../public/javascripts/renderPages')
+const { renderResourcePage, renderUserPage, renderListUsers } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
@@ -19,6 +19,15 @@ const {renderResourcePage, renderUserPage, renderListUsers} = require('../public
 router.get('/', function (req, res, next) {
   console.log(req.session.user)
   if (req.session.user == undefined || req.session.user.token == null) {
+    return res.redirect('/login');
+  }else{
+    res.redirect('/noticias')
+  }
+});
+
+router.get('/noticias', function (req, res, next) {
+  console.log(req.session.user)
+  if (!req.session.user) {
     return res.redirect('/login');
   }
   else {
@@ -30,7 +39,7 @@ router.get('/', function (req, res, next) {
     })
       .then((notic) => {
         console.log(notic.data)
-        res.render('noticias', { noticias: notic.data });
+        res.render('noticias', { noticias: notic.data, userInfo: req.session.user });
       })
       .catch((err) => {
         console.log(err)
@@ -52,28 +61,28 @@ router.post('/login', function (req, res, next) {
     password: req.body.password
   }
 
-  axios.post(process.env.API_AUTH_URL + '/login',body)
-  .then((rep) => {
-    console.log(rep.data.token)
-    if (!req.session) {
-      return res.redirect('/login')//res.status(500).send('Session object is undefined');
-    }
-    req.session.user = {
-      username: rep.data.username, 
-      role: rep.data.role,
-      token: rep.data.token,
-      userId: rep.data.userId
-    };
-    //TODO: render home page
-    res.render('test', {userInfo:req.session.user});
-  }).catch((err) => {
+  axios.post(process.env.API_AUTH_URL + '/login', body)
+    .then((rep) => {
+      console.log(rep.data.token)
+      if (!req.session) {
+        return res.redirect('/login')//res.status(500).send('Session object is undefined');
+      }
+      req.session.user = {
+        username: rep.data.username,
+        role: rep.data.role,
+        token: rep.data.token,
+        userId: rep.data.userId
+      };
+      //TODO: render home page
+      res.render('test', { userInfo: req.session.user });
+    }).catch((err) => {
 
-    if (err.response && err.response.data){
-      res.render('login', {wrong_data:true, error:  err.response.data.error});
-    }else{
-      res.render('error_page', { message: err });
-    }
-  });
+      if (err.response && err.response.data) {
+        res.render('login', { wrong_data: true, error: err.response.data.error });
+      } else {
+        res.render('error_page', { message: err });
+      }
+    });
 });
 
 
@@ -106,20 +115,20 @@ router.post('/signup', function (req, res, next) {
         token: response.data.token,
         userId: response.data.userId
       };
-    // TODO: Render the home page or redirect to a different route
-    res.render('test', { userInfo:req.session.user, user: req.session.user });
-  })
-  .catch((error) => {
-    //console.log(error.response);
-    if (error.response && error.response.data){
-      //console.log("error")
-      //console.log(error.response.data.error)
-      res.render('signup', {wrong_data:true, error:  error.response.data.error});
-    }else{
-      res.render('error_page', { message: error });
-    }
-   
-  });
+      // TODO: Render the home page or redirect to a different route
+      res.render('test', { userInfo: req.session.user, user: req.session.user });
+    })
+    .catch((error) => {
+      //console.log(error.response);
+      if (error.response && error.response.data) {
+        //console.log("error")
+        //console.log(error.response.data.error)
+        res.render('signup', { wrong_data: true, error: error.response.data.error });
+      } else {
+        res.render('error_page', { message: error });
+      }
+
+    });
 });
 
 
@@ -205,7 +214,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
           .then((resp) => {
             if (resp == false) {
               // zip não se encontra no formato correcto.
-              
+
               //res.render('error_page', { message: "ZIP is invalid." });
               res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "ZIP is invalid." });
             }
@@ -263,11 +272,10 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                           .catch((error) => {
                             console.log(error);
                             //res.render('error_page', { message: "Não foi possivel Adicionar o ficheiro: " + file_body.fileName });
-                            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError:  "Não foi possivel Adicionar o ficheiro: " + file_body.fileName  });
+                            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel Adicionar o ficheiro: " + file_body.fileName });
                           });
                       }
-                      //AQUIUIIIIIII È APRA TROCAR 
-                      res.redirect('/recursos');
+                      res.redirect('/recurso/' + resource_id);
                     })
                     .catch((error) => {
                       console.log(error);
@@ -279,7 +287,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                 .catch((error) => {
                   console.log(error);
                   //res.render('error_page', { message: "Não foi possivel submeter o recurso." });
-                  res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel submeter o recurso."  });
+                  res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel submeter o recurso." });
                 })
             }
           })
@@ -327,8 +335,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
                         }
                       })
                         .then((response) => {
-                          console.log(response.data);
-                          res.redirect('/recursos')
+                          res.redirect('/recurso/' + resource_id);
                         })
                         .catch((error) => {
                           console.log(error);
@@ -354,7 +361,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
           .catch((error) => {
             console.log(error);
             //res.render('error_page', { message: "Não foi possivel submeter o recurso." });
-            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel submeter o recurso."  });
+            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel submeter o recurso." });
           });
       }
     }
@@ -419,88 +426,88 @@ router.post('/rate', function (req, res, next) {
 
 
 //Errors Not Tested!!
-router.get('/download/:id', function(req, res) {
+router.get('/download/:id', function (req, res) {
 
   if (!req.session.user) {
     return res.redirect('/login');
   }
 
   axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,)
-  .then((response) => {
-    console.log(response.data);
-    console.log("DOWNLOAD PATH: ",response.data.path);
-    res.download(response.data.path)
-  })
-  .catch((error) => {
-    console.log(error);
+    .then((response) => {
+      console.log(response.data);
+      console.log("DOWNLOAD PATH: ", response.data.path);
+      res.download(response.data.path)
+    })
+    .catch((error) => {
+      console.log(error);
 
 
-    renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do ficheiro.");
-    //res.render('error_page', { message: "Não foi possivel fazer download do ficheiro." });
-  })
+      renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do ficheiro.");
+      //res.render('error_page', { message: "Não foi possivel fazer download do ficheiro." });
+    })
 });
 
-router.get('/download/resource/:id', function(req, res) {
+router.get('/download/resource/:id', function (req, res) {
 
   if (!req.session.user) {
     return res.redirect('/login');
   }
 
   axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,)
-  .then((response) => {
-    console.log(response.data);
-    console.log("DOWNLOAD RESOURCE PATH: ",response.data.path);
-    res.download(response.data.path)
-  })
-  .catch((error) => {
-    console.log(error);
-    renderResourcePage(req, res, req.params.id, true, null, null,"Não foi possivel fazer download do recurso.");
-    //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
-  })
+    .then((response) => {
+      console.log(response.data);
+      console.log("DOWNLOAD RESOURCE PATH: ", response.data.path);
+      res.download(response.data.path)
+    })
+    .catch((error) => {
+      console.log(error);
+      renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do recurso.");
+      //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
+    })
 });
 
 router.get('/listUsers', function (req, res, next) {
   //console.log(req.body.password)
   if (!req.session.user) {
-      return res.redirect('/login');
-    }
+    return res.redirect('/login');
+  }
 
-    renderListUsers(req, res, null, null);
+  renderListUsers(req, res, null, null);
 });
 
 router.get('/getUser/:id', function (req, res, next) {
   //console.log(req.body.password)
   if (!req.session.user) {
-      return res.redirect('/login');
-    }
+    return res.redirect('/login');
+  }
 
-  console.log("topken "+req.session.user.token)
+  console.log("topken " + req.session.user.token)
   axios.get(process.env.API_AUTH_URL + '/getUser/' + req.params.id, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
   })
-  .then((response) => {
+    .then((response) => {
 
-    if (!req.session) {
-      return res.redirect('/login')//res.status(500).send('Session object is undefined');
-    }
-    var owner = false;
-  
-    if (req.session.user.userId == response.data._id){
-      owner = true;
-    }
-    res.render('user_page', { user: response.data, owner:owner, userInfo:req.session.user });
-  }).catch((err) => {
-    console.log(err)
+      if (!req.session) {
+        return res.redirect('/login')//res.status(500).send('Session object is undefined');
+      }
+      var owner = false;
 
-    renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
-    
-  });
+      if (req.session.user.userId == response.data._id) {
+        owner = true;
+      }
+      res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user });
+    }).catch((err) => {
+      console.log(err)
+
+      renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
+
+    });
 });
 
 
-router.get('/logout', function(req, res) {
+router.get('/logout', function (req, res) {
   if (!req.session) {
     return res.redirect('/login')//res.status(500).send('Session object is undefined');
   }
@@ -508,5 +515,67 @@ router.get('/logout', function(req, res) {
   res.clearCookie('session');
   res.redirect('/'); // Redirect the user to the home page or any other desired page
 });
+
+
+
+router.get('/comment/delete/soft/:id', function (req, res) {
+
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  axios.get(process.env.API_DATA_URL + '/comment/' + req.params.id, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      //renderResourcePage(req, res, req.params.id, null, true, null);
+      axios.delete(process.env.API_DATA_URL + '/comment/delete/soft/' + req.params.id, {
+        headers: {
+          Authorization: `Bearer ${req.session.user.token}`
+        }
+      })
+        .then((response) => {
+          console.log(response.data);
+          renderResourcePage(req, res, response.data.resourceId, null, true, null);
+        })
+        .catch((error) => {
+          console.log(error);
+          renderResourcePage(req, res, response.data.resourceId, null, falso, null, "Não foi possivel remover o comentário.");
+        })
+    })
+    .catch((error) => {
+      console.log(error);
+      //renderResourcePage(req, res, req.params.id, null, falso, null,"Não foi possivel remover o comentário.");
+    })
+});
+
+// MEGA HARD DELETE
+router.get('/resource/delete/:id', function (req, res) {
+  // FAZER ISTO 
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  axios.delete(process.env.API_DATA_URL + '/resource/delete/hard/' + req.params.id, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      res.redirect('/noticias');
+      //renderResourcePage(req, res, req.params.id, null, true, null);
+    })
+    .catch((error) => {
+      console.log(error);
+      renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
+    })
+});
+
+
 
 module.exports = router;
