@@ -91,7 +91,7 @@ router.post('/signup', function (req, res, next) {
       };
 
     // TODO: Render the home page or redirect to a different route
-    res.render('test', { user: req.session.user });
+    res.render('test', { userInfo:req.session.user, user: req.session.user });
   })
   .catch((error) => {
     //console.log(error.response);
