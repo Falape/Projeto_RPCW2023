@@ -71,7 +71,7 @@ block content
     div.page-container
         div.page-header(style="display: flex; align-items: center;")
             h1(style="margin-right: 30px;").page-heading Welcome, #{user.username}!
-            if owner
+            if owner || userInfo.role === 'admin'
                 div
                     button.w3-button.w3-red(data-bs-toggle="modal" data-bs-target="#deleteUserModal") Delete
                     button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordModal") Update Password

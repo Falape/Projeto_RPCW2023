@@ -1,0 +1,41 @@
+extends layout
+
+block content
+    include header
+    include navbar
+
+    div.page-container
+        h1.page-heading Role Update List
+        table.w3-table-all
+            thead
+                tr
+                    th User
+                    th Current Role
+                    th Required Role
+                    th Actions
+            tbody
+                each update in roleUpdatesList
+                    tr
+                        td #{update.user_username}
+                        td #{update.current_Role}
+                        td #{update.required_Role}
+                        td
+                            a.w3-button(href=`/admin/requestRoleUpdate/accept/` + update._id) Accept
+                            a.w3-button(href=`/admin/requestRoleUpdate/refuse/` + update._id) Refuse
+
+
+    include footer
+
+    script.
+        var acceptedFlag = "#{acceptedFlag}"
+        if (acceptedFlag === "true") {
+            alert('Pedido Aceite!');
+        } else if (acceptedFlag === "false") {
+            alert('Pedido Recusado!');
+        }
+
+
+        var errorFlag = "#{errorFlag}"
+        if (errorFlag != "") {
+            alert('Falha no pedido:' + errorFlag);
+        }

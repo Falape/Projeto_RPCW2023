@@ -4,11 +4,12 @@ block content
   include header
   include navbar
   div.page-container
-    h1.page-heading Welcome, #{user.username}!
+    h1.page-heading Welcome, #{userInfo.username}!
     div.user-info
-      p Role: #{user.role}
-      p UserId: #{user.userId}
-      p Token: #{user.token}
+      p Role: #{userInfo.role}
+      p UserId: #{userInfo.userId}
+      p Token: #{userInfo.token}
     a.w3-button.w3-blue(href='/users/getUser') Get User
+
   include footer
 

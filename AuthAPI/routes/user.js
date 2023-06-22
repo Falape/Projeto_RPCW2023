@@ -14,17 +14,28 @@ const user = require('../models/user');
 var router = express.Router();
 
 
-router.post("/requestUpdateRole", checkValidToken, async function (req, res){
+router.post("/requestUpdateRole", checkValidToken, function (req, res){
   console.log("requestUpdateRole")
 
   if(req.body.required_Role == undefined){
     res.status(400).jsonp({ error: "Field is missing" })
   }else{
-    const reqUp = new requestUpdateRole({user_id: req.payload._id, current_Role: req.payload.role, required_Role: req.body.required_Role})
+    const reqUp = new requestUpdateRole({user_id: req.payload._id, user_username:req.payload.username, current_Role: req.payload.role, required_Role: req.body.required_Role})
 
-    await RequestUpdateRole.insert(reqUp)
+    RequestUpdateRole.insert(reqUp)
+      .then(savedReqUp => {
+        res.status(200).jsonp(savedReqUp);
+      })
+      .catch(error => {
+        console.log(error.code);
+        if(error.code == 11000){
+          res.status(400).jsonp({ error: "Já tem o pedido pendente, espere pela aprovação do admin!" });
+        }else{
+          res.status(400).jsonp({ error: error.message });
+        }
+      });
     //await reqUp.save();
-    res.status(200).jsonp(reqUp);
+    //res.status(200).jsonp(reqUp);
   }
 
 })
