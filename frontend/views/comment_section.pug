@@ -7,9 +7,9 @@ block content
       if comment.deleted === false
         .comment.w3-card-4.w3-margin
           .w3-container
-            h3.w3-large= comment.postedByUsername
-            span.w3-small.comment-date= comment.dateCreated
-            span.w3-small.comment-update= comment.updateDate
+            div.comment-container(style="display: flex; align-items: center;")
+              h3.w3-large(style="margin-right: 10px;")= comment.postedByUsername
+              span.w3-small.comment-date(style="flex-shrink: 0;")= comment.dateCreated
           .w3-display-container
             p.w3-margin= comment.content
             if comment.postedBy === userInfo.userId || userInfo.role === 'admin'

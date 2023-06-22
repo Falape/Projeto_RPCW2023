@@ -139,7 +139,11 @@ router.get('/recursos', function (req, res, next) {
   }
 
   // make request to daa api to get all resources
-  axios.post(process.env.API_DATA_URL + '/resource')
+  axios.post(process.env.API_DATA_URL + '/resource',{}, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
     .then((response) => {
       console.log(response.data);
       res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
@@ -432,7 +436,11 @@ router.get('/download/:id', function (req, res) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,)
+  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,{
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
     .then((response) => {
       console.log(response.data);
       console.log("DOWNLOAD PATH: ", response.data.path);
@@ -453,7 +461,11 @@ router.get('/download/resource/:id', function (req, res) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,)
+  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,{
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
     .then((response) => {
       console.log(response.data);
       console.log("DOWNLOAD RESOURCE PATH: ", response.data.path);
@@ -543,12 +555,13 @@ router.get('/comment/delete/soft/:id', function (req, res) {
         })
         .catch((error) => {
           console.log(error);
-          renderResourcePage(req, res, response.data.resourceId, null, falso, null, "Não foi possivel remover o comentário.");
+          renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
         })
     })
     .catch((error) => {
       console.log(error);
       //renderResourcePage(req, res, req.params.id, null, falso, null,"Não foi possivel remover o comentário.");
+      res.render('error_page', { message: "Não foi possivel remover o comentário." });
     })
 });
 

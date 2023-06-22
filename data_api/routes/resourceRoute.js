@@ -7,7 +7,7 @@ const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = requi
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
 
 /* List all resources. */
-router.post('/', function (req, res) {
+router.post('/', checkValidToken, function (req, res) {
     console.log("BODY:", req.body)
     re_data = {
         title: req.body.title,
@@ -35,6 +35,11 @@ router.post('/', function (req, res) {
         }
     });
 
+    if (req.payload.role == "consumer") {
+        re_data.public = true
+    }
+
+
     //console.log("RE_DATA FILTRADA:", re_data)
 
     resourceController.list(re_data)
@@ -47,11 +52,16 @@ router.post('/', function (req, res) {
 });
 
 /* Get resource by id */
-router.get('/:id', function (req, res) {
+router.get('/:id',checkValidToken,  function (req, res) {
     re_id = req.params.id
     resourceController.getResource(re_id)
         .then(resources => {
-            res.status(200).jsonp(resources)
+            if(resources.public == false && req.payload.role == "consumer"){
+                res.status(502).jsonp({ error: error, message: "Não tem permissões para ver o recurso." })
+            }
+            else{
+                res.status(200).jsonp(resources)
+            }
         })
         .catch(error => {
             res.status(502).jsonp({ error: error, message: "Error getting resource..." })

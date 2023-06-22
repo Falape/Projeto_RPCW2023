@@ -24,7 +24,7 @@ router.post('/', function (req, res) {
     //Object.keys(ra_data).forEach(key => ra_data[key] === undefined ? delete ra_data[key] : '');
 
     Object.keys(ra_data).forEach(key => {
-        if(ra_data[key] === undefined || ra_data[key] === null) {
+        if (ra_data[key] === undefined || ra_data[key] === null) {
             delete ra_data[key];
         }
     });
@@ -69,7 +69,7 @@ router.post('/add/:id', checkValidToken, function (req, res) {
     const requiredFields = ['content',];
     const missingFields = [];
     for (let field of requiredFields) {
-        if (!req.body[field]) 
+        if (!req.body[field])
             missingFields.push(field);
     }
     if (missingFields.length > 0) {
@@ -78,7 +78,7 @@ router.post('/add/:id', checkValidToken, function (req, res) {
 
     // get fields from body
     ra_data = {
-        author : req.payload.username,
+        author: req.payload.username,
         postedBy: req.payload._id,
         postedByUsername: req.payload.username,
         content: req.body.content,
@@ -106,9 +106,9 @@ router.put('/edit/:id', checkValidToken, function (req, res) {
     ra_id = req.params.id
 
     // Se não for admin, tenho que verificar se quem quer apagar é o dono do recurso
-    if(req.payload.role != "admin"){
+    if (req.payload.role != "admin") {
         rec = commentController.getComment(ra_id)
-        if(rec.uploadedBy != req.payload._id && rec.uploadedByUsername != req.payload.username){
+        if (rec.uploadedBy != req.payload._id && rec.uploadedByUsername != req.payload.username) {
             return res.status(401).jsonp({ error: `Unauthorized to edit this resource...` });
         }
     }
@@ -150,21 +150,27 @@ router.delete('/delete/soft/:id', checkValidToken, function (req, res) {
     ra_id = req.params.id
 
     // Se não for admin, tenho que verificar se quem quer apagar é o dono do recurso
-    if(req.payload.role != "admin"){
-        rec = commentController.getComment(ra_id)
-        if(rec.uploadedBy != req.payload._id && rec.uploadedByUsername != req.payload.username){
-            return res.status(401).jsonp({ error: `Unauthorized to delete this comment..` });
-        }
-    }
+    commentController.getComment(ra_id)
+        .then(rec => {
+            console.log("rec: ", rec)
+            console.log("req.payload._id: ", req.payload._id)
+            if (rec.postedBy != req.payload._id) {
+                return res.status(401).jsonp({ error: `Unauthorized to delete this comment..` });
+            }
 
-    info = {
-        deleted: true,
-        deleteDate: new Date().toISOString().substring(0, 16),
-        deletedBy: req.payload._id
-    }
-    commentController.deleteCommentSoft(ra_id, info)
-        .then(comment => {
-            res.status(207).jsonp(comment)
+
+            info = {
+                deleted: true,
+                deleteDate: new Date().toISOString().substring(0, 16),
+                deletedBy: req.payload._id
+            }
+            commentController.deleteCommentSoft(ra_id, info)
+                .then(comment => {
+                    res.status(207).jsonp(comment)
+                })
+                .catch(error => {
+                    res.status(507).jsonp({ error: error, message: "Error (soft) deleting comment..." })
+                })
         })
         .catch(error => {
             res.status(507).jsonp({ error: error, message: "Error (soft) deleting comment..." })
