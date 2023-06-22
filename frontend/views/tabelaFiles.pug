@@ -17,10 +17,38 @@ block content
             td
               if file.browserSupported
                 a(href=`/download/${file._id}`, class='w3-btn w3-blue') Download
-                button(class='w3-btn w3-green', onclick=`showFile('${file.path}', '${file.fileName}', '${file.type}')`) Ver
+                button(class='w3-btn w3-green', onclick=`openModal('${file.path}', '${file.fileName}', '${file.type}')`) Ver
 
               else
                 a(href=`/download/${file._id}`, class='w3-btn w3-blue') Download
+        //- img(src="/storage/a88d399fc4550743/14fbdd0e4c1c14ab/unziped/jacasld.jpg", width='400px')
+        //- Button to activate the modal
+        //- button(class='w3-btn w3-blue', onclick='openModal()') Open Modal
+        //- Modal Box
+        #myModal.w3-modal
+          .w3-modal-content
+            span.w3-button.w3-display-topright(onclick='closeModal()') &times;
+            .w3-container
+              //- Image container
+              #imageContainer(style="padding: 20px;")  // added padding
+  
   else
     p Este recurso não tem ficheiros..
+
+
+  script.
+
+    function openModal(path, fileName, type) {
+      var modal_html = showFile(path, fileName, type);
+      var modal = document.getElementById("myModal");
+      var imageContainer = document.getElementById("imageContainer");
+      imageContainer.innerHTML = modal_html;
+      //- imageContainer.innerHTML = '<img src="/storage/a88d399fc4550743/14fbdd0e4c1c14ab/unziped/jacasld.jpg" width="400px" />';
+      modal.style.display = "block";
+    }
+
+    function closeModal() {
+      var modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
 
