@@ -140,10 +140,20 @@ router.get('/delete', function(req, res, next) {
 router.get('/recursos/:id', function(req, res, next) {
   
   // make request to daa api to get all resources
-  axios.post(process.env.API_DATA_URL + '/resource', {uploadedBy: req.params.id})
+  axios.post(process.env.API_DATA_URL + '/resource', {uploadedBy: req.params.id}, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
   .then((response) => {
     console.log(response.data);
-    res.render('list_resources3', {userInfo:req.session.user, resources: response.data, user : req.session.user.username});
+    if (response.data.length > 0) {
+      id_user = response.data[0].uploadedByUsername;
+    }
+    else {
+      id_user = ""
+    }
+    res.render('list_resources3', {userInfo:req.session.user, resources: response.data, user : id_user});
   })
   .catch((error) => {
     console.log(error);
