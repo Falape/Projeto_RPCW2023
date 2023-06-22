@@ -87,6 +87,24 @@ router.post('/add', checkValidTokenProducer, function (req, res) {
     resourceController.addResource(re_data)
         .then(resource => {
             res.status(200).jsonp(resource)
+            // adicionar noticia
+                ra_data = {
+                    title : resource.title,
+                    uploadedBy: resource.uploadedBy,
+                    uploadedByUsername: resource.uploadedByUsername,
+                    resourceId: resource._id,
+                    type: resource.type,
+                    public: resource.public,
+                    dateCreated: resource.dateCreated
+                }
+                noticiaController.addNoticia(ra_data)
+                    .then(noticia => {
+                        console.log("noticia added: ", noticia)
+                        res.status(200).jsonp(noticia)
+                    })
+                    .catch(error => {
+                        res.status(504).jsonp({ error: error, message: "Error adding noticia..." })
+                    })
         })
         .catch(error => {
             res.status(503).jsonp({ error: error, message: "Error adding resource..." })

@@ -20,6 +20,7 @@ db.on('open', () => {
 
 var resourceRouter = require('./routes/resourceRoute');
 var commentRouter = require('./routes/commentRoute');
+var noticiaRouter = require('./routes/noticiaRoute');
 var ratingRouter = require('./routes/ratingRoute');
 var fileRouter = require('./routes/fileRoute');
 var apiRouter = require('./routes/apiRoute');
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/resource', resourceRouter);
 app.use('/comment', commentRouter);
+app.use('/noticia', noticiaRouter);
 app.use('/rating', ratingRouter);
 app.use('/file', fileRouter);
 app.use('/api', apiRouter);
