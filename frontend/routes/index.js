@@ -543,7 +543,9 @@ router.get('/comment/delete/soft/:id', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      //renderResourcePage(req, res, req.params.id, null, true, null);
+      if(response.data == null){
+        res.render('error_page', { message: "Comentário já foi apagado." });
+      }
       axios.delete(process.env.API_DATA_URL + '/comment/delete/soft/' + req.params.id, {
         headers: {
           Authorization: `Bearer ${req.session.user.token}`
@@ -551,6 +553,43 @@ router.get('/comment/delete/soft/:id', function (req, res) {
       })
         .then((response) => {
           console.log(response.data);
+          renderResourcePage(req, res, response.data.resourceId, null, true, null);
+        })
+        .catch((error) => {
+          console.log(error);
+          renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+        })
+    })
+    .catch((error) => {
+      console.log(error);
+      //renderResourcePage(req, res, req.params.id, null, falso, null,"Não foi possivel remover o comentário.");
+      res.render('error_page', { message: "Não foi possivel remover o comentário." });
+    })
+});
+
+router.get('/comment/delete/hard/:id', function (req, res) {
+
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  axios.get(process.env.API_DATA_URL + '/comment/' + req.params.id, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log("rep.data.1:",response.data);
+      if(response.data == null){
+        res.render('error_page', { message: "Comentário já foi apagado." });
+      }
+      axios.delete(process.env.API_DATA_URL + '/comment/delete/hard/' + req.params.id, {
+        headers: {
+          Authorization: `Bearer ${req.session.user.token}`
+        }
+      })
+        .then((response2) => {
+          console.log("rep.data.2:",response2.data);
           renderResourcePage(req, res, response.data.resourceId, null, true, null);
         })
         .catch((error) => {
@@ -579,7 +618,7 @@ router.get('/resource/delete/:id', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      res.redirect('/noticias');
+      res.redirect('/');
       //renderResourcePage(req, res, req.params.id, null, true, null);
     })
     .catch((error) => {
@@ -588,6 +627,91 @@ router.get('/resource/delete/:id', function (req, res) {
       //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
     })
 });
+
+
+router.post('/resource/filter', function (req, res) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  // get all fields
+  campos = {
+    title: req.body.title,
+    uploadedByUsername: req.body.uploadedByUsername,
+    dateCreated: req.body.dateCreated,
+    type: req.body.type,
+  }
+
+  
+  // verify if fields of body are empty
+  for (var key in campos) {
+    if (campos[key] == "" || campos[key] == undefined) {
+      campos[key] = null;
+    }
+  }
+  
+  console.log(campos);
+
+  axios.post(process.env.API_DATA_URL + '/resource',campos, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      res.render('list_resources3', { resources: response.data, userInfo: req.session.user });
+      //res.redirect('/noticias');
+      //renderResourcePage(req, res, req.params.id, null, true, null);
+    })
+    .catch((error) => {
+      console.log(error);
+      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      res.render('error_page', { message: "Não foi possivel filtrar os recursos." });
+    })
+});
+
+
+router.post('/resource/filter/geral', function (req, res) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  // get all fields
+  campos = {
+    title: req.body.title,
+    uploadedByUsername: req.body.uploadedByUsername,
+    dateCreated: req.body.dateCreated,
+    type: req.body.type,
+  }
+
+  
+  // verify if fields of body are empty
+  for (var key in campos) {
+    if (campos[key] == "" || campos[key] == undefined) {
+      campos[key] = null;
+    }
+  }
+  
+  console.log(campos);
+
+  axios.post(process.env.API_DATA_URL + '/resource',campos, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
+      //res.redirect('/noticias');
+      //renderResourcePage(req, res, req.params.id, null, true, null);
+    })
+    .catch((error) => {
+      console.log(error);
+      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      res.render('error_page', { message: "Não foi possivel filtrar os recursos." });
+    })
+});
+
 
 
 

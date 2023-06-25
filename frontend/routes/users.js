@@ -270,7 +270,10 @@ router.get('/delete/:id', function(req, res, next) {
 
 
 router.get('/recursos/:id', function(req, res, next) {
-  
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
   // make request to daa api to get all resources
   axios.post(process.env.API_DATA_URL + '/resource', {uploadedBy: req.params.id}, {
     headers: {
