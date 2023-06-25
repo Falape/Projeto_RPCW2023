@@ -4,6 +4,39 @@ block content
   include header
   include navbar
   h1 Recursos disponíveis:
+
+  //- Filter Section
+  .w3-container.w3-margin-bottom.w3-light-grey
+    h2 Filtros:
+    form(method='POST' action='/resource/filter/geral')
+      .w3-row-padding
+        .w3-half
+          label Titulo:
+          input.w3-input(type='text' name='title')
+        .w3-half
+          label Autor da submissão:
+          input.w3-input(type='text' name='uploadedByUsername')
+      .w3-row-padding
+        .w3-half
+          label Data de submissão:
+          input.w3-input(type='date' name='dateCreated')
+        .w3-half
+          label Tipo de Recurso:
+          //- input.w3-input(type='text' name='type')
+          select.w3-select(id='type' name='type')
+            option(value='' selected disabled) Escolha uma opção...
+            option(value='relatório') Relatório
+            option(value='tese') Tese
+            option(value='artigo') Artigo
+            option(value='aplicação') Aplicação
+            option(value='slides') Slides
+            option(value='teste') Teste
+            option(value='exame') Exame
+            option(value='problema resolvido') Problema resolvido
+      button.w3-button.w3-blue.w3-margin(type='submit') Filtrar
+      a.w3-button.w3-red(href='/recursos') Reset
+
+  //- Table of resources
   table.w3-table.w3-bordered.w3-striped.w3-centered
     thead
       tr
