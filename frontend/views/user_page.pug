@@ -158,7 +158,7 @@ block content
                     if owner
                         a.w3-button.w3-red.delete-button(href='/users/delete') Delete
                     if userInfo.role == 'admin' && !owner
-                        a.w3-button.w3-red.delete-button(href='/users/delete/' + user._id) Delete
+                        a.w3-button.w3-red.delete-button(href='/admin/delete/' + user._id) Delete
                     button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
 
                     
