@@ -10,7 +10,7 @@ const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
 
-const { renderResourcePage, renderUserPage, renderListUsers } = require('../public/javascripts/renderPages')
+const { renderResourcePage, renderUserPage } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
@@ -487,8 +487,34 @@ router.get('/listUsers', function (req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
 
-  renderListUsers(req, res, null, null);
+  axios.get(process.env.API_AUTH_URL + '/listUsers', {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+  .then((rep) => {
+    console.log(rep.data.token)
+    if (!req.session) {
+      return res.redirect('/login')//res.status(500).send('Session object is undefined');
+    }
+
+    //console.log(rep.data)
+    //TODO: render home page
+    res.render('list_user', {userInfo:req.session.user, userList: rep.data, errorFlag:alerts.errorFlag, msg:alerts.msg});
+  }).catch((err) => {
+    console.log(err)
+    if (err.response && err.response.data){
+      console.log(err.response.data)
+      res.render('error_page', { message: err.response.data.error });
+    }else{
+      res.render('error_page', { message: err });
+    }
+  });
+
+  //renderListUsers(req, res, null, null);
 });
 
 router.get('/getUser/:id', function (req, res, next) {
@@ -497,7 +523,7 @@ router.get('/getUser/:id', function (req, res, next) {
     return res.redirect('/login');
   }
 
-  console.log("topken " + req.session.user.token)
+  console.log("token " + req.session.user.token)
   axios.get(process.env.API_AUTH_URL + '/getUser/' + req.params.id, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
@@ -516,9 +542,12 @@ router.get('/getUser/:id', function (req, res, next) {
       res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user });
     }).catch((err) => {
       console.log(err)
-
-      renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
-
+      req.session.alerts = {
+        errorFlag:true, 
+        msg:"Não foi possivel obter o utilizador."
+      }
+      //renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
+      res.redirect('/listUsers');
     });
 });
 

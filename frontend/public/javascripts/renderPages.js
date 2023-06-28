@@ -101,31 +101,31 @@ function renderResourcePage(req, res, resourceId, downloadFlag=null, updateFlag 
 }
 
 
-function renderListUsers(req, res, flagError=null, error=null){
-  axios.get(process.env.API_AUTH_URL + '/listUsers', {
-    headers: {
-      Authorization: `Bearer ${req.session.user.token}`
-    }
-  })
-  .then((rep) => {
-    console.log(rep.data.token)
-    if (!req.session) {
-      return res.redirect('/login')//res.status(500).send('Session object is undefined');
-    }
+// function renderListUsers(req, res, flagError=null, error=null){
+//   axios.get(process.env.API_AUTH_URL + '/listUsers', {
+//     headers: {
+//       Authorization: `Bearer ${req.session.user.token}`
+//     }
+//   })
+//   .then((rep) => {
+//     console.log(rep.data.token)
+//     if (!req.session) {
+//       return res.redirect('/login')//res.status(500).send('Session object is undefined');
+//     }
 
-    //console.log(rep.data)
-    //TODO: render home page
-    res.render('list_user', {userInfo:req.session.user, userList: rep.data, flagError:flagError, error:error});
-  }).catch((err) => {
-    console.log(err)
-    if (err.response && err.response.data){
-      console.log(err.response.data)
-      res.render('error_page', { message: err.response.data.error });
-    }else{
-      res.render('error_page', { message: err });
-    }
-  });
-}
+//     //console.log(rep.data)
+//     //TODO: render home page
+//     res.render('list_user', {userInfo:req.session.user, userList: rep.data, flagError:flagError, error:error});
+//   }).catch((err) => {
+//     console.log(err)
+//     if (err.response && err.response.data){
+//       console.log(err.response.data)
+//       res.render('error_page', { message: err.response.data.error });
+//     }else{
+//       res.render('error_page', { message: err });
+//     }
+//   });
+// }
 
 // function renderListRoleUpdateRequests(req, res, acceptedFlag=null, errorFlag=null){
 //   axios.get(process.env.API_AUTH_URL + '/admin/updateRoleList',{
@@ -163,4 +163,4 @@ function renderListUsers(req, res, flagError=null, error=null){
 
 
 
-module.exports = {renderUserPage, renderResourcePage, renderListUsers};
+module.exports = {renderUserPage, renderResourcePage};
