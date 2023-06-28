@@ -6,8 +6,30 @@ var noticiaModel = require('../models/noticia')
 
 // List all resources
 module.exports.list = (fields) => {
+    let newFields = {...fields}; // cloning fields object to avoid mutations
+    if(fields.dateCreated){
+        const fromDate = fields.dateCreated + "T00:00"; 
+        
+        const toDate = fields.dateCreated + "T23:59";
+
+        // replacing 'dateCreated' field with the new range
+        newFields.dateCreated = {
+            $gte: fromDate,
+            $lt: toDate
+        }
+    }
+    // filter by title
+    if(fields.title){
+        newFields.title = { $regex: new RegExp(fields.title.toLowerCase(), "i") };
+    }
+
+    // filter by uploadedByUsername
+    if(fields.uploadedByUsername){
+        newFields.uploadedByUsername = { $regex: new RegExp(fields.uploadedByUsername.toLowerCase(), "i") };
+    }
+    console.log("NEW FIELDS:", newFields)
     return Resource
-        .find(fields)  //filtra por parametros
+        .find(newFields)  //filtra por parametros
         .sort({dateCreated: -1})
         .then(resposta => {
             return resposta

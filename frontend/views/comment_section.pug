@@ -12,8 +12,19 @@ block content
               span.w3-small.comment-date(style="flex-shrink: 0;")= comment.dateCreated
           .w3-display-container
             p.w3-margin= comment.content
-            if comment.postedBy === userInfo.userId || userInfo.role === 'admin'
+            if comment.postedBy === userInfo.userId && userInfo.role !== 'admin'
               a.w3-button.w3-red.w3-display-bottomright(href=`/comment/delete/soft/${comment._id}`) Apagar comentário
+            else if userInfo.role === 'admin'
+              a.w3-button.w3-red.w3-display-bottomright(href=`/comment/delete/hard/${comment._id}`) Apagar comentário
+      else if userInfo.role === 'admin'
+        .comment.w3-card-4.w3-margin.w3-dark-grey
+          .w3-container
+            div.comment-container(style="display: flex; align-items: center;")
+              h3.w3-large(style="margin-right: 10px;")= comment.postedByUsername
+              span.w3-small.comment-date(style="flex-shrink: 0;")= comment.dateCreated
+          .w3-display-container
+            p.w3-margin= comment.content
+            a.w3-button.w3-red.w3-display-bottomright(href=`/comment/delete/hard/${comment._id}`) Apagar comentário
     h2.w3-xlarge Leave a comment
     form(action='/comment', method='POST').w3-container
       input(type='hidden', name='resourceId', value=resource._id)

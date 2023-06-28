@@ -152,6 +152,7 @@ router.delete('/delete/soft/:id', checkValidToken, function (req, res) {
     // Se não for admin, tenho que verificar se quem quer apagar é o dono do recurso
     commentController.getComment(ra_id)
         .then(rec => {
+
             console.log("rec: ", rec)
             console.log("req.payload._id: ", req.payload._id)
             if (rec.postedBy != req.payload._id) {
@@ -171,6 +172,7 @@ router.delete('/delete/soft/:id', checkValidToken, function (req, res) {
                 .catch(error => {
                     res.status(507).jsonp({ error: error, message: "Error (soft) deleting comment..." })
                 })
+
         })
         .catch(error => {
             res.status(507).jsonp({ error: error, message: "Error (soft) deleting comment..." })
