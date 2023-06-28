@@ -37,8 +37,9 @@ router.get('/noticias', function (req, res, next) {
 });
 
 router.get('/login', function (req, res, next) {
-  res.render('login');
-
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+  res.render('login', {errorFlag:alerts.errorFlag, userDeleted:alerts.userDeleted , msg:alerts.msg});
 });
 
 router.post('/login', function (req, res, next) {
@@ -65,7 +66,7 @@ router.post('/login', function (req, res, next) {
     }).catch((err) => {
 
       if (err.response && err.response.data) {
-        res.render('login', { wrong_data: true, error: err.response.data.error });
+        res.render('login', { errorFlag: true, msg: err.response.data.error });
       } else {
         res.render('error_page', { message: err });
       }

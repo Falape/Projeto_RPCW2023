@@ -36,6 +36,11 @@ block content
 
 
         var errorFlag = "#{errorFlag}"
-        if (errorFlag != "") {
-            alert('Falha no pedido:' + errorFlag);
+        if (errorFlag === "true") {
+            var error = "#{msg}"
+            if(error != ""){
+                alert('Falha no pedido:' + error);
+            }else{
+                alert('Falha no pedido!');
+            }
         }

@@ -22,7 +22,7 @@ router.get('/getUser', function(req, res, next) {
         console.log(error);
         res.render('error_page', { message: error.response.data.error });
   });
-});
+}); 
 
 
 router.post('/updatePassword', function(req, res, next) {
@@ -146,7 +146,11 @@ router.get('/delete', function(req, res, next) {
                 //res.render('error_page', { message: error.response.data.error });
               });
               //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
-              res.render('login', { userDeleted: true, msg: "Utilizador apagado!" });
+              req.session.alerts={
+                deletedFlag: true,
+                msg: "Utilizador apagado!"
+              }
+              res.redirect('/login');
             })
             .catch((error) => {
               //console.log(error);
