@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-const {renderUserPage, renderNoticiasPage} = require('../public/javascripts/renderPages')
+const {renderUserPage} = require('../public/javascripts/renderPages')
 
 /* GET users listing. */
 router.get('/getUser', function(req, res, next) {
@@ -147,7 +147,7 @@ router.get('/delete', function(req, res, next) {
               });
               //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
               req.session.alerts={
-                deletedFlag: true,
+                userDeletedFlag: true,
                 msg: "Utilizador apagado!"
               }
               res.redirect('/login');

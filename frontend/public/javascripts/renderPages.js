@@ -127,40 +127,40 @@ function renderListUsers(req, res, flagError=null, error=null){
   });
 }
 
-function renderListRoleUpdateRequests(req, res, acceptedFlag=null, errorFlag=null){
-  axios.get(process.env.API_AUTH_URL + '/admin/updateRoleList',{
-    headers: {
-        Authorization: `Bearer ${req.session.user.token}`
-    }
-    })
-  .then((response) => {
-    console.log(response.data)
-    res.render('listRequestUpdate', { roleUpdatesList: response.data, userInfo:req.session.user, acceptedFlag:acceptedFlag, errorFlag:errorFlag});
-  })
-  .catch((error) => {
-    console.log(error);
-    res.render('error_page', { message: error.response.data.error });
-  });
-}
+// function renderListRoleUpdateRequests(req, res, acceptedFlag=null, errorFlag=null){
+//   axios.get(process.env.API_AUTH_URL + '/admin/updateRoleList',{
+//     headers: {
+//         Authorization: `Bearer ${req.session.user.token}`
+//     }
+//     })
+//   .then((response) => {
+//     console.log(response.data)
+//     res.render('listRequestUpdate', { roleUpdatesList: response.data, userInfo:req.session.user, acceptedFlag:acceptedFlag, errorFlag:errorFlag});
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//     res.render('error_page', { message: error.response.data.error });
+//   });
+// }
 
-function renderNoticiasPage(res, req, body={}, userDeletedFlag =null, resourceDeleted = null, errorFlag= null ,error=null){
-  body = body// pode ser usado para filtrar
-    axios.post(process.env.API_DATA_URL + '/noticia/', body, {
-      headers: {
-        Authorization: `Bearer ${req.session.user.token}`
-      }
-    })
-      .then((notic) => {
-        console.log(notic.data)
-        res.render('noticias', { noticias: notic.data, userInfo: req.session.user, userDeletedFlag: userDeletedFlag, resourceDeleted: resourceDeleted, errorFlag: errorFlag, error:error });
-      })
-      .catch((err) => {
-        console.log(err)
-        res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
-      });
-}
-
-
+// function renderNoticiasPage(res, req, body={}, userDeletedFlag =null, resourceDeleted = null, errorFlag= null ,error=null){
+//   body = body// pode ser usado para filtrar
+//     axios.post(process.env.API_DATA_URL + '/noticia/', body, {
+//       headers: {
+//         Authorization: `Bearer ${req.session.user.token}`
+//       }
+//     })
+//       .then((notic) => {
+//         console.log(notic.data)
+//         res.render('noticias', { noticias: notic.data, userInfo: req.session.user, userDeletedFlag: userDeletedFlag, resourceDeleted: resourceDeleted, errorFlag: errorFlag, error:error });
+//       })
+//       .catch((err) => {
+//         console.log(err)
+//         res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
+//       });
+// }
 
 
-module.exports = {renderUserPage, renderResourcePage, renderListUsers, renderListRoleUpdateRequests, renderNoticiasPage};
+
+
+module.exports = {renderUserPage, renderResourcePage, renderListUsers};

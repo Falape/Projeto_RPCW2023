@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-const { renderListRoleUpdateRequests, renderNoticiasPage } = require('../public/javascripts/renderPages')
+//const {renderNoticiasPage } = require('../public/javascripts/renderPages')
 
 router.get('/updateRequests', function (req, res, next) {
   if (!req.session.user) {
@@ -134,8 +134,11 @@ router.get('/delete/:id', function (req, res, next) {
           //res.render('error_page', { message: error.response.data.error });
         });
       //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
-      renderNoticiasPage(res, req, {}, true, null, null, null);
-      //res.render('noticias', { userInfo: req.session.user, userDeletedFlag: true});
+      req.session.alerts = {
+        userDeletedFlag: true
+      }
+      //renderNoticiasPage(res, req);
+      res.redirect('/noticias');
     })
     .catch((error) => {
       //console.log(error);
