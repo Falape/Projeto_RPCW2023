@@ -97,10 +97,13 @@ router.post('/requestRoleUpdate', function(req, res, next) {
   }
 
   console.log(req.body);
-
     if(req.body.role == undefined){
-      //(req, res, owner=null, admin=null, passwordFlag=null, requestRoleUpdateFlag=null, updateUserFlag=null, error=null)
-      renderUserPage(req, res, true, null, false, null, null, "Role missing!");
+      req.session.alerts = {
+        requestRoleUpdateFlag: false,
+        msg: "Role em falta!"
+      }
+      //renderUserPage(req, res, true, null, false, null, null, "Role missing!");
+      res.redirect('/users/getUser')
     }else{
       axios.post(process.env.API_AUTH_URL + '/user/requestUpdateRole', {
             required_Role: req.body.role
@@ -112,14 +115,23 @@ router.post('/requestRoleUpdate', function(req, res, next) {
             .then((response) => {
               //console.log(response);
             
-              //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
-              renderUserPage(req, res, true, null, true, null, null, null);
+              req.session.alerts = {
+                requestRoleUpdateFlag: true
+              }
+              //renderUserPage(req, res, true, null, true, null, null, null);
+              res.redirect('/users/getUser')
             })
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response && error.response.data){
-                renderUserPage(req, res, true, null, false, null, null, error.response.data.error);
+
+                req.session.alerts = {
+                  requestRoleUpdateFlag: false,
+                  msg: error.response.data.error
+                }
+                //renderUserPage(req, res, true, null, false, null, null, error.response.data.error);
+                res.redirect('/users/getUser')
               }else{
                 res.render('error_page', { message: error });
               }
