@@ -27,6 +27,66 @@ router.get('/updateRequests', function (req, res, next) {
   //renderListRoleUpdateRequests(req, res);
 });
 
+router.post('/updatePassword/:id', function(req, res, next) {
+  console.log("updatePassword")
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  console.log(req.body);
+
+  //  if(req.body.oldPassword == undefined){
+  //   //res.render('error_page', { message: "Old password missing!" });
+  //   req.session.alerts = {
+  //     passwordFlag: false,
+  //     msg: "Password antiga em falta!"
+  //   }
+  //   //renderUserPage(req, res, true, false, null, null, null, "Old password missing!" );
+  //   res.redirect('/users/getUser')
+    
+      if(req.body.newPassword != req.body.newPasswordConfirm){
+        //res.render('error_page', { message: "New password and confimation doesn't match!" });
+        req.session.alerts = {
+          passwordFlag: false,
+          msg: "Password nova e confirmação não coincidem!"
+        }
+        res.redirect('/getUser/' + req.params.id)
+        //renderUserPage(req, res, true, false, null, null, null, "New password and confimation doesn't match!" );
+      } else{
+
+          axios.post(process.env.API_AUTH_URL + '/admin/updatePassword/' + req.params.id, {
+              newPassword: req.body.newPassword
+            }, {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((response) => {
+              //console.log(response);
+              //res.render('user_page', { user: response.data, owner:true, admin:false, passwordFlag:true });
+              req.session.alerts = {
+                passwordFlag: true
+              } 
+              //renderUserPage(req, res, true, true, null, null, null, null);
+              res.redirect('/getUser/'+ req.params.id)
+            })
+            .catch((error) => {
+              console.log(error);
+              //res.render('error_page', { message: error.response.data.error });
+              if (error.response && error.response.data){
+                req.session.alerts = {
+                  passwordFlag: false,
+                  msg: error.response.data.error
+                }
+                //renderUserPage(req, res, true, false, null, null, null,error.response.data.error);
+                res.redirect('/getUser/' + req.params.id)
+              }else{
+                res.render('error_page', { message: error });
+              }
+          });
+      }
+});
+
 router.get('/requestRoleUpdate/accept/:id', function (req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');

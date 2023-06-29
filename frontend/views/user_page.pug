@@ -74,7 +74,10 @@ block content
             if owner || userInfo.role === 'admin'
                 div
                     button.w3-button.w3-red(data-bs-toggle="modal" data-bs-target="#deleteUserModal") Delete
-                    button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordModal") Update Password
+                    if userInfo.role === 'admin' && !owner
+                        button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordAdminModal") Update Password
+                    else
+                        button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordModal") Update Password
                     a.w3-button.w3-green(href='/user/update') Update User
         div.user-info
             p Email: #{user.email}
@@ -102,6 +105,28 @@ block content
                         div.form-group
                             label(for="oldPassword") Old Password
                             input.w3-input(type="password" name="oldPassword" required)
+                        div.form-group
+                            label(for="newPassword") New Password
+                            input.w3-input(type="password" name="newPassword" id="newPassword" pattern='.{8,}' title='Password tem de ter no minimo 8 carateres!' required)
+                        div.form-group
+                            label(for="newPasswordConfirm") Confirm New Password
+                            input.w3-input(type="password" name="newPasswordConfirm" id="newPasswordConfirm" required)
+                            small#passwordWarning(style="display: none; color: red") Password do not match new password
+
+                        button.w3-button.w3-green.w3-right(type="submit") Save Changes
+                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+
+
+    // Update Password Modal
+    div.modal.fade(id="updatePasswordAdminModal" tabindex="-1" aria-labelledby="updatePasswordAdminModalLabel" aria-hidden="true")
+        div.modal-dialog.modal-dialog-centered
+            div.w3-modal-content
+                div.w3-container
+                    h5.modal-title#updatePasswordAdminModalLabel Update Password
+                    //- button.w3-closebtn.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
+                        span(aria-hidden="true") ×
+                div.w3-container
+                    form(action=`/users/updatePassword` method="POST" onsubmit="return validatePasswordForm(this)")
                         div.form-group
                             label(for="newPassword") New Password
                             input.w3-input(type="password" name="newPassword" id="newPassword" pattern='.{8,}' title='Password tem de ter no minimo 8 carateres!' required)
@@ -167,6 +192,9 @@ block content
     script.
         var myModalPasswordUpdate = new bootstrap.Modal(document.getElementById('updatePasswordModal'), options)
         myModalPasswordUpdate.show()
+
+        var myModalPasswordUpdateAdmin = new bootstrap.Modal(document.getElementById('updatePasswordAdminModal'), options)
+        myModalPasswordUpdateAdmin.show()
 
         var myModalRequestRoleUpdate = new bootstrap.Modal(document.getElementById('requestRoleUpdateModal'), options)
         myModalRequestRoleUpdate.show()
