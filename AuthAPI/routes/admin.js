@@ -4,7 +4,7 @@ var jwt = require('jsonwebtoken');
 const passport = require("passport"),
 
     User = require("../controllers/user"),
-    user = require("../models/user"),
+    userModel = require("../models/user"),
     RequestUpdateRole = require("../controllers/requestUpdateRole"),
     requestUpdateRole = require("../models/requestUpdateRole");
   
@@ -134,6 +134,41 @@ router.post('/listUsers', checkValidTokenAdmin,async function(req, res, next) {
   console.log("listUsers")
 
   res.status(200).jsonp(await User.list())
+
+});
+
+
+router.post("/updatePassword/:id", checkValidTokenAdmin, async function (req, res) {
+  console.log("updatePassword")
+
+  if (req.body.newPassword == undefined) {
+    res.status(400).jsonp({ error: "Field is missing" })
+  } else {
+    userModel.findOne({ _id: req.params.id })
+    .then(user => {
+      if (!user) {
+        return res.status(404).jsonp({ error: 'User not found' });
+      }
+
+      // Update the user's password
+      user.setPassword(req.body.newPassword, function (err) {
+        if (err) {
+          return res.status(500).jsonp({ error: 'Error setting password: ' + err });
+        }
+
+        user.save()
+          .then(() => {
+            return res.status(200).json(user);
+          })
+          .catch(err => {
+            return res.status(500).jsonp({ error: 'Error updating password: ' + err });
+          });
+      });
+    })
+
+    // Update the user's password
+    
+  } 
 
 });
 
