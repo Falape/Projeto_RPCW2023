@@ -10,7 +10,7 @@ const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
 
-const { renderResourcePage, renderUserPage } = require('../public/javascripts/renderPages')
+const { renderUserPage } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
