@@ -144,7 +144,13 @@ router.get('/delete/:id', function (req, res, next) {
       //console.log(error);
       //res.render('error_page', { message: error.response.data.error });
       if (error.response && error.response.data) {
-        renderUserPage(req, res, true, null, null, null, false, error.response.data.error);
+        //It will be a diferente render
+        req.session.alerts = {
+          userDeletedFlag: false,
+          msg: error.response.data.error
+        }
+        //renderUserPage(req, res, true, null, null, null, false, error.response.data.error);
+        res.redirect('/users/getUser/' + req.params.id);
       } else {
         res.render('error_page', { message: error });
       }

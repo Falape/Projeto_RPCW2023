@@ -10,7 +10,7 @@ const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
 
-const { renderUserPage } = require('../public/javascripts/renderPages')
+//const { renderUserPage } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
@@ -609,6 +609,9 @@ router.get('/getUser/:id', function (req, res, next) {
     return res.redirect('/login');
   }
 
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+
   console.log("token " + req.session.user.token)
   axios.get(process.env.API_AUTH_URL + '/getUser/' + req.params.id, {
     headers: {
@@ -625,7 +628,8 @@ router.get('/getUser/:id', function (req, res, next) {
       if (req.session.user.userId == response.data._id) {
         owner = true;
       }
-      res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user });
+
+      res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user, passwordFlag : alerts.passwordFlag, requestRoleUpdateFlag: alerts.requestRoleUpdateFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
     }).catch((err) => {
       console.log(err)
       req.session.alerts = {

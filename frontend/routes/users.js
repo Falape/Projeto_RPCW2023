@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-const {renderUserPage} = require('../public/javascripts/renderPages')
+//const {renderUserPage} = require('../public/javascripts/renderPages')
 
 /* GET users listing. */
 router.get('/getUser', function(req, res, next) {
@@ -190,7 +190,12 @@ router.get('/delete', function(req, res, next) {
               //console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response && error.response.data){
-                renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
+                req.session.alerts={
+                  userDeletedFlag: false,
+                  msg: error.response.data.error
+                }
+                //renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
+                res.redirect('/users/getUser')
               }else{
                 res.render('error_page', { message: error });
               }
