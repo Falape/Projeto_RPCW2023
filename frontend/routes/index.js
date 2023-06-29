@@ -26,6 +26,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/noticias', function (req, res, next) {
+  console.log(req.session)
   console.log(req.session.user)
   if (!req.session.user) {
     return res.redirect('/login');
@@ -701,6 +702,19 @@ router.post('/resource/filter/geral', function (req, res) {
 
 router.post('/login/google/sucess', function (req, res) {
   
+  console.log("body:", req.body);
+  
+  req.session.user = {
+    token: req.body.token,
+    username: req.body.username,
+    role: req.body.role,
+    userId: req.body.userId,
+  };
+
+  console.log("session:", req.session.user);
+
+  //res.status(201).jsonp(req.session.user);
+  res.redirect('/noticias');
 })
 
 module.exports = router;
