@@ -398,7 +398,7 @@ router.get('/callback', function (req, res, next) {
     //return res.status(200).json(user);
   })(req, res, next);
 
-  //res.redirect("http://localhost:3000/noticias")
+  res.redirect("http://localhost:3000/noticias")
   /*
   , (req, res, next)=>{
 
