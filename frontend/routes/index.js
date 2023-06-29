@@ -699,7 +699,8 @@ router.post('/resource/filter/geral', function (req, res) {
     })
 });
 
-
-
+router.post('/login/google/sucess', function (req, res) {
+  
+})
 
 module.exports = router;
