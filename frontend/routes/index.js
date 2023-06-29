@@ -167,7 +167,85 @@ router.get('/recurso/:id', function (req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
-  renderResourcePage(req, res, req.params.id);
+
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+
+  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,
+    {
+      headers: {
+        Authorization: `Bearer ${req.session.user.token}`
+      }
+    })
+    .then((response) => {
+      console.log(response.data);
+      // need to get resource files
+      axios.get(process.env.API_DATA_URL + '/file/resource/' + req.params.id,
+        {
+          headers: {
+            Authorization: `Bearer ${req.session.user.token}`
+          }
+        })
+        .then((response2) => {
+          console.log(response2.data);
+
+          // need to get resource rating
+          axios.get(process.env.API_DATA_URL + '/rating/resource/' + req.params.id,
+            {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((response3) => {
+              //tries to get the comments
+              axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id,
+                {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                })
+                .then((response4) => {
+                  console.log(response4.data);
+                  res.render('resource', { resource: response.data, userInfo:req.session.user  ,files: response2.data ,rating: response3.data, comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:alerts.errorFlag, msg:alerts.msg});
+                })
+                .catch((error) => {
+                  //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
+                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter os comentários do recurso."});
+                })
+            })
+            .catch((error) => {
+              console.log(error);
+              
+              //failed to get the rating, it will try to get the comments
+              axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id,
+                {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                })
+                //got the comments
+                .then((response4) => {
+                  console.log(response4.data);
+                  //res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id });
+                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating do recurso."});
+                })
+                //failed to get the comments
+                .catch((error) => {
+                  //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
+                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating nem os comentários do recurso."});
+                })
+
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+          res.render('error_page', { message: "Não foi possivel obter os ficheiros do recurso." });
+        })
+    })
+    .catch((error) => {
+      console.log(error);
+      res.render('error_page', { message: "Não foi possivel obter o recurso desejado." });
+    });
 });
 
 router.get('/navbar', function (req, res, next) {
@@ -433,9 +511,8 @@ router.post('/rate', function (req, res, next) {
 })
 
 
-//Errors Not Tested!!
+//TODO, mas find a way to have acess to the resource id
 router.get('/download/:id', function (req, res) {
-
   if (!req.session.user) {
     return res.redirect('/login');
   }
@@ -452,9 +529,13 @@ router.get('/download/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
+      req.session.alerts = {
+        downloadFlag : true,
+        msg: "Não foi possivel fazer download do ficheiro."
+      }
 
-
-      renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do ficheiro.");
+      res.redirect('/recurso/' + req.params.id)
+      //renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do ficheiro.");
       //res.render('error_page', { message: "Não foi possivel fazer download do ficheiro." });
     })
 });
@@ -477,7 +558,12 @@ router.get('/download/resource/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
-      renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do recurso.");
+      req.session.alerts = {
+        downloadFlag : true,
+        msg: "Não foi possivel fazer download do recurso."
+      }
+      res.redirect('/recurso/' + req.params.id)
+      //renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do recurso.");
       //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
     })
 });
@@ -564,6 +650,7 @@ router.get('/logout', function (req, res) {
 
 
 router.get('/comment/delete/soft/:id', function (req, res) {
+  console.log("DELETE COMMENT: ", req.params.id);
 
   if (!req.session.user) {
     return res.redirect('/login');
@@ -586,17 +673,33 @@ router.get('/comment/delete/soft/:id', function (req, res) {
       })
         .then((response) => {
           console.log(response.data);
-          renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          req.session.alerts = {
+            commentDeleteFlag : true
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          res.redirect('/recurso/' + response.data.resourceId)
         })
         .catch((error) => {
           console.log(error);
-          renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          req.session.alerts = {
+            commentDeleteFlag : false,
+            msg: "Não foi possivel remover o comentário."
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          res.redirect('/recurso/' + response.data.resourceId)
         })
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, falso, null,"Não foi possivel remover o comentário.");
-      res.render('error_page', { message: "Não foi possivel remover o comentário." });
+    
+      //TODO: render 
+      //res.render('error_page', { message: "Não foi possivel remover o comentário." });
+      req.session.alerts = {
+        commentDeleteFlag : false,
+        msg: "Não foi possivel remover o comentário."
+      }
+      //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+      res.redirect('/recurso/' + response.data.resourceId)
     })
 });
 
@@ -623,16 +726,31 @@ router.get('/comment/delete/hard/:id', function (req, res) {
       })
         .then((response2) => {
           console.log("rep.data.2:",response2.data);
-          renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          req.session.alerts = {
+            commentDeleteFlag : true
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          res.redirect('/recurso/' + response.data.resourceId)
         })
         .catch((error) => {
           console.log(error);
-          renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          req.session.alerts = {
+            commentDeleteFlag : false,
+            msg: "Não foi possivel remover o comentário."
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          res.redirect('/recurso/' + response.data.resourceId)
         })
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, falso, null,"Não foi possivel remover o comentário.");
+      req.session.alerts = {
+        commentDeleteFlag : false,
+        msg: "Não foi possivel remover o comentário."
+      }
+
+      //TODO: passar o id do recurso
+      //res.redirect('/recurso/' + response.data.resourceId)
       res.render('error_page', { message: "Não foi possivel remover o comentário." });
     })
 });
@@ -652,11 +770,16 @@ router.get('/resource/delete/:id', function (req, res) {
     .then((response) => {
       console.log(response.data);
       res.redirect('/');
-      //renderResourcePage(req, res, req.params.id, null, true, null);
+
     })
     .catch((error) => {
       console.log(error);
-      renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      req.session.alerts = {
+        commentDeleteFlag : false,
+        msg: "Não foi possivel fazer remover o recurso."
+      }
+      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      res.redirect('/recurso/' + req.params.id)
       //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
     })
 });
@@ -694,11 +817,9 @@ router.post('/resource/filter', function (req, res) {
       console.log(response.data);
       res.render('list_resources3', { resources: response.data, userInfo: req.session.user });
       //res.redirect('/noticias');
-      //renderResourcePage(req, res, req.params.id, null, true, null);
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
       res.render('error_page', { message: "Não foi possivel filtrar os recursos." });
     })
 });
@@ -736,11 +857,9 @@ router.post('/resource/filter/geral', function (req, res) {
       console.log(response.data);
       res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
       //res.redirect('/noticias');
-      //renderResourcePage(req, res, req.params.id, null, true, null);
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
       res.render('error_page', { message: "Não foi possivel filtrar os recursos." });
     })
 });
