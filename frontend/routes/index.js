@@ -535,7 +535,7 @@ router.get('/download/:id', function (req, res) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/file2/' + req.params.id,{
+  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,{
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
