@@ -77,7 +77,6 @@ router.post('/login', function (req, res, next) {
         token: rep.data.token,
         userId: rep.data.userId
       };
-      //TODO: render home page
       res.render('test', { userInfo: req.session.user });
     }).catch((err) => {
 
@@ -617,8 +616,6 @@ router.get('/listUsers', function (req, res, next) {
       return res.redirect('/login')//res.status(500).send('Session object is undefined');
     }
 
-    //console.log(rep.data)
-    //TODO: render home page
     res.render('list_user', {userInfo:req.session.user, userList: rep.data, errorFlag:alerts.errorFlag, msg:alerts.msg});
   }).catch((err) => {
     console.log(err)
@@ -726,14 +723,23 @@ router.get('/comment/delete/soft/:id', function (req, res) {
     .catch((error) => {
       console.log(error);
     
-      //TODO: render 
+      
       //res.render('error_page', { message: "Não foi possivel remover o comentário." });
-      req.session.alerts = {
-        commentDeleteFlag : false,
-        msg: "Não foi possivel remover o comentário."
+      if(req.session.alerts.resourceID != undefined){
+        var resourceID = req.session.alerts.resourceID
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possível remover o comentário."
+        }
+        res.redirect('/recurso/' + resourceID)
+      } else{
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possivel apagar o comentário"
+        }
+        res.redirect('/recursos')
       }
       //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
-      res.redirect('/recurso/' + response.data.resourceId)
     })
 });
 
@@ -778,14 +784,22 @@ router.get('/comment/delete/hard/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
-      req.session.alerts = {
-        commentDeleteFlag : false,
-        msg: "Não foi possivel remover o comentário."
+      if(req.session.alerts.resourceID != undefined){
+        var resourceID = req.session.alerts.resourceID
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possível remover o comentário."
+        }
+        res.redirect('/recurso/' + resourceID)
+      } else{
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possivel apagar o comentário"
+        }
+        res.redirect('/recursos')
       }
-
-      //TODO: passar o id do recurso
       //res.redirect('/recurso/' + response.data.resourceId)
-      res.render('error_page', { message: "Não foi possivel remover o comentário." });
+      //res.render('error_page', { message: "Não foi possivel remover o comentário." });
     })
 });
 
