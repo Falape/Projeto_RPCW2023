@@ -139,7 +139,7 @@ router.post('/listUsers', checkValidTokenAdmin,async function(req, res, next) {
 
 
 router.post("/updatePassword/:id", checkValidTokenAdmin, async function (req, res) {
-  console.log("updatePassword")
+  console.log("updatePasswordById")
 
   if (req.body.newPassword == undefined) {
     res.status(400).jsonp({ error: "Field is missing" })
