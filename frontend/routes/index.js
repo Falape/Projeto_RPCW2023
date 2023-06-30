@@ -9,18 +9,25 @@ const sip_creation = require('../public/javascripts/creation');
 const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
+const passport = require("passport");
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 const { renderResourcePage, renderUserPage, renderListUsers, renderNoticiasPage } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
+const { v4: uuidv4 } = require('uuid');
+
+function generateUniqueUsername() {
+  return 'user_' + uuidv4();
+}
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
   console.log(req.session.user)
   if (req.session.user == undefined || req.session.user.token == null) {
     return res.redirect('/login');
-  }else{
+  } else {
     res.redirect('/noticias')
   }
 });
@@ -127,7 +134,7 @@ router.get('/recursos', function (req, res, next) {
   }
 
   // make request to daa api to get all resources
-  axios.post(process.env.API_DATA_URL + '/resource',{}, {
+  axios.post(process.env.API_DATA_URL + '/resource', {}, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -424,7 +431,7 @@ router.get('/download/:id', function (req, res) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,{
+  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -449,7 +456,7 @@ router.get('/download/resource/:id', function (req, res) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,{
+  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -531,7 +538,7 @@ router.get('/comment/delete/soft/:id', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      if(response.data == null){
+      if (response.data == null) {
         res.render('error_page', { message: "Comentário já foi apagado." });
       }
       axios.delete(process.env.API_DATA_URL + '/comment/delete/soft/' + req.params.id, {
@@ -567,8 +574,8 @@ router.get('/comment/delete/hard/:id', function (req, res) {
     }
   })
     .then((response) => {
-      console.log("rep.data.1:",response.data);
-      if(response.data == null){
+      console.log("rep.data.1:", response.data);
+      if (response.data == null) {
         res.render('error_page', { message: "Comentário já foi apagado." });
       }
       axios.delete(process.env.API_DATA_URL + '/comment/delete/hard/' + req.params.id, {
@@ -577,7 +584,7 @@ router.get('/comment/delete/hard/:id', function (req, res) {
         }
       })
         .then((response2) => {
-          console.log("rep.data.2:",response2.data);
+          console.log("rep.data.2:", response2.data);
           renderResourcePage(req, res, response.data.resourceId, null, true, null);
         })
         .catch((error) => {
@@ -630,17 +637,17 @@ router.post('/resource/filter', function (req, res) {
     type: req.body.type,
   }
 
-  
+
   // verify if fields of body are empty
   for (var key in campos) {
     if (campos[key] == "" || campos[key] == undefined) {
       campos[key] = null;
     }
   }
-  
+
   console.log(campos);
 
-  axios.post(process.env.API_DATA_URL + '/resource',campos, {
+  axios.post(process.env.API_DATA_URL + '/resource', campos, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -672,17 +679,17 @@ router.post('/resource/filter/geral', function (req, res) {
     type: req.body.type,
   }
 
-  
+
   // verify if fields of body are empty
   for (var key in campos) {
     if (campos[key] == "" || campos[key] == undefined) {
       campos[key] = null;
     }
   }
-  
+
   console.log(campos);
 
-  axios.post(process.env.API_DATA_URL + '/resource',campos, {
+  axios.post(process.env.API_DATA_URL + '/resource', campos, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -700,27 +707,85 @@ router.post('/resource/filter/geral', function (req, res) {
     })
 });
 
-router.get('/login/google/success', function (req, res) {
-  
-  //const urlParts = url.parse(req.url, true);
-  //const query = urlParts.query;
+/*  Google AUTH  */
+const GOOGLE_CLIENT_ID = process.env.CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = process.env.REDIRECT_URI;
+console.log("GOOGLE_CLIENT_ID: ", GOOGLE_CLIENT_ID)
+console.log("GOOGLE_CLIENT_SECRET: ", GOOGLE_CLIENT_SECRET)
+console.log("GOOGLE_REDIRECT_URI: ", GOOGLE_REDIRECT_URI)
 
-  const token = req.query.token;
-  const username = req.query.username;
-  const role = req.query.role;
-  const userId = req.query.userId;
-  
-  req.session.user = {
-    token: token,
-    username: username,
-    role: role,
-    userId: userId,
-  };
+passport.use(new GoogleStrategy({
+  clientID: GOOGLE_CLIENT_ID,
+  clientSecret: GOOGLE_CLIENT_SECRET,
+  callbackURL: GOOGLE_REDIRECT_URI
+},
+  function (accessToken, refreshToken, profile, done) {
+    //userProfile=profile;
 
-  console.log("session:", req.session.user);
+    userProfile = {
+      id: profile.id,
+      displayName: profile.displayName,
+      email: profile.emails[0].value, // gets the first email
+      provider: profile.provider
+    };
+    console.log("userProfile: ", userProfile)
 
-  //res.status(201).jsonp(req.session.user);
-  res.redirect('/noticias');
-})
+    return done(null, userProfile);
+  }
+));
+
+router.get('/login/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+
+router.get('/callback', function (req, res, next) {
+  console.log("callback")
+  passport.authenticate('google', { failureJSON: { message: 'An error has occurred' } }, function (err, user, info) {
+    if (err) {
+      return res.status(500).json({ error: 'Erro no login1: ', err });
+    }
+    if (!user) {
+      return res.status(500).json({ error: 'Erro no login2: ', err });
+    }
+    console.log("user: ", user)
+    console.log("info: ", info)
+
+    axios.get(process.env.API_AUTH_URL + '/getUserGoogleID/' + user.id, {})
+      .then((response) => {
+        console.log("response: ", response)
+        
+        // esta resposta já inclui o token
+        // fazer update do req.session.user
+        // dar então redirect para /noticias
+        req.session.user = {
+          token: response.token,
+          username: response.username,
+          role: response.role,
+          userId: response.userId,
+        }
+
+        res.redirect('/noticias');
+
+
+      })
+      .catch((error) => {
+        console.log("error: ", error)
+        //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+        res.render('error_page', { message: "Não foi possivel registar o utilizador com OAuth." });
+      })
+
+    
+    // tirar dados 
+    // Verificar se tem conta interna no nosso sistema 
+    //User.findByFilter({id_oauth: })
+    // se tiver, cria um token e continua normalmente
+    // se não tiver, cria uma conta interna, cria um token e continua normalmente
+
+
+  })(req, res, next);
+
+});
+
 
 module.exports = router;

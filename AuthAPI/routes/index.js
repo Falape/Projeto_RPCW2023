@@ -311,19 +311,6 @@ router.get('/callback', function (req, res, next) {
                     } catch (e) {
                       console.log(e)
                     }
-                    res.redirect(`http://localhost:3000/login/google/success?token=${token}&username=${usr.username}&role=${usr.role}&userId=${usr._id}`);
-                    /*
-                    res_body = {token: token,
-                      username: usr.username,
-                      role: usr.role,
-                      userId: usr._id}
-                    console.log("res_body: ", res_body)
-                    axios.post("http://localhost:3000/login/google/sucess", res_body)
-                          .catch((error) => {
-                            console.log("Axios request error:", error.message);
-                            // Handle the error without crashing the server
-                          });
-                    //res.redirect("http://localhost:3000/noticias")
                     res.status(201).jsonp(
                       {
                         token: token,
@@ -332,7 +319,7 @@ router.get('/callback', function (req, res, next) {
                         userId: user._id
                       }
                     )
-                    */
+
                   }
                 });
             })
@@ -368,22 +355,6 @@ router.get('/callback', function (req, res, next) {
                 } catch (e) {
                   console.log(e)
                 }
-
-                res.redirect(`http://localhost:3000/login/google/success?token=${token}&username=${usr.username}&role=${usr.role}&userId=${usr._id}`);
-
-                /*
-                res_body = {token: token,
-                  username: usr.username,
-                  role: usr.role,
-                  userId: usr._id}
-                console.log("res_body: ", res_body)
-                axios.post("http://localhost:3000/login/google/sucess", res_body)
-                      .catch((error) => {
-                        console.log("Axios request error:", error.message);
-                        // Handle the error without crashing the server
-                      });
-                        
-                
                 res.status(201).jsonp(
                   {
                     token: token,
@@ -392,7 +363,7 @@ router.get('/callback', function (req, res, next) {
                     userId: user._id
                   }
                 )
-                */
+
               }
             });
         }
@@ -410,8 +381,117 @@ router.get('/callback', function (req, res, next) {
     console.log(" CHEGUEI AQUI")
     //return res.status(200).json(user);
   })(req, res, next);
-  
+
 });
+
+router.get('/getUserGoogleID/:id', function (req, res, next) {
+  console.log("get_user_id")
+
+  myfilter = { id_oauth: req.params.id }
+  console.log("myfilter: ", myfilter)
+
+  User.findByFilter(myfilter)
+    .then((usr) => {
+      if (usr == null) {
+        console.log("user.length == 0")
+        newUser = {
+          username: generateUniqueUsername(),
+          email: user.email,
+          role: "consumer",
+          method: "google",
+          id_oauth: user.id
+        }
+
+        User.insert(newUser)
+          .then((user) => {
+            console.log("user: ", user)
+            //const token = user.generateJwt();
+            jwt.sign({ _id: user._id, role: user.role, username: user.username }, process.env.TOKEN_SECRET,
+              { expiresIn: process.env.TOKEN_EXPIRATION },
+              function (e, token) {
+                if (e) res.status(507).jsonp({ error: "Error creating token" })
+                else {
+                  userInfo = {
+                    name: user.name,
+                    //filiacao: req.body.filiacao,
+                    username: user.username,
+                    userId: user._id
+                  }
+                  try {
+                    axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
+                      .then((response) => {
+                        console.log("Axios request success");
+                      })
+                      .catch((error) => {
+                        console.log("Axios request error:", error.message);
+                        // Handle the error without crashing the server
+                      });
+                  } catch (e) {
+                    console.log(e)
+                  }
+                  res.status(201).jsonp(
+                    {
+                      token: token,
+                      username: user.username,
+                      role: user.role,
+                      userId: user._id
+                    }
+                  )
+
+                }
+              });
+          })
+          .catch((err) => {
+            console.log("err: ", err)
+            return res.status(500).json({ error: 'Erro ao registar novo utilizador ', err });
+          })
+      } else {
+        console.log("user.length != 0")
+        console.log("usr: ", usr)
+        //const token = user.generateJwt();
+        jwt.sign({ _id: usr._id, role: usr.role, username: usr.username }, process.env.TOKEN_SECRET,
+          { expiresIn: process.env.TOKEN_EXPIRATION },
+          function (e, token) {
+            if (e) res.status(507).jsonp({ error: "Error creating token" })
+            else {
+              userInfo = {
+                name: usr.name,
+                //filiacao: req.body.filiacao,
+                username: usr.username,
+                userId: usr._id
+              }
+
+              try {
+                axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
+                  .then((response) => {
+                    console.log("Axios request success");
+                  })
+                  .catch((error) => {
+                    console.log("Axios request error:", error.message);
+                    // Handle the error without crashing the server
+                  });
+              } catch (e) {
+                console.log(e)
+              }
+              res.status(201).jsonp(
+                {
+                  token: token,
+                  username: usr.username,
+                  role: usr.role,
+                  userId: usr._id
+                }
+              )
+
+            }
+          });
+      }
+    })
+    .catch((err) => {
+      console.log("err: ", err)
+      return res.status(500).json({ error: 'Não foi possivel obter o user, erro: ', err });
+    })
+});
+
 
 
 
