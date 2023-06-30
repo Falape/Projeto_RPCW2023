@@ -415,7 +415,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
             console.log(response.data);
             resource_id = response.data._id;
 
-            console.log("adicionaei o recurso, agora vou ao async");
+            console.log("adicionei o recurso, agora vou ao async");
             (async () => {
               try {
                 //console.log("PATH:", __dirname + '/../uploads/' + req.file.originalname)
