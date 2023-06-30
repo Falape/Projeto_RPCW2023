@@ -18,7 +18,6 @@ router.get('/getUser', function(req, res, next) {
             })
       .then((response) => {
         
-        // TODO: Render the home page or redirect to a different route
         res.render('user_page', { user: response.data, userInfo:req.session.user, owner:true, passwordFlag : alerts.passwordFlag, requestRoleUpdateFlag: alerts.requestRoleUpdateFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
       })
       .catch((error) => {

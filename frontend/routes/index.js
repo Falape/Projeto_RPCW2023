@@ -151,6 +151,7 @@ router.get('/recursos', function (req, res, next) {
     .then((response) => {
       console.log(response.data);
       res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
+
     })
     .catch((error) => {
       if (error.response && error.response.data) {
@@ -206,9 +207,18 @@ router.get('/recurso/:id', function (req, res, next) {
                 })
                 .then((response4) => {
                   console.log(response4.data);
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
+                  console.log("alerts: ", req.session.alerts)
                   res.render('resource', { resource: response.data, userInfo:req.session.user  ,files: response2.data ,rating: response3.data, comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:alerts.errorFlag, msg:alerts.msg});
                 })
                 .catch((error) => {
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
                   //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
                   res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter os comentários do recurso."});
                 })
@@ -226,12 +236,20 @@ router.get('/recurso/:id', function (req, res, next) {
                 //got the comments
                 .then((response4) => {
                   console.log(response4.data);
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
                   //res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id });
                   res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating do recurso."});
                 })
                 //failed to get the comments
                 .catch((error) => {
                   //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
                   res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating nem os comentários do recurso."});
                 })
 
@@ -511,17 +529,17 @@ router.post('/rate', function (req, res, next) {
 })
 
 
-//TODO, mas find a way to have acess to the resource id
 router.get('/download/:id', function (req, res) {
+  // console.log("CHEGUEI AO DOWNLOAD")
   if (!req.session.user) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,{
+  axios.get(process.env.API_DATA_URL + '/file2/' + req.params.id,{
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
-  })
+    })
     .then((response) => {
       console.log(response.data);
       console.log("DOWNLOAD PATH: ", response.data.path);
@@ -529,12 +547,24 @@ router.get('/download/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
-      req.session.alerts = {
-        downloadFlag : true,
-        msg: "Não foi possivel fazer download do ficheiro."
+      // console.log("NÃO FOI POSSIVEL FAZER DOWNLOAD DO FICHEIRO")
+      // console.log(req.session.alerts)
+      if(req.session.alerts.resourceID != undefined){
+        var resourceID = req.session.alerts.resourceID
+        req.session.alerts = {
+          downloadFlag : true,
+          msg: "Não foi possivel fazer download do ficheiro."
+        }
+        res.redirect('/recurso/' + resourceID)
+        
+      }else{
+        req.session.alerts = {
+          downloadFlag : false,
+          msg: "Não foi possivel fazer download do ficheiro."
+        }
+        res.redirect('/recursos')
       }
 
-      res.redirect('/recurso/' + req.params.id)
       //renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do ficheiro.");
       //res.render('error_page', { message: "Não foi possivel fazer download do ficheiro." });
     })
