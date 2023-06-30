@@ -1,20 +1,20 @@
-.social-btn {
+.google-btn {
     display: inline-flex;
     align-items: center;
-    background-color: #4285f4;
+    background-color: #c0c4c9 !important;
     color: white;
     border-radius: 2px;
     text-decoration: none;
     font-size: 14px;
   }
   
-  .social-btn img {
+  .google-btn img {
     height: 18px;
     width: 18px;
     margin-right: 10px;
   }
   
-  .social-btn:hover {
+  .google-btn:hover {
     background-color: #357ae8;
   }
   
