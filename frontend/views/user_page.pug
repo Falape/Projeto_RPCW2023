@@ -55,15 +55,15 @@ block content
             alert('Password updated successfully!');
         } else if (passwordFlag === "false") {
             var msg = "#{msg}";
-            alert('Password update failed: ' + msg);
+            alert('Update da password falhou: ' + msg);
         }
 
         var requestRoleUpdateFlag = "#{requestRoleUpdateFlag}"
         if (requestRoleUpdateFlag === "true") {
-            alert('Request Role Update successfully!');
+            alert('Pedido de atualização de role enviado com sucesso!');
         } else if (requestRoleUpdateFlag === "false") {
             var msg = "#{msg}";
-            alert('Request Role Update failed: ' + msg);
+            alert('Pedido de atualização de role falhou: ' + msg);
         }
 
         //- var updateUserFlag = "#{updateUserFlag}"
@@ -77,7 +77,7 @@ block content
         var userDeletedFlag = "#{userDeletedFlag}"
          if (userDeletedFlag === "false") {
             var msg = "#{msg}";
-            alert('User update failed: ' + msg);
+            alert('Falha, não foi possível apagar o user: ' + msg);
         }
         
         
@@ -87,12 +87,13 @@ block content
             h1(style="margin-right: 30px;").page-heading Welcome, #{user.username}!
             if owner || userInfo.role === 'admin'
                 div
-                    button.w3-button.w3-red(data-bs-toggle="modal" data-bs-target="#deleteUserModal") Delete
+                    button.w3-button.w3-red(data-bs-toggle="modal" data-bs-target="#deleteUserModal") Apagar Conta
                     if userInfo.role === 'admin' && !owner  
                         button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordAdminModal") Update Password
                     else
                         button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordModal") Update Password
-                    a.w3-button.w3-green(href='/user/update') Update User
+                    if false
+                        a.w3-button.w3-green(href='/user/update') Update User
         div.user-info
             p Email: #{user.email}
             if user.name
@@ -102,9 +103,9 @@ block content
             div(style="display: flex; align-items: center;")
                 p(style="margin-right: 10px;") Role: #{user.role}
                 if owner
-                    a.w3-button.w3-orange(data-bs-toggle="modal" data-bs-target="#requestRoleUpdateModal") Request Update
+                    a.w3-button.w3-orange(data-bs-toggle="modal" data-bs-target="#requestRoleUpdateModal") Pedir Atualização
 
-    a.w3-button.w3-yellow(href=`/users/recursos/${user._id}`) Show Resources
+    a.w3-button.w3-yellow(href=`/users/recursos/${user._id}`) Recursos do Utilizador
 
     // Update Password Modal
     div.modal.fade(id="updatePasswordModal" tabindex="-1" aria-labelledby="updatePasswordModalLabel" aria-hidden="true")
@@ -117,18 +118,18 @@ block content
                 div.w3-container
                     form(action=`/users/updatePassword` method="POST" onsubmit="return validatePasswordForm(this)")
                         div.form-group
-                            label(for="oldPassword") Old Password
+                            label(for="oldPassword") Password antiga
                             input.w3-input(type="password" name="oldPassword" required)
                         div.form-group
-                            label(for="newPassword") New Password
+                            label(for="newPassword") Password nova
                             input.w3-input(type="password" name="newPassword" id="newPassword" pattern='.{8,}' title='Password tem de ter no minimo 8 carateres!' required)
                         div.form-group
-                            label(for="newPasswordConfirm") Confirm New Password
+                            label(for="newPasswordConfirm") Confirm a password nova
                             input.w3-input(type="password" name="newPasswordConfirm" id="newPasswordConfirm" required)
-                            small#passwordWarning(style="display: none; color: red") Password do not match new password
+                            small#passwordWarning(style="display: none; color: red") Password nova e de confirmação não são iguais!
 
                         button.w3-button.w3-green.w3-right(type="submit") Save Changes
-                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Cancelar
 
 
     // Update Password Admin Modal
@@ -142,29 +143,29 @@ block content
                 div.w3-container
                     form(action=`/admin/updatePassword/${user._id}` method="POST" onsubmit="return validatePasswordForm2(this)")
                         div.form-group
-                            label(for="newPassword") New Password
+                            label(for="newPassword") Password nova
                             input.w3-input(type="password" name="newPassword" id="newPassword" pattern='.{8,}' title='Password tem de ter no minimo 8 carateres!' required)
                         div.form-group
-                            label(for="newPasswordConfirm") Confirm New Password
+                            label(for="newPasswordConfirm") Confirm a password nova
                             input.w3-input(type="password" name="newPasswordConfirm" id="newPasswordConfirm" required)
-                            small#passwordWarning2(style="display: none; color: red") Password do not match new password
+                            small#passwordWarning2(style="display: none; color: red") Password nova e de confirmação não são iguais!
 
                         button.w3-button.w3-green.w3-right(type="submit") Save Changes
-                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Cancelar
 
     // Request Role Update Modal
     div.modal.fade(id="requestRoleUpdateModal" tabindex="-1" aria-labelledby="requestRoleUpdateLabel" aria-hidden="true")
         div.modal-dialog.modal-dialog-centered
             div.w3-modal-content
                 div.w3-container
-                    h5.modal-title#requestRoleUpdateLabel Request Role Update
+                    h5.modal-title#requestRoleUpdateLabel Pedido de Atualização de Role
                     //- button.w3-closebtn.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
                         span(aria-hidden="true") ×
                 div.w3-container
                     form(action=`/users/requestRoleUpdate` method="POST")
                     
                         div.form-group
-                            label(for="role") New Role
+                            label(for="role") Novo Role
 
                             select.form-select(name="role")
                                 if user.role === 'consumer'
@@ -178,15 +179,15 @@ block content
                                         if user.role === 'admin'
                                             option(value="consumer") Consumer
                                             option(value="producer") Producer
-                        button.w3-button.w3-green.w3-right(type="submit") Save Changes
-                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+                        button.w3-button.w3-green.w3-right(type="submit") Submeter
+                        button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Cancelar
 
     // Delete User Modal
     div.modal.fade(id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserLabel" aria-hidden="true")
         div.modal-dialog.modal-dialog-centered
             div.w3-modal-content
                 div.w3-container
-                    h5.modal-title#deleteUserLabel Delete User
+                    h5.modal-title#deleteUserLabel Apagar o Utilizador
                     //- button.w3-closebtn.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
                         span(aria-hidden="true") ×
                     p Tem a certeza que pretende eliminar a sua conta?
@@ -195,10 +196,10 @@ block content
 
                 div.w3-container
                     if owner
-                        a.w3-button.w3-red.delete-button(href='/users/delete') Delete
+                        a.w3-button.w3-red.delete-button(href='/users/delete') Apagar
                     if userInfo.role == 'admin' && !owner
-                        a.w3-button.w3-red.delete-button(href='/admin/delete/' + user._id) Delete
-                    button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Close
+                        a.w3-button.w3-red.delete-button(href='/admin/delete/' + user._id) Apagar
+                    button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Cancelar
 
                     
 

@@ -5,14 +5,14 @@ block content
     include navbar
 
     div.page-container
-        h1.page-heading Role Update List
+        h1.page-heading Lista de Pedidos de Atualização de Role
         table.w3-table-all
             thead
                 tr
                     th User
-                    th Current Role
-                    th Required Role
-                    th Actions
+                    th Role Atual
+                    th Role Requerido
+                    th Ações
             tbody
                 each update in roleUpdatesList
                     tr
@@ -20,8 +20,8 @@ block content
                         td #{update.current_Role}
                         td #{update.required_Role}
                         td
-                            a.w3-button(href=`/admin/requestRoleUpdate/accept/` + update._id) Accept
-                            a.w3-button(href=`/admin/requestRoleUpdate/refuse/` + update._id) Refuse
+                            a.w3-button.w3-green(href=`/admin/requestRoleUpdate/accept/` + update._id) Aceitar
+                            a.w3-button.w3-red(href=`/admin/requestRoleUpdate/refuse/` + update._id) Recusar
 
 
     include footer
