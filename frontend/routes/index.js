@@ -47,8 +47,6 @@ router.get('/noticias', function (req, res, next) {
         console.log(err)
         res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
       });
-    //renderNoticiasPage(res, req, {}, null, null, null, null)
-    //res.redirect('/recursos')
   }
 });
 
@@ -141,6 +139,9 @@ router.get('/recursos', function (req, res, next) {
     return res.redirect('/login');
   }
 
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+
   // make request to daa api to get all resources
   axios.post(process.env.API_DATA_URL + '/resource',{}, {
     headers: {
@@ -148,8 +149,9 @@ router.get('/recursos', function (req, res, next) {
     }
   })
     .then((response) => {
-      console.log(response.data);
-      res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
+      //console.log(response.data);
+      console.log(alerts)
+      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag:alerts.downloadFlag, commentDeleteFlag:alerts.commentDeleteFlag , msg:alerts.msg });
 
     })
     .catch((error) => {
@@ -469,7 +471,6 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
       }
     }
   })
-  //res.redirect('/recursos')
 })
 
 router.post('/comment', function (req, res, next) {
@@ -548,6 +549,7 @@ router.get('/download/:id', function (req, res) {
       console.log(error);
       // console.log("NÃO FOI POSSIVEL FAZER DOWNLOAD DO FICHEIRO")
       // console.log(req.session.alerts)
+      //req.session.alerts.resourceID = undefined
       if(req.session.alerts.resourceID != undefined){
         var resourceID = req.session.alerts.resourceID
         req.session.alerts = {
