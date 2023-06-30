@@ -22,18 +22,15 @@ block content
   include footer
 
   script.
-        var wrong_data = null 
 
-        var wrong_data = "#{wrong_data}"
-        if (wrong_data === "true") {
-            var error = "#{error}"
+        var errorFlag = "#{errorFlag}"
+        if (errorFlag === "true") {
+            var error = "#{msg}"
             alert('Login failed: ' + error);
         }
 
-        var userDeleted = null 
-
-        var userDeleted = "#{userDeleted}"
-        if (userDeleted === "true") {
+        var userDeletedFlag = "#{userDeletedFlag}"
+        if (userDeletedFlag === "true") {
             var msg = "#{msg}"
             alert(msg);
         }

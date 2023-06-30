@@ -10,7 +10,7 @@ const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
 
-const { renderResourcePage, renderUserPage, renderListUsers, renderNoticiasPage } = require('../public/javascripts/renderPages')
+//const { renderUserPage } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
@@ -31,14 +31,29 @@ router.get('/noticias', function (req, res, next) {
     return res.redirect('/login');
   }
   else {
-    renderNoticiasPage(res, req, {}, null, null, null, null)
-    //res.redirect('/recursos')
+    const alerts = req.session.alerts;
+    req.session.alerts = {}
+
+    axios.post(process.env.API_DATA_URL + '/noticia/', {}, {
+      headers: {
+        Authorization: `Bearer ${req.session.user.token}`
+      }
+    })
+      .then((notic) => {
+        console.log(notic.data)
+        res.render('noticias', { noticias: notic.data, userInfo: req.session.user, userDeletedFlag: alerts.userDeletedFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, errorFlag: alerts.errorFlag, msg:alerts.msg });
+      })
+      .catch((err) => {
+        console.log(err)
+        res.render('error_page', { message: "Não foi possivel mostrar as noticias." });
+      });
   }
 });
 
 router.get('/login', function (req, res, next) {
-  res.render('login');
-
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+  res.render('login', {errorFlag:alerts.errorFlag, userDeletedFlag:alerts.userDeletedFlag , msg:alerts.msg});
 });
 
 router.post('/login', function (req, res, next) {
@@ -60,12 +75,11 @@ router.post('/login', function (req, res, next) {
         token: rep.data.token,
         userId: rep.data.userId
       };
-      //TODO: render home page
       res.render('test', { userInfo: req.session.user });
     }).catch((err) => {
 
       if (err.response && err.response.data) {
-        res.render('login', { wrong_data: true, error: err.response.data.error });
+        res.render('login', { errorFlag: true, msg: err.response.data.error });
       } else {
         res.render('error_page', { message: err });
       }
@@ -125,6 +139,9 @@ router.get('/recursos', function (req, res, next) {
     return res.redirect('/login');
   }
 
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+
   // make request to daa api to get all resources
   axios.post(process.env.API_DATA_URL + '/resource',{}, {
     headers: {
@@ -132,8 +149,10 @@ router.get('/recursos', function (req, res, next) {
     }
   })
     .then((response) => {
-      console.log(response.data);
-      res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
+      //console.log(response.data);
+      console.log(alerts)
+      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag:alerts.downloadFlag, commentDeleteFlag:alerts.commentDeleteFlag , msg:alerts.msg });
+
     })
     .catch((error) => {
       if (error.response && error.response.data) {
@@ -150,7 +169,102 @@ router.get('/recurso/:id', function (req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
-  renderResourcePage(req, res, req.params.id);
+
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+
+  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,
+    {
+      headers: {
+        Authorization: `Bearer ${req.session.user.token}`
+      }
+    })
+    .then((response) => {
+      console.log(response.data);
+      // need to get resource files
+      axios.get(process.env.API_DATA_URL + '/file/resource/' + req.params.id,
+        {
+          headers: {
+            Authorization: `Bearer ${req.session.user.token}`
+          }
+        })
+        .then((response2) => {
+          console.log(response2.data);
+
+          // need to get resource rating
+          axios.get(process.env.API_DATA_URL + '/rating/resource/' + req.params.id,
+            {
+              headers: {
+                Authorization: `Bearer ${req.session.user.token}`
+              }
+            })
+            .then((response3) => {
+              //tries to get the comments
+              axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id,
+                {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                })
+                .then((response4) => {
+                  console.log(response4.data);
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
+                  console.log("alerts: ", req.session.alerts)
+                  res.render('resource', { resource: response.data, userInfo:req.session.user  ,files: response2.data ,rating: response3.data, comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:alerts.errorFlag, msg:alerts.msg});
+                })
+                .catch((error) => {
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
+                  //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
+                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter os comentários do recurso."});
+                })
+            })
+            .catch((error) => {
+              console.log(error);
+              
+              //failed to get the rating, it will try to get the comments
+              axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id,
+                {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                })
+                //got the comments
+                .then((response4) => {
+                  console.log(response4.data);
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
+                  //res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id });
+                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating do recurso."});
+                })
+                //failed to get the comments
+                .catch((error) => {
+                  //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
+                  //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
+                  req.session.alerts = {
+                    resourceID:response.data._id
+                  }
+                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating nem os comentários do recurso."});
+                })
+
+            })
+        })
+        .catch((error) => {
+          console.log(error);
+          res.render('error_page', { message: "Não foi possivel obter os ficheiros do recurso." });
+        })
+    })
+    .catch((error) => {
+      console.log(error);
+      res.render('error_page', { message: "Não foi possivel obter o recurso desejado." });
+    });
 });
 
 router.get('/navbar', function (req, res, next) {
@@ -301,7 +415,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
             console.log(response.data);
             resource_id = response.data._id;
 
-            console.log("adicionaei o recurso, agora vou ao async");
+            console.log("adicionei o recurso, agora vou ao async");
             (async () => {
               try {
                 //console.log("PATH:", __dirname + '/../uploads/' + req.file.originalname)
@@ -357,7 +471,6 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
       }
     }
   })
-  //res.redirect('/recursos')
 })
 
 router.post('/comment', function (req, res, next) {
@@ -416,9 +529,8 @@ router.post('/rate', function (req, res, next) {
 })
 
 
-//Errors Not Tested!!
 router.get('/download/:id', function (req, res) {
-
+  // console.log("CHEGUEI AO DOWNLOAD")
   if (!req.session.user) {
     return res.redirect('/login');
   }
@@ -427,7 +539,7 @@ router.get('/download/:id', function (req, res) {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
-  })
+    })
     .then((response) => {
       console.log(response.data);
       console.log("DOWNLOAD PATH: ", response.data.path);
@@ -435,9 +547,26 @@ router.get('/download/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
+      // console.log("NÃO FOI POSSIVEL FAZER DOWNLOAD DO FICHEIRO")
+      // console.log(req.session.alerts)
+      //req.session.alerts.resourceID = undefined
+      if(req.session.alerts.resourceID != undefined){
+        var resourceID = req.session.alerts.resourceID
+        req.session.alerts = {
+          downloadFlag : true,
+          msg: "Não foi possivel fazer download do ficheiro."
+        }
+        res.redirect('/recurso/' + resourceID)
+        
+      }else{
+        req.session.alerts = {
+          downloadFlag : false,
+          msg: "Não foi possivel fazer download do ficheiro."
+        }
+        res.redirect('/recursos')
+      }
 
-
-      renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do ficheiro.");
+      //renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do ficheiro.");
       //res.render('error_page', { message: "Não foi possivel fazer download do ficheiro." });
     })
 });
@@ -460,7 +589,12 @@ router.get('/download/resource/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
-      renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do recurso.");
+      req.session.alerts = {
+        downloadFlag : true,
+        msg: "Não foi possivel fazer download do recurso."
+      }
+      res.redirect('/recurso/' + req.params.id)
+      //renderResourcePage(req, res, req.params.id, true, null, null, "Não foi possivel fazer download do recurso.");
       //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
     })
 });
@@ -470,8 +604,32 @@ router.get('/listUsers', function (req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
 
-  renderListUsers(req, res, null, null);
+  axios.get(process.env.API_AUTH_URL + '/listUsers', {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+  .then((rep) => {
+    console.log(rep.data.token)
+    if (!req.session) {
+      return res.redirect('/login')//res.status(500).send('Session object is undefined');
+    }
+
+    res.render('list_user', {userInfo:req.session.user, userList: rep.data, errorFlag:alerts.errorFlag, msg:alerts.msg});
+  }).catch((err) => {
+    console.log(err)
+    if (err.response && err.response.data){
+      console.log(err.response.data)
+      res.render('error_page', { message: err.response.data.error });
+    }else{
+      res.render('error_page', { message: err });
+    }
+  });
+
+  //renderListUsers(req, res, null, null);
 });
 
 router.get('/getUser/:id', function (req, res, next) {
@@ -480,7 +638,10 @@ router.get('/getUser/:id', function (req, res, next) {
     return res.redirect('/login');
   }
 
-  console.log("topken " + req.session.user.token)
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+
+  console.log("token " + req.session.user.token)
   axios.get(process.env.API_AUTH_URL + '/getUser/' + req.params.id, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
@@ -496,12 +657,16 @@ router.get('/getUser/:id', function (req, res, next) {
       if (req.session.user.userId == response.data._id) {
         owner = true;
       }
-      res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user });
+
+      res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user, passwordFlag : alerts.passwordFlag, requestRoleUpdateFlag: alerts.requestRoleUpdateFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
     }).catch((err) => {
       console.log(err)
-
-      renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
-
+      req.session.alerts = {
+        errorFlag:true, 
+        msg:"Não foi possivel obter o utilizador."
+      }
+      //renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
+      res.redirect('/listUsers');
     });
 });
 
@@ -518,6 +683,7 @@ router.get('/logout', function (req, res) {
 
 
 router.get('/comment/delete/soft/:id', function (req, res) {
+  console.log("DELETE COMMENT: ", req.params.id);
 
   if (!req.session.user) {
     return res.redirect('/login');
@@ -540,17 +706,42 @@ router.get('/comment/delete/soft/:id', function (req, res) {
       })
         .then((response) => {
           console.log(response.data);
-          renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          req.session.alerts = {
+            commentDeleteFlag : true
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          res.redirect('/recurso/' + response.data.resourceId)
         })
         .catch((error) => {
           console.log(error);
-          renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          req.session.alerts = {
+            commentDeleteFlag : false,
+            msg: "Não foi possivel remover o comentário."
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          res.redirect('/recurso/' + response.data.resourceId)
         })
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, falso, null,"Não foi possivel remover o comentário.");
-      res.render('error_page', { message: "Não foi possivel remover o comentário." });
+    
+      
+      //res.render('error_page', { message: "Não foi possivel remover o comentário." });
+      if(req.session.alerts.resourceID != undefined){
+        var resourceID = req.session.alerts.resourceID
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possível remover o comentário."
+        }
+        res.redirect('/recurso/' + resourceID)
+      } else{
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possivel apagar o comentário"
+        }
+        res.redirect('/recursos')
+      }
+      //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
     })
 });
 
@@ -577,17 +768,40 @@ router.get('/comment/delete/hard/:id', function (req, res) {
       })
         .then((response2) => {
           console.log("rep.data.2:",response2.data);
-          renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          req.session.alerts = {
+            commentDeleteFlag : true
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, true, null);
+          res.redirect('/recurso/' + response.data.resourceId)
         })
         .catch((error) => {
           console.log(error);
-          renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          req.session.alerts = {
+            commentDeleteFlag : false,
+            msg: "Não foi possivel remover o comentário."
+          }
+          //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
+          res.redirect('/recurso/' + response.data.resourceId)
         })
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, falso, null,"Não foi possivel remover o comentário.");
-      res.render('error_page', { message: "Não foi possivel remover o comentário." });
+      if(req.session.alerts.resourceID != undefined){
+        var resourceID = req.session.alerts.resourceID
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possível remover o comentário."
+        }
+        res.redirect('/recurso/' + resourceID)
+      } else{
+        req.session.alerts = {
+          commentDeleteFlag : false,
+          msg: "Não foi possivel apagar o comentário"
+        }
+        res.redirect('/recursos')
+      }
+      //res.redirect('/recurso/' + response.data.resourceId)
+      //res.render('error_page', { message: "Não foi possivel remover o comentário." });
     })
 });
 
@@ -606,11 +820,16 @@ router.get('/resource/delete/:id', function (req, res) {
     .then((response) => {
       console.log(response.data);
       res.redirect('/');
-      //renderResourcePage(req, res, req.params.id, null, true, null);
+
     })
     .catch((error) => {
       console.log(error);
-      renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      req.session.alerts = {
+        commentDeleteFlag : false,
+        msg: "Não foi possivel fazer remover o recurso."
+      }
+      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      res.redirect('/recurso/' + req.params.id)
       //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
     })
 });
@@ -648,11 +867,9 @@ router.post('/resource/filter', function (req, res) {
       console.log(response.data);
       res.render('list_resources3', { resources: response.data, userInfo: req.session.user });
       //res.redirect('/noticias');
-      //renderResourcePage(req, res, req.params.id, null, true, null);
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
       res.render('error_page', { message: "Não foi possivel filtrar os recursos." });
     })
 });
@@ -690,11 +907,9 @@ router.post('/resource/filter/geral', function (req, res) {
       console.log(response.data);
       res.render('list_resources2', { resources: response.data, userInfo: req.session.user });
       //res.redirect('/noticias');
-      //renderResourcePage(req, res, req.params.id, null, true, null);
     })
     .catch((error) => {
       console.log(error);
-      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
       res.render('error_page', { message: "Não foi possivel filtrar os recursos." });
     })
 });

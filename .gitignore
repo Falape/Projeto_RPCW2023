@@ -13,6 +13,8 @@ frontend/public/storage/
 
 frontend/uploads/
 
+frontend/flags.json
+
 ingestion_storing/storing/storage/
 
 ingestion_storing/storing/

@@ -31,6 +31,13 @@ app.use(cookieSession({
   maxAge: process.env.COOKIE_SESSION_EXPIRATION * 60 * 1000, // 24 hours
 }));
 
+app.use((req, res, next) => {
+  if (req.session.alerts === undefined) {
+      req.session.alerts = {};
+  }
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/admin', adminRouter);

@@ -2,7 +2,7 @@ extends layout
 
 block content
   #comments.w3-container
-    h2.w3-xlarge Comments
+    h2.w3-xlarge Comentários
     each comment, index in comments
       if comment.deleted === false
         .comment.w3-card-4.w3-margin
@@ -25,11 +25,11 @@ block content
           .w3-display-container
             p.w3-margin= comment.content
             a.w3-button.w3-red.w3-display-bottomright(href=`/comment/delete/hard/${comment._id}`) Apagar comentário
-    h2.w3-xlarge Leave a comment
+    h2.w3-xlarge Deixe um comentário!
     form(action='/comment', method='POST').w3-container
       input(type='hidden', name='resourceId', value=resource._id)
-      label(for='comment').w3-text-blue Comment
+      label(for='comment').w3-text-blue Comentário
       textarea#comment.w3-input.w3-border(name='comment', required)
-      button.w3-btn.w3-blue(type='submit') Submit Comment
+      button.w3-btn.w3-blue(type='submit') Comentar
 
 

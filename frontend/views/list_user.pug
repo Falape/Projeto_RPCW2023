@@ -5,7 +5,7 @@ block content
     include navbar
 
     div.page-container
-        h1.page-heading User List
+        h1.page-heading Lista de Utilizadores
         table.w3-table-all
             thead
                 tr
@@ -26,8 +26,8 @@ block content
 
 
     script.
-        var flagError = "#{flagError}"
-        if (flagError === "true") {
-            var error = "#{error}";
+        var errorFlag = "#{errorFlag}"
+        if (errorFlag === "true") {
+            var error = "#{msg}";
             alert('Erro: ' + error);
         }
