@@ -1,4 +1,4 @@
-.google-btn {
+.social-btn {
     display: inline-flex;
     align-items: center;
     background-color: #4285f4;
@@ -8,13 +8,13 @@
     font-size: 14px;
   }
   
-  .google-btn img {
+  .social-btn img {
     height: 18px;
     width: 18px;
     margin-right: 10px;
   }
   
-  .google-btn:hover {
+  .social-btn:hover {
     background-color: #357ae8;
   }
   
