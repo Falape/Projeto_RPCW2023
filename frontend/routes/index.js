@@ -700,15 +700,21 @@ router.post('/resource/filter/geral', function (req, res) {
     })
 });
 
-router.post('/login/google/sucess', function (req, res) {
+router.get('/login/google/success', function (req, res) {
   
-  console.log("body:", req.body);
+  //const urlParts = url.parse(req.url, true);
+  //const query = urlParts.query;
+
+  const token = req.query.token;
+  const username = req.query.username;
+  const role = req.query.role;
+  const userId = req.query.userId;
   
   req.session.user = {
-    token: req.body.token,
-    username: req.body.username,
-    role: req.body.role,
-    userId: req.body.userId,
+    token: token,
+    username: username,
+    role: role,
+    userId: userId,
   };
 
   console.log("session:", req.session.user);

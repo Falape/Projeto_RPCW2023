@@ -294,9 +294,9 @@ router.get('/callback', function (req, res, next) {
                   if (e) res.status(507).jsonp({ error: "Error creating token" })
                   else {
                     userInfo = {
-                      name: req.body.name,
-                      filiacao: req.body.filiacao,
-                      username: req.body.username,
+                      name: user.name,
+                      //filiacao: req.body.filiacao,
+                      username: user.username,
                       userId: user._id
                     }
                     try {
@@ -311,8 +311,19 @@ router.get('/callback', function (req, res, next) {
                     } catch (e) {
                       console.log(e)
                     }
-                    res.redirect("http://localhost:3000/noticias")
+                    res.redirect(`http://localhost:3000/login/google/success?token=${token}&username=${usr.username}&role=${usr.role}&userId=${usr._id}`);
                     /*
+                    res_body = {token: token,
+                      username: usr.username,
+                      role: usr.role,
+                      userId: usr._id}
+                    console.log("res_body: ", res_body)
+                    axios.post("http://localhost:3000/login/google/sucess", res_body)
+                          .catch((error) => {
+                            console.log("Axios request error:", error.message);
+                            // Handle the error without crashing the server
+                          });
+                    //res.redirect("http://localhost:3000/noticias")
                     res.status(201).jsonp(
                       {
                         token: token,
@@ -357,6 +368,10 @@ router.get('/callback', function (req, res, next) {
                 } catch (e) {
                   console.log(e)
                 }
+
+                res.redirect(`http://localhost:3000/login/google/success?token=${token}&username=${usr.username}&role=${usr.role}&userId=${usr._id}`);
+
+                /*
                 res_body = {token: token,
                   username: usr.username,
                   role: usr.role,
@@ -367,10 +382,8 @@ router.get('/callback', function (req, res, next) {
                         console.log("Axios request error:", error.message);
                         // Handle the error without crashing the server
                       });
-
+                        
                 
-                
-                /*
                 res.status(201).jsonp(
                   {
                     token: token,
@@ -397,21 +410,7 @@ router.get('/callback', function (req, res, next) {
     console.log(" CHEGUEI AQUI")
     //return res.status(200).json(user);
   })(req, res, next);
-
-  res.redirect("http://localhost:3000/noticias")
-  /*
-  , (req, res, next)=>{
-
-    console.log("req: ", req)
-    console.log("res: ", res)
-    // tirar dados 
-    // Verificar se tem conta interna no nosso sistema 
-    //User.findByFilter({id_oauth: })
-    // se tiver, cria um token e continua normalmente
-    // se não tiver, cria uma conta interna, cria um token e continua normalmente
-  }
-  */
-
+  
 });
 
 
