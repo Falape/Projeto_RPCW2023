@@ -28,7 +28,7 @@ router.get('/updateRequests', function (req, res, next) {
 });
 
 router.post('/updatePassword/:id', function(req, res, next) {
-  console.log("updatePassword")
+  console.log("updatePasswordById")
   if (!req.session.user) {
     return res.redirect('/login');
   }
