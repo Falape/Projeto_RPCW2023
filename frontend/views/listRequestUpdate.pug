@@ -20,8 +20,8 @@ block content
                         td #{update.current_Role}
                         td #{update.required_Role}
                         td
-                            a.w3-button.w3-green(href=`/admin/requestRoleUpdate/accept/` + update._id) Aceitar
-                            a.w3-button.w3-red(href=`/admin/requestRoleUpdate/refuse/` + update._id) Recusar
+                            a.w3-button.w3-green(href=`/admin/requestRoleUpdate/` + update._id + '?accept=true') Aceitar
+                            a.w3-button.w3-red(href=`/admin/requestRoleUpdate/` + update._id + '?accept=false') Recusar
 
 
     include footer
