@@ -65,9 +65,9 @@ block content
                     addFileButton.click();  // simulate a click on the addFileButton when the checkbox is checked
                 } else {
                     addFileButton.style.display = 'none';
-                    while (fileCount > 1) {
-                        removeFileInput();
-                    }
+                    const allAdditionalInputGroups = document.querySelectorAll('.additional');  // select all "additional" file input groups
+                    allAdditionalInputGroups.forEach(group => group.remove());
+                    fileCount = 1;
                 }
             });
 
@@ -75,7 +75,7 @@ block content
                 const newFileInput = document.createElement('input');
                 const removeButton = document.createElement('button');
                 const fileInputGroup = document.createElement('div');
-                fileInputGroup.className = 'file-input-group';
+                fileInputGroup.className = 'file-input-group additional';
                 
                 newFileInput.type = 'file';
                 newFileInput.name = 'Myfiles';
@@ -83,14 +83,21 @@ block content
                 newFileInput.required = true;
                 newFileInput.id = `file${++fileCount}`;
 
-                removeButton.textContent = 'Remover';
-                removeButton.type = 'button';
-                removeButton.addEventListener('click', () => {
-                    fileInputGroup.remove();
-                    fileCount--;
-                });
+                if (fileCount > 2) {    
+                    removeButton.textContent = 'Remover';
+                    removeButton.type = 'button';
+                    removeButton.addEventListener('click', () => {
+                        fileInputGroup.remove();
+                        fileCount--;
+                    });
+                    fileInputGroup.append(newFileInput, removeButton);
+                }
+                else{
+                    fileInputGroup.append(newFileInput);
+                }
 
-                fileInputGroup.append(newFileInput, removeButton);
+                //- filesContainer.appendChild(fileInputGroup);
+                //- filesContainer.insertBefore(fileInputGroup, addFileButton);
                 //- filesContainer.append(fileInputGroup);
                 const firstFileInputGroup = document.querySelector('.file-input-group');
                 firstFileInputGroup.parentNode.insertBefore(fileInputGroup, firstFileInputGroup.nextSibling);
