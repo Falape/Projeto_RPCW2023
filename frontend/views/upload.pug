@@ -4,7 +4,7 @@ block content
     include header
     include navbar
 
-    div.w3-center(style='margin-top: 75px; display: flex; justify-content: center;')
+    div(style='margin-top: 75px; display: flex; justify-content: center;')
         div.w3-card-4.w3-padding-large.w3-light-grey.w3-margin-bottom(style='width: 60%; min-width: 600px;')
             h2.w3-center Carregue um Ficheiro
             form.w3-container.w3-margin-bottom(action='/upload2', method='POST', enctype='multipart/form-data')
