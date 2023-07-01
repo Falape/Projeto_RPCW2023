@@ -280,8 +280,28 @@ router.get('/submission', function (req, res, next) {
   res.render('upload', { userInfo: req.session.user });
 })
 
-router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
 
+router.post('/upload2', multer_upload.array('Myfiles'), function (req, res) {
+    console.log("chega aqui!")
+    console.log(req.body);
+    console.log(req.files);
+
+    for(let i = 0; i < req.files.length; i++){
+      console.log(req.files[i].originalname);
+      console.log(`Received file ${req.file.originalname}`);
+      let oldPath = __dirname + '/../' + req.file.path
+      console.log('oldPath: ' + oldPath)
+      let newPath = __dirname + '/../uploads/' + req.file.originalname
+      console.log('newPath: ' + newPath)
+    }
+    // req.files is an array of files
+    // req.body will contain the text fields, if there were any
+
+    // process the files here
+});
+
+router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
+  console.log(req);
   if (!req.session.user) {
     return res.redirect('/login');
   }
