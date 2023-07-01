@@ -4,10 +4,10 @@ block content
     include header
     include navbar
 
-    div.w3-display-middle(style='margin-top: 75px;')
-        div.w3-card-4.w3-padding-large.w3-light-grey(style='width: 100%; min-width: 600px;')
+    div.w3-center(style='margin-top: 75px; display: flex; justify-content: center;')
+        div.w3-card-4.w3-padding-large.w3-light-grey.w3-margin-bottom(style='width: 60%; min-width: 600px;')
             h2.w3-center Carregue um Ficheiro
-            form.w3-container(action='/upload2', method='POST', enctype='multipart/form-data')
+            form.w3-container.w3-margin-bottom(action='/upload2', method='POST', enctype='multipart/form-data')
                 p
                     label(for='title') Título:
                     input.w3-input(type='text' id='title' name='title' required)
@@ -31,7 +31,7 @@ block content
                         option(value='exame') Exame
                         option(value='problema resolvido') Problema resolvido
                 p
-                    input(type='checkbox' id='multipleSwitch', name='multiple')
+                    input(type='checkbox' id='multipleSwitch', name='multiple', style='margin-right: 5px;')
                     label(for='multipleSwitch') Permitir vários ficheiros
                 p#filesContainer
                     div.file-input-group
@@ -62,6 +62,7 @@ block content
             multipleSwitch.addEventListener('change', () => {
                 if (multipleSwitch.checked) {
                     addFileButton.style.display = 'block';
+                    addFileButton.click();  // simulate a click on the addFileButton when the checkbox is checked
                 } else {
                     addFileButton.style.display = 'none';
                     while (fileCount > 1) {
@@ -90,7 +91,10 @@ block content
                 });
 
                 fileInputGroup.append(newFileInput, removeButton);
-                filesContainer.append(fileInputGroup);
+                //- filesContainer.append(fileInputGroup);
+                const firstFileInputGroup = document.querySelector('.file-input-group');
+                firstFileInputGroup.parentNode.insertBefore(fileInputGroup, firstFileInputGroup.nextSibling);
+
             });
 
             function removeFileInput() {
