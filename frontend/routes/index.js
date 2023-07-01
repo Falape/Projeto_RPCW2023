@@ -739,7 +739,7 @@ router.get('/login/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 
-router.get('/callback', function (req, res, next) {
+router.get('/callback/google', function (req, res, next) {
   console.log("callback")
   passport.authenticate('google', { failureJSON: { message: 'An error has occurred' } }, function (err, user, info) {
     if (err) {
@@ -751,18 +751,24 @@ router.get('/callback', function (req, res, next) {
     console.log("user: ", user)
     console.log("info: ", info)
 
-    axios.get(process.env.API_AUTH_URL + '/getUserGoogleID/' + user.id, {})
+    body = {
+      name: user.displayName,
+      email: user.email,
+      id_oauth: user.id,
+    }
+
+    axios.post(process.env.API_AUTH_URL + '/getUserGoogleID/', body)
       .then((response) => {
-        console.log("response: ", response)
+        console.log("response: ", response.data)
         
         // esta resposta já inclui o token
         // fazer update do req.session.user
         // dar então redirect para /noticias
         req.session.user = {
-          token: response.token,
-          username: response.username,
-          role: response.role,
-          userId: response.userId,
+          token: response.data.token,
+          username: response.data.username,
+          role: response.data.role,
+          userId: response.data.userId,
         }
 
         res.redirect('/noticias');

@@ -228,6 +228,7 @@ router.get('/getUser/:id', checkValidToken, async function (req, res, next) {
 
 
 /*  Google AUTH  */
+/*
 const GOOGLE_CLIENT_ID = process.env.CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.CLIENT_SECRET;
 const GOOGLE_REDIRECT_URI = process.env.REDIRECT_URI;
@@ -383,23 +384,31 @@ router.get('/callback', function (req, res, next) {
   })(req, res, next);
 
 });
+*/
 
-router.get('/getUserGoogleID/:id', function (req, res, next) {
+router.post('/getUserGoogleID/', function (req, res, next) {
   console.log("get_user_id")
 
-  myfilter = { id_oauth: req.params.id }
+  user_body = {
+    name: req.body.name,
+    id_oauth: req.body.id_oauth,
+    email: req.body.email
+  }
+
+  myfilter = { id_oauth: user_body.id_oauth}
   console.log("myfilter: ", myfilter)
 
   User.findByFilter(myfilter)
     .then((usr) => {
       if (usr == null) {
         console.log("user.length == 0")
+        console.log("usr: ", usr)
         newUser = {
           username: generateUniqueUsername(),
-          email: user.email,
+          email: user_body.email,
           role: "consumer",
           method: "google",
-          id_oauth: user.id
+          id_oauth: user_body.id_oauth
         }
 
         User.insert(newUser)
@@ -461,18 +470,6 @@ router.get('/getUserGoogleID/:id', function (req, res, next) {
                 userId: usr._id
               }
 
-              try {
-                axios.post(process.env.USER_SERVER_PROTOCOL + '://' + process.env.USER_SERVER_HOST + ':' + process.env.USER_SERVER_PORT + '/api/create', userInfo)
-                  .then((response) => {
-                    console.log("Axios request success");
-                  })
-                  .catch((error) => {
-                    console.log("Axios request error:", error.message);
-                    // Handle the error without crashing the server
-                  });
-              } catch (e) {
-                console.log(e)
-              }
               res.status(201).jsonp(
                 {
                   token: token,
