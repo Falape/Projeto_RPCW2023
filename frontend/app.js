@@ -35,6 +35,8 @@ app.use(cookieSession({
 app.use((req, res, next) => {
   if (req.session.user === undefined) {
       req.session.user = {};
+  if (req.session.alerts === undefined) {
+      req.session.alerts = {};
   }
   next();
 });

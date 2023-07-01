@@ -223,6 +223,9 @@ router.get('/getUser/:id', checkValidToken, async function (req, res, next) {
 
           res.status(200).json(userResp);
         });
+    }).
+    catch(err => {
+      res.status(500).jsonp({error: "User não encontrado!"})
     })
 });
 

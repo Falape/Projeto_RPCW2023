@@ -55,3 +55,27 @@ block content
           td
             a.w3-button.w3-green(href=`/recurso/${resource._id}`) View Details
   include footer
+
+  script.
+    
+    var downloadFlag = "#{downloadFlag}"
+    console.log(downloadFlag)
+    if (downloadFlag === "false") {
+        var msg = "#{msg}";
+        if (msg !== "") {
+            alert('Download falhou: ' + msg);
+        }else{
+            alert('Download falhou!');
+        }
+    }
+
+    var commentDeleteFlag = "#{commentDeleteFlag}"
+    if (commentDeleteFlag === "false") {
+        var msg = "#{msg}";
+        if (msg !== "") {
+            alert('Não foi possivel pagar o comentário: ' + msg);
+        }else{
+            alert('Não foi possivel pagar o comentário!');
+        }
+    }
+    

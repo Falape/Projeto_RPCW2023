@@ -1,13 +1,16 @@
 var express = require('express');
 var router = express.Router();
 const axios = require('axios');
-const {renderUserPage, renderNoticiasPage} = require('../public/javascripts/renderPages')
+//const {renderUserPage} = require('../public/javascripts/renderPages')
 
 /* GET users listing. */
 router.get('/getUser', function(req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
+
   axios.get(process.env.API_AUTH_URL + '/user/getUser',{
               headers: {
                 Authorization: `Bearer ${req.session.user.token}`
@@ -15,14 +18,13 @@ router.get('/getUser', function(req, res, next) {
             })
       .then((response) => {
         
-        // TODO: Render the home page or redirect to a different route
-        res.render('user_page', { user: response.data, owner:true, userInfo:req.session.user});
+        res.render('user_page', { user: response.data, userInfo:req.session.user, owner:true, passwordFlag : alerts.passwordFlag, requestRoleUpdateFlag: alerts.requestRoleUpdateFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
       })
       .catch((error) => {
         console.log(error);
         res.render('error_page', { message: error.response.data.error });
   });
-});
+}); 
 
 
 router.post('/updatePassword', function(req, res, next) {
@@ -35,11 +37,21 @@ router.post('/updatePassword', function(req, res, next) {
 
    if(req.body.oldPassword == undefined){
     //res.render('error_page', { message: "Old password missing!" });
-    renderUserPage(req, res, true, false, null, null, null, "Old password missing!" );
+    req.session.alerts = {
+      passwordFlag: false,
+      msg: "Password antiga em falta!"
+    }
+    //renderUserPage(req, res, true, false, null, null, null, "Old password missing!" );
+    res.redirect('/users/getUser')
    }else 
       if(req.body.newPassword != req.body.newPasswordConfirm){
         //res.render('error_page', { message: "New password and confimation doesn't match!" });
-        renderUserPage(req, res, true, false, null, null, null, "New password and confimation doesn't match!" );
+        req.session.alerts = {
+          passwordFlag: false,
+          msg: "Password nova e confirmação não coincidem!"
+        }
+        res.redirect('/users/getUser')
+        //renderUserPage(req, res, true, false, null, null, null, "New password and confimation doesn't match!" );
       } else{
 
           axios.post(process.env.API_AUTH_URL + '/updatePassword', {
@@ -54,13 +66,22 @@ router.post('/updatePassword', function(req, res, next) {
               //console.log(response);
             
               //res.render('user_page', { user: response.data, owner:true, admin:false, passwordFlag:true });
-              renderUserPage(req, res, true, true, null, null, null, null);
+              req.session.alerts = {
+                passwordFlag: true
+              } 
+              //renderUserPage(req, res, true, true, null, null, null, null);
+              res.redirect('/users/getUser')
             })
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response && error.response.data){
-                renderUserPage(req, res, true, false, null, null, null,error.response.data.error);
+                req.session.alerts = {
+                  passwordFlag: false,
+                  msg: error.response.data.error
+                }
+                //renderUserPage(req, res, true, false, null, null, null,error.response.data.error);
+                res.redirect('/users/getUser')
               }else{
                 res.render('error_page', { message: error });
               }
@@ -75,10 +96,13 @@ router.post('/requestRoleUpdate', function(req, res, next) {
   }
 
   console.log(req.body);
-
     if(req.body.role == undefined){
-      //(req, res, owner=null, admin=null, passwordFlag=null, requestRoleUpdateFlag=null, updateUserFlag=null, error=null)
-      renderUserPage(req, res, true, null, false, null, null, "Role missing!");
+      req.session.alerts = {
+        requestRoleUpdateFlag: false,
+        msg: "Role em falta!"
+      }
+      //renderUserPage(req, res, true, null, false, null, null, "Role missing!");
+      res.redirect('/users/getUser')
     }else{
       axios.post(process.env.API_AUTH_URL + '/user/requestUpdateRole', {
             required_Role: req.body.role
@@ -90,14 +114,23 @@ router.post('/requestRoleUpdate', function(req, res, next) {
             .then((response) => {
               //console.log(response);
             
-              //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
-              renderUserPage(req, res, true, null, true, null, null, null);
+              req.session.alerts = {
+                requestRoleUpdateFlag: true
+              }
+              //renderUserPage(req, res, true, null, true, null, null, null);
+              res.redirect('/users/getUser')
             })
             .catch((error) => {
               console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response && error.response.data){
-                renderUserPage(req, res, true, null, false, null, null, error.response.data.error);
+
+                req.session.alerts = {
+                  requestRoleUpdateFlag: false,
+                  msg: error.response.data.error
+                }
+                //renderUserPage(req, res, true, null, false, null, null, error.response.data.error);
+                res.redirect('/users/getUser')
               }else{
                 res.render('error_page', { message: error });
               }
@@ -146,13 +179,22 @@ router.get('/delete', function(req, res, next) {
                 //res.render('error_page', { message: error.response.data.error });
               });
               //res.render('user_page', { user: response.data, owner:true, admin:false, requestRoleUpdateFlag:true });
-              res.render('login', { userDeleted: true, msg: "Utilizador apagado!" });
+              req.session.alerts={
+                userDeletedFlag: true,
+                msg: "Utilizador apagado!"
+              }
+              res.redirect('/login');
             })
             .catch((error) => {
               //console.log(error);
               //res.render('error_page', { message: error.response.data.error });
               if (error.response && error.response.data){
-                renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
+                req.session.alerts={
+                  userDeletedFlag: false,
+                  msg: error.response.data.error
+                }
+                //renderUserPage(req, res, true, null, null, null, false,error.response.data.error);
+                res.redirect('/users/getUser')
               }else{
                 res.render('error_page', { message: error });
               }
