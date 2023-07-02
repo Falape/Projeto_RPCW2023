@@ -84,7 +84,7 @@ router.post('/login', function (req, res, next) {
         token: rep.data.token,
         userId: rep.data.userId
       };
-      res.render('test', { userInfo: req.session.user });
+      res.redirect('/noticias')
     }).catch((err) => {
 
       if (err.response && err.response.data) {
