@@ -289,6 +289,15 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
 
   let listFilePaths = []; // Define array to hold successful paths
 
+  body = {
+    title: req.body.title,
+    uploadedBy: req.session.user.userId,
+    uploadedByUsername: req.session.user.username,
+    author: req.body.author == "" ? null : req.body.author,
+    public: req.body.publicResource == 'yes' ? true : false,
+    type: req.body.type,
+    description: req.body.description
+  }
 
   for (let i = 0; i < req.files.length; i++) {
     console.log(req.files[i].originalname);
@@ -304,31 +313,61 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
       console.log('ERROR: ' + err);
     }
   }
+  console.log("Lista de paths: ", listFilePaths);
   if (req.body.multiple != undefined && req.body.multiple == 'on' && req.files.length > 1) {
     //hadle multiple files here
     console.log("multiple files");
+
+    sip_creation.createSIP(listFilePaths, req.body.title)
+      .then((zipPath) => {
+        console.log('--- ZIP CREATED ---');
+        console.log('Zip path: ', zipPath);
+
+        return sip_store.StoreSIP(__dirname + '/../uploads/' + zipPath);
+      })
+      .then((files) => {
+        console.log("files:", files);
+        //console.log('--- SIP STORED ---');
+        body.path = files.zip_path
+        body.list_files = files.list_files
+        axios.post(process.env.API_DATA_URL + '/resource/add2', body, {
+          headers: {
+            Authorization: `Bearer ${req.session.user.token}`
+          }
+          })
+          .then((response) => {
+            console.log(response.data);
+            res.redirect('/recurso/' + response.data._id);
+          })
+          .catch((error) => {
+            console.log(error);
+            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+          })
+
+      })
+      .catch((error) => {
+        console.log(error);
+        res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+      });
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
   } else {
     if (req.body.multiple == undefined && req.files.length == 1) {
       //handle multiple files here
       console.log("single file");
+
       if (req.file[0].mimetype == 'application/zip') {
 
-      }else{
-        
+      } else {
+
       }
-    }else{
+    } else {
       //handle error here
       console.log("error porque tem mais que um ficheiro e não está selecionado o multiple");
     }
   }
-  //multiple: 'on'
-
-
-  // req.files is an array of files
-  // req.body will contain the text fields, if there were any
-
-  // process the files here
 });
 
 router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
@@ -360,7 +399,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
   //console.dir(req.file)
   fs.rename(oldPath, newPath, (erro) => {
     if (erro) {
-      
+
     }
     else {
       // se for um zip então readArchive --> store
