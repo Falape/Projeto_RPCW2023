@@ -6,8 +6,8 @@ var UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     userId: { type: String, required: true, unique: true },
     filiacao: String,
-    created_date : { type: Date, required: true },
-    last_access : Date,
+    created_date : { type: String, required: true },
+    last_access : String,
     // deleted: { type: Boolean, default: false },
     // deleted_date : { type: Date, default: null },
 });
