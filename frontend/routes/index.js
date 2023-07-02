@@ -340,8 +340,12 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
             res.redirect('/recurso/' + response.data._id);
           })
           .catch((error) => {
-            console.log("message error: ",error.message)
-            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+            //console.log(error);
+            //console.log("message error: ",error.response.data.message)
+            if(error.response.data !=undefined && error.response.data.message!=undefined){
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError:error.response.data.message });
+            }else  
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
           })
 
       })
@@ -374,8 +378,11 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
           })
           .catch((error) => {
             //console.log(error);
-            console.log("message error: ",error.message)
-            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+            //console.log("message error: ",error.response.data.message)
+            if(error.response.data !=undefined && error.response.data.message!=undefined){
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError:error.response.data.message });
+            }else  
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
           })
         })
 
