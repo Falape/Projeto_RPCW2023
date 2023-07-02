@@ -1,7 +1,7 @@
 <h1 align="center">Projeto RPCW 2023</h1>
       
 <p align="center">
-  <a href="#about">About</a> •
+  <a href="#about">Sobre</a> •
   <a href="#features">Features</a> •
   <a href="#installation">Installation and usage</a> •
   <a href="#wiki">Wiki</a> 
@@ -9,7 +9,7 @@
 
 ---
 
-## About
+## Sobre
 
 Proposta 1: Plataforma de Gestão e Disponibilização de Recursos Educativos
 
