@@ -1,9 +1,9 @@
 <h1 align="center">Projeto RPCW 2023</h1>
       
 <p align="center">
-  <a href="#sobre">Sobre</a> •
-  <a href="#características">Características</a> •
-  <a href="#instalação-e-uso">Instalação e uso</a> •
+  <a href="#sobre">Sobre</a>  •  
+  <a href="#características">Características</a>  •  
+  <a href="#instalação-e-uso">Instalação e uso</a>  • 
   <a href="#wiki">Wiki</a> 
 </p>
 
@@ -36,6 +36,11 @@ hello world
 ### Api frontend
 
 hello world
+
+### Processo de ingestão
+Para que a nossa plataforma conseguisse receber qualquer tipo de ficheiros, decidimos dividir este processo em 2 partes. Uma para os ficheiros zip, no qual criamos um script para efectuar a verificação e outro para fazer o storing do do ficheiro zip. E outra parte, na qual criamos um zip com o(s) ficheiros submetidos pelo utilizador e depois fazemos store do mesmo. Nesta ultima parte, não fazemos a verificação, porque somos nós que criamos o zip, e desta maneira consideramo-lo logo válido.
+
+O processo de storing consiste em fazer a hash md5 do ficheiro zip, a qual tem 32 caracteres. Dividimos esta string em 2 (cada com 16 caractesres) e criamos directórios da seguinte maneira: pasta_principal/hash1/hash2/ , dentro do hash2 então temos o 2 coisas, uma pasta comficheiros unziped e o ficheiro zip original. Dentro da pasta unziped encontra-se todos os ficheiros do zip, para que seja possivel aos utilizadores fazer download de cada uma partes de um recurso.
 
 
 ## Instalação e uso:
