@@ -208,6 +208,8 @@ router.get('/recursos/:id', function(req, res, next) {
   if (!req.session.user) {
     return res.redirect('/login');
   }
+  const alerts = req.session.alerts;
+  req.session.alerts = {}
   // make request to daa api to get all resources
   axios.post(process.env.API_DATA_URL + '/resource', {uploadedBy: req.params.id}, {
     headers: {
@@ -222,7 +224,7 @@ router.get('/recursos/:id', function(req, res, next) {
     else {
       id_user = ""
     }
-    res.render('list_resources3', {userInfo:req.session.user, resources: response.data, user : id_user});
+    res.render('list_resources3', {userInfo:req.session.user, resources: response.data, user : id_user, downloadFlag: alerts.downloadFlag, resourceDeletedFlag:alerts.resourceDeletedFlag , commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg });
   })
   .catch((error) => {
     console.log(error);

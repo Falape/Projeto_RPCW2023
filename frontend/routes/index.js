@@ -160,7 +160,7 @@ router.get('/recursos', function (req, res, next) {
     .then((response) => {
       //console.log(response.data);
       console.log(alerts)
-      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag: alerts.downloadFlag, commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg });
+      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag: alerts.downloadFlag, resourceDeletedFlag:alerts.resourceDeletedFlag , commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg });
 
     })
     .catch((error) => {
@@ -950,6 +950,9 @@ router.get('/resource/delete/:id', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
+      req.session.alerts = {
+        resourceDeletedFlag: true,
+      }
       if(req.session.user.role == "admin"){
         res.redirect('/recursos');
       }else{
@@ -1000,7 +1003,7 @@ router.post('/resource/filter', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      res.render('list_resources3', { resources: response.data, userInfo: req.session.user });
+      res.render('list_resources3', { resources: response.data, userInfo: req.session.user, downloadFlag: alerts.downloadFlag, resourceDeletedFlag:alerts.resourceDeletedFlag , commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg  });
       //res.redirect('/noticias');
     })
     .catch((error) => {
