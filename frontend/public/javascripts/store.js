@@ -4,6 +4,8 @@ const md5File = require('md5-file');
 const StreamZip = require('node-stream-zip');
 const fs = require("fs");
 const { stdin } = require('process');
+//const { response } = require('express');
+//const { replaceOne } = require('../../data_api/models/resource');
 //const fs = require('fs/promises');
 
 
@@ -51,6 +53,7 @@ function StoreSIP(zip_name){
             file: zip_path,
             storeEntries: true
         });
+        console.log("zip_path abaixo: ", zip_path)
         console.log("Criei o stream com sucesso!")
         return new Promise((resolve, reject) => {
         // Esta função procura no zip, sem fazer unzip, isto para o caso de não haver nenhum, poupa tempo
@@ -117,8 +120,13 @@ function StoreSIP(zip_name){
         // Move the zip file to the final directory
         return fs.promises.rename(zip_path, final_dir + '/' + zip_name)
             .then(() => {
+                console.log("FINAL DIR: ", final_dir + '/' + zip_name)
                 console.log('Successfully renamed - AKA moved!');
-                return final_info;
+                qq = { 
+                    "zip_path" : final_dir + '/' + zip_name,
+                    "list_files" : final_info
+                }
+                return qq;
             })
             .catch((err) => {
                 throw err;
@@ -132,13 +140,13 @@ module.exports = {
     StoreSIP : StoreSIP
 }
 
-/*
-var args = process.argv.slice(2);
-StoreSIP(args[0]).then(x=>{
-    console.log("FINAL DIR =======================================> ", x)
-     // este valor ainda não está a dar correcto.
-})
-*/
+
+//var args = process.argv.slice(2);
+// StoreSIP('../sip_creation/output.zip').then(x=>{
+//     console.log("FINAL DIR =======================================> ", x)
+//      // este valor ainda não está a dar correcto.
+// })
+
 
 // Desta forma a promessa fica pendente, desta maneira a variavel não tem o resultado:
 // x = StoreSIP('template4.zip')
