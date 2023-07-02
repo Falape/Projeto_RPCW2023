@@ -77,7 +77,25 @@ Aqui estão as rotas disponíveis em /users:
 
 ### Api users 
 
-hello world
+Aqui estão as rotas disponíveis em /admin:
+
+- `PUT /user/:id`: Atualiza um usuário pelo ID. Esta rota é usada para atualizar as informações de um usuário específico (como nome, nome de usuário, filiação e data de último acesso) usando seu ID.
+
+Aqui estão as rotas disponíveis em /api:
+
+- `POST /create`: Cria um novo usuário. Esta rota é usada para criar um novo usuário com as informações fornecidas no corpo da solicitação.
+
+- `GET /user/:id`: Obtém um usuário por ID. Esta rota é usada para buscar um usuário específico pelo seu ID.
+
+- `DELETE /delete/:id`: Deleta um usuário por ID. Esta rota é usada para excluir um usuário específico pelo seu ID.
+
+- `GET /updateLastAccess/:id`: Atualiza o último acesso de um usuário pelo ID. Esta rota é usada para atualizar a data e hora do último acesso de um usuário específico usando seu ID.
+
+- `PUT /user/:id`: Atualiza um usuário pelo ID. Esta rota é usada para atualizar as informações de um usuário específico (como nome, filiação e último acesso) usando seu ID.
+
+Aqui estão as rotas disponíveis em /users:
+
+- `PUT /user/:id`: Atualiza um usuário pelo ID. Esta rota é usada para atualizar as informações de um usuário específico (como nome, filiação e último acesso) usando seu ID.
 
 ### Api frontend
 
