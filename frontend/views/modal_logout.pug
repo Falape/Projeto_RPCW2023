@@ -1,20 +1,29 @@
 extends layout 
 
 block content
-    div.modal.fade(id="logoutModal" tabindex="-1" aria-labelledby="logoutLabel" aria-hidden="true")
-        div.modal-dialog.modal-dialog-centered
-            div.w3-modal-content
-                div.w3-container
-                    h5.modal-title#logoutLabel Delete User
-                    //- button.w3-closebtn.w3-red(type="button" data-bs-dismiss="modal" aria-label="Close")
-                        span(aria-hidden="true") ×
-                    p Tem a certeza que pretende sair?
-
-
-                div.w3-container
-                    a.w3-button.w3-red.delete-button(href='/logout') Sim
-                    button.w3-button.w3-light-grey.w3-right(type="button" data-bs-dismiss="modal") Não
+    div.w3-modal(id="logoutModal")
+        div.w3-modal-content.w3-card-4(style="width: auto; max-width: 300px;")
+            header.w3-container.w3-dark-grey
+                span.w3-button.w3-display-topright(onclick="document.getElementById('logoutModal').style.display='none'") ×
+                h5#logoutLabel Logout
+            div.w3-container
+                p Tem a certeza que pretende sair?
+            footer.w3-container.w3-dark-grey
+                button.w3-button.w3-light-grey.w3-right(onclick="document.getElementById('logoutModal').style.display='none'") Não
+                a.w3-button.w3-red.delete-button.w3-right(href='/logout') Sim
 
     script.
-        var myModallogoutModal = new bootstrap.Modal(document.getElementById('logoutModal'), options)
-            myModallogoutModal.show()
+        // Get the logout button
+        var logoutButton = document.getElementById('logoutButton');
+        
+        // Show the modal when the logout button is clicked
+        logoutButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('logoutModal').style.display='block';
+        });
+
+        // Hide the modal when the "Não" button is clicked
+        document.querySelector('.w3-light-grey').addEventListener('click', function(event) {
+            event.preventDefault();
+            document.getElementById('logoutModal').style.display='none';
+        });

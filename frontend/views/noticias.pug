@@ -19,6 +19,9 @@ block content
                             | #{noticia.uploadedByUsername} 
                             strong Data: 
                             | #{noticia.dateCreated}
+                if userInfo.role === 'admin'
+                    .w3-col.s12.w3-right-align
+                        a.w3-button.w3-red(href=`/noticia/delete/${noticia._id}`) Apagar Notícia
             else
                 .w3-container.w3-blue
                     p Novo recurso adicionado!
@@ -32,8 +35,10 @@ block content
                             | #{noticia.dateCreated} 
                             strong Tipo de Recurso: 
                             | #{noticia.type}
-                .w3-col.s6.w3-text-right
+                .w3-col.s12.w3-right-align
                     a.w3-button.w3-green(href=`/recurso/${noticia.resourceId}`) Ver detalhes
+                    if userInfo.role === 'admin'
+                        a.w3-button.w3-red(href=`/noticia/delete/${noticia._id}`) Apagar Notícia
     include footer
 
     script.

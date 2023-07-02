@@ -278,7 +278,7 @@ router.put('/edit/:id', checkValidTokenProducer, function (req, res) {
 
 
 // delete resource (hard)
-router.delete('/delete/hard/:id', checkValidTokenAdmin, function (req, res) {
+router.delete('/delete/hard/:id', checkValidTokenProducer, function (req, res) {
     re_id = req.params.id
     resourceController.deleteResourceMEGA(re_id)
         .then(resources => {
