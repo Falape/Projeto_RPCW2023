@@ -180,15 +180,13 @@ router.post('/add2', checkValidTokenProducer, function (req, res) {
                         .catch(error => {
                             resourceController.deleteResourceHard(resource._id)
                             .then(respDelete => {
-                                res.status(504).jsonp({ error: error, message: "Error adding file..." })
+                                res.status(504).jsonp({ error: error, message: "Erro a adicionar ficheiro..." })
                             }).catch(error => {
-                                res.status(400).jsonp({ error: error, message: "Error adding file and then error deleting resource..." });
+                                res.status(400).jsonp({ error: error, message: "Erro a adicionar ficheiro e erro a apagar recurso!" });
                             });                            
                         })
                 }
             }
-
-            console.log("Passa aqui")
 
             
             ra_data = {
@@ -217,7 +215,12 @@ router.post('/add2', checkValidTokenProducer, function (req, res) {
         })
         .catch(error => {
             console.log("error adding resource: ", error.message)
-            res.status(503).jsonp({ error: error, message: "Error adding resource..." })
+            if(error.code == 11000){
+                return res.status(400).jsonp({ error: error, message: "Já existe um recurso com este nome!" });
+            }else{
+
+                res.status(503).jsonp({ error: error, message: "Falha ao adicionar o recurso!" })
+            }
         })
 });
 
