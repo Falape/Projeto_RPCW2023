@@ -2,7 +2,8 @@ var express = require('express');
 const resource = require('../../data_api/models/resource');
 var router = express.Router();
 const axios = require('axios');
-var fs = require('fs')
+//var fs = require('fs')
+const fs = require('fs').promises;
 const multer = require('multer');
 var multer_upload = multer({ dest: 'uploads' })
 const sip_creation = require('../public/javascripts/creation');
@@ -20,7 +21,7 @@ router.get('/', function (req, res, next) {
   console.log(req.session.user)
   if (req.session.user == undefined || req.session.user.token == null) {
     return res.redirect('/login');
-  }else{
+  } else {
     res.redirect('/noticias')
   }
 });
@@ -41,7 +42,7 @@ router.get('/noticias', function (req, res, next) {
     })
       .then((notic) => {
         console.log(notic.data)
-        res.render('noticias', { noticias: notic.data, userInfo: req.session.user, userDeletedFlag: alerts.userDeletedFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, errorFlag: alerts.errorFlag, msg:alerts.msg });
+        res.render('noticias', { noticias: notic.data, userInfo: req.session.user, userDeletedFlag: alerts.userDeletedFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, errorFlag: alerts.errorFlag, msg: alerts.msg });
       })
       .catch((err) => {
         console.log(err)
@@ -53,7 +54,7 @@ router.get('/noticias', function (req, res, next) {
 router.get('/login', function (req, res, next) {
   const alerts = req.session.alerts;
   req.session.alerts = {}
-  res.render('login', {errorFlag:alerts.errorFlag, userDeletedFlag:alerts.userDeletedFlag , msg:alerts.msg});
+  res.render('login', { errorFlag: alerts.errorFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
 });
 
 router.post('/login', function (req, res, next) {
@@ -143,7 +144,7 @@ router.get('/recursos', function (req, res, next) {
   req.session.alerts = {}
 
   // make request to daa api to get all resources
-  axios.post(process.env.API_DATA_URL + '/resource',{}, {
+  axios.post(process.env.API_DATA_URL + '/resource', {}, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -151,7 +152,7 @@ router.get('/recursos', function (req, res, next) {
     .then((response) => {
       //console.log(response.data);
       console.log(alerts)
-      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag:alerts.downloadFlag, commentDeleteFlag:alerts.commentDeleteFlag , msg:alerts.msg });
+      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag: alerts.downloadFlag, commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg });
 
     })
     .catch((error) => {
@@ -210,23 +211,23 @@ router.get('/recurso/:id', function (req, res, next) {
                   console.log(response4.data);
                   //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
                   req.session.alerts = {
-                    resourceID:response.data._id
+                    resourceID: response.data._id
                   }
                   console.log("alerts: ", req.session.alerts)
-                  res.render('resource', { resource: response.data, userInfo:req.session.user  ,files: response2.data ,rating: response3.data, comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:alerts.errorFlag, msg:alerts.msg});
+                  res.render('resource', { resource: response.data, userInfo: req.session.user, files: response2.data, rating: response3.data, comments: response4.data, downloadFlag: alerts.downloadFlag, updateFlag: alerts.updateFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, commentDeleteFlag: alerts.commentDeleteFlag, errorFlag: alerts.errorFlag, msg: alerts.msg });
                 })
                 .catch((error) => {
                   //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
                   req.session.alerts = {
-                    resourceID:response.data._id
+                    resourceID: response.data._id
                   }
                   //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
-                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter os comentários do recurso."});
+                  res.render('resource', { resource: response.data, userInfo: req.session.user, files: response2.data, rating: response3.data, comments: "", downloadFlag: alerts.downloadFlag, updateFlag: alerts.updateFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, commentDeleteFlag: alerts.commentDeleteFlag, errorFlag: true, msg: alerts.msg || "Não foi possivel obter os comentários do recurso." });
                 })
             })
             .catch((error) => {
               console.log(error);
-              
+
               //failed to get the rating, it will try to get the comments
               axios.get(process.env.API_DATA_URL + '/comment/resource/' + req.params.id,
                 {
@@ -239,19 +240,19 @@ router.get('/recurso/:id', function (req, res, next) {
                   console.log(response4.data);
                   //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
                   req.session.alerts = {
-                    resourceID:response.data._id
+                    resourceID: response.data._id
                   }
                   //res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: response3.data, comments: response4.data, downloadUrl: process.env.FRONT_URL + '/download/resource/'+req.params.id });
-                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: response4.data, downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating do recurso."});
+                  res.render('resource', { resource: response.data, userInfo: req.session.user, files: response2.data, rating: "", comments: response4.data, downloadFlag: alerts.downloadFlag, updateFlag: alerts.updateFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, commentDeleteFlag: alerts.commentDeleteFlag, errorFlag: true, msg: alerts.msg || "Não foi possivel obter o rating do recurso." });
                 })
                 //failed to get the comments
                 .catch((error) => {
                   //res.render('error_page', { message: "Não foi possivel obter os comentários do recurso." });
                   //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
                   req.session.alerts = {
-                    resourceID:response.data._id
+                    resourceID: response.data._id
                   }
-                  res.render('resource', { resource: response.data, userInfo:req.session.user ,files: response2.data ,rating: "", comments: "", downloadFlag:alerts.downloadFlag, updateFlag:alerts.updateFlag, resourceDeletedFlag:alerts.resourceDeletedFlag, commentDeleteFlag:alerts.commentDeleteFlag, errorFlag:true, msg: alerts.msg || "Não foi possivel obter o rating nem os comentários do recurso."});
+                  res.render('resource', { resource: response.data, userInfo: req.session.user, files: response2.data, rating: "", comments: "", downloadFlag: alerts.downloadFlag, updateFlag: alerts.updateFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, commentDeleteFlag: alerts.commentDeleteFlag, errorFlag: true, msg: alerts.msg || "Não foi possivel obter o rating nem os comentários do recurso." });
                 })
 
             })
@@ -280,8 +281,130 @@ router.get('/submission', function (req, res, next) {
   res.render('upload', { userInfo: req.session.user });
 })
 
-router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
 
+router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res) {
+  console.log("chega aqui!")
+  console.log(req.body);
+  console.log(req.files);
+
+  let listFilePaths = []; // Define array to hold successful paths
+
+  body = {
+    title: req.body.title,
+    uploadedBy: req.session.user.userId,
+    uploadedByUsername: req.session.user.username,
+    author: req.body.author == "" ? null : req.body.author,
+    public: req.body.publicResource == 'yes' ? true : false,
+    type: req.body.type,
+    description: req.body.description
+  }
+
+  for (let i = 0; i < req.files.length; i++) {
+    console.log(req.files[i].originalname);
+    console.log(`Received file ${req.files[i].originalname}`);
+    let oldPath = __dirname + '/../' + req.files[i].path
+    let newPath = __dirname + '/../uploads/' + req.files[i].originalname
+
+    try {
+      await fs.rename(oldPath, newPath);
+      console.log('Successfully renamed - AKA moved!');
+      listFilePaths.push(newPath); // Add new path to listFilePaths array
+    } catch (err) {
+      console.log('ERROR: ' + err);
+    }
+  }
+  console.log("Lista de paths: ", listFilePaths);
+  if (req.body.multiple != undefined && req.body.multiple == 'on' || req.files.length == 1 && req.files[0].mimetype != 'application/zip') {
+    //hadle multiple files here
+    console.log("multiple files");
+
+    sip_creation.createSIP(listFilePaths, req.body.title)
+      .then((zipPath) => {
+        console.log('--- ZIP CREATED ---');
+        console.log('Zip path: ', zipPath);
+
+        return sip_store.StoreSIP(__dirname + '/../uploads/' + zipPath);
+      })
+      .then((files) => {
+        console.log("files:", files);
+        //console.log('--- SIP STORED ---');
+        body.path = files.zip_path
+        body.list_files = files.list_files
+        axios.post(process.env.API_DATA_URL + '/resource/add2', body, {
+          headers: {
+            Authorization: `Bearer ${req.session.user.token}`
+          }
+          })
+          .then((response) => {
+            console.log(response.data);
+            res.redirect('/recurso/' + response.data._id);
+          })
+          .catch((error) => {
+            //console.log(error);
+            //console.log("message error: ",error.response.data.message)
+            if(error.response.data !=undefined && error.response.data.message!=undefined){
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError:error.response.data.message });
+            }else  
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+          })
+
+      })
+      .catch((error) => {
+        console.log("message error: ",error.message)
+        res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+      });
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+  } else {
+    if (req.body.multiple == undefined && req.files.length == 1 && req.files[0].mimetype == 'application/zip') {
+      //handle multiple files here
+      console.log("single file zip");
+      sip_read.readZipArchive(__dirname + '/../uploads/' + req.files[0].originalname)
+          .then((resp) => {
+            if (resp == false) {
+              // zip não se encontra no formato correcto.
+
+              //res.render('error_page', { message: "ZIP is invalid." });
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "ZIP is invalid." });
+            }
+            else {
+              sip_store.StoreSIP(listFilePaths[0])
+              .then((files) => {
+                console.log("files:", files);
+                //console.log('--- SIP STORED ---');
+                body.path = files.zip_path
+                body.list_files = files.list_files
+                axios.post(process.env.API_DATA_URL + '/resource/add2', body, {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                  })
+                  .then((response) => {
+                    console.log(response.data);
+                    res.redirect('/recurso/' + response.data._id);
+                  })
+                  .catch((error) => {
+                    //console.log(error);
+                    //console.log("message error: ",error.response.data.message)
+                    if(error.response.data !=undefined && error.response.data.message!=undefined){
+                      res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError:error.response.data.message });
+                    }else  
+                      res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+                  })
+                })
+            }
+          })
+    } else {
+      //handle error here
+      console.log("error porque tem mais que um ficheiro e não está selecionado o multiple");
+    }
+  }
+});
+
+router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
+  console.log(req);
   if (!req.session.user) {
     return res.redirect('/login');
   }
@@ -309,7 +432,7 @@ router.post('/upload', multer_upload.single('Myfile'), (req, res) => {
   //console.dir(req.file)
   fs.rename(oldPath, newPath, (erro) => {
     if (erro) {
-      res.render('error', { error: erro })
+
     }
     else {
       // se for um zip então readArchive --> store
@@ -535,11 +658,11 @@ router.get('/download/:id', function (req, res) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id,{
+  axios.get(process.env.API_DATA_URL + '/file/' + req.params.id, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
-    })
+  })
     .then((response) => {
       console.log(response.data);
       console.log("DOWNLOAD PATH: ", response.data.path);
@@ -550,17 +673,17 @@ router.get('/download/:id', function (req, res) {
       // console.log("NÃO FOI POSSIVEL FAZER DOWNLOAD DO FICHEIRO")
       // console.log(req.session.alerts)
       //req.session.alerts.resourceID = undefined
-      if(req.session.alerts.resourceID != undefined){
+      if (req.session.alerts.resourceID != undefined) {
         var resourceID = req.session.alerts.resourceID
         req.session.alerts = {
-          downloadFlag : true,
+          downloadFlag: true,
           msg: "Não foi possivel fazer download do ficheiro."
         }
         res.redirect('/recurso/' + resourceID)
-        
-      }else{
+
+      } else {
         req.session.alerts = {
-          downloadFlag : false,
+          downloadFlag: false,
           msg: "Não foi possivel fazer download do ficheiro."
         }
         res.redirect('/recursos')
@@ -577,7 +700,7 @@ router.get('/download/resource/:id', function (req, res) {
     return res.redirect('/login');
   }
 
-  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id,{
+  axios.get(process.env.API_DATA_URL + '/resource/' + req.params.id, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -590,7 +713,7 @@ router.get('/download/resource/:id', function (req, res) {
     .catch((error) => {
       console.log(error);
       req.session.alerts = {
-        downloadFlag : true,
+        downloadFlag: true,
         msg: "Não foi possivel fazer download do recurso."
       }
       res.redirect('/recurso/' + req.params.id)
@@ -612,22 +735,22 @@ router.get('/listUsers', function (req, res, next) {
       Authorization: `Bearer ${req.session.user.token}`
     }
   })
-  .then((rep) => {
-    console.log(rep.data.token)
-    if (!req.session) {
-      return res.redirect('/login')//res.status(500).send('Session object is undefined');
-    }
+    .then((rep) => {
+      console.log(rep.data.token)
+      if (!req.session) {
+        return res.redirect('/login')//res.status(500).send('Session object is undefined');
+      }
 
-    res.render('list_user', {userInfo:req.session.user, userList: rep.data, errorFlag:alerts.errorFlag, msg:alerts.msg});
-  }).catch((err) => {
-    console.log(err)
-    if (err.response && err.response.data){
-      console.log(err.response.data)
-      res.render('error_page', { message: err.response.data.error });
-    }else{
-      res.render('error_page', { message: err });
-    }
-  });
+      res.render('list_user', { userInfo: req.session.user, userList: rep.data, errorFlag: alerts.errorFlag, msg: alerts.msg });
+    }).catch((err) => {
+      console.log(err)
+      if (err.response && err.response.data) {
+        console.log(err.response.data)
+        res.render('error_page', { message: err.response.data.error });
+      } else {
+        res.render('error_page', { message: err });
+      }
+    });
 
   //renderListUsers(req, res, null, null);
 });
@@ -658,12 +781,12 @@ router.get('/getUser/:id', function (req, res, next) {
         owner = true;
       }
 
-      res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user, passwordFlag : alerts.passwordFlag, requestRoleUpdateFlag: alerts.requestRoleUpdateFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
+      res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user, passwordFlag: alerts.passwordFlag, requestRoleUpdateFlag: alerts.requestRoleUpdateFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
     }).catch((err) => {
       console.log(err)
       req.session.alerts = {
-        errorFlag:true, 
-        msg:"Não foi possivel obter o utilizador."
+        errorFlag: true,
+        msg: "Não foi possivel obter o utilizador."
       }
       //renderListUsers(req, res, true, "Não foi possivel obter o utilizador.");
       res.redirect('/listUsers');
@@ -696,7 +819,7 @@ router.get('/comment/delete/soft/:id', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      if(response.data == null){
+      if (response.data == null) {
         res.render('error_page', { message: "Comentário já foi apagado." });
       }
       axios.delete(process.env.API_DATA_URL + '/comment/delete/soft/' + req.params.id, {
@@ -707,7 +830,7 @@ router.get('/comment/delete/soft/:id', function (req, res) {
         .then((response) => {
           console.log(response.data);
           req.session.alerts = {
-            commentDeleteFlag : true
+            commentDeleteFlag: true
           }
           //renderResourcePage(req, res, response.data.resourceId, null, true, null);
           res.redirect('/recurso/' + response.data.resourceId)
@@ -715,7 +838,7 @@ router.get('/comment/delete/soft/:id', function (req, res) {
         .catch((error) => {
           console.log(error);
           req.session.alerts = {
-            commentDeleteFlag : false,
+            commentDeleteFlag: false,
             msg: "Não foi possivel remover o comentário."
           }
           //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
@@ -724,19 +847,19 @@ router.get('/comment/delete/soft/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
-    
-      
+
+
       //res.render('error_page', { message: "Não foi possivel remover o comentário." });
-      if(req.session.alerts.resourceID != undefined){
+      if (req.session.alerts.resourceID != undefined) {
         var resourceID = req.session.alerts.resourceID
         req.session.alerts = {
-          commentDeleteFlag : false,
+          commentDeleteFlag: false,
           msg: "Não foi possível remover o comentário."
         }
         res.redirect('/recurso/' + resourceID)
-      } else{
+      } else {
         req.session.alerts = {
-          commentDeleteFlag : false,
+          commentDeleteFlag: false,
           msg: "Não foi possivel apagar o comentário"
         }
         res.redirect('/recursos')
@@ -757,8 +880,8 @@ router.get('/comment/delete/hard/:id', function (req, res) {
     }
   })
     .then((response) => {
-      console.log("rep.data.1:",response.data);
-      if(response.data == null){
+      console.log("rep.data.1:", response.data);
+      if (response.data == null) {
         res.render('error_page', { message: "Comentário já foi apagado." });
       }
       axios.delete(process.env.API_DATA_URL + '/comment/delete/hard/' + req.params.id, {
@@ -767,9 +890,9 @@ router.get('/comment/delete/hard/:id', function (req, res) {
         }
       })
         .then((response2) => {
-          console.log("rep.data.2:",response2.data);
+          console.log("rep.data.2:", response2.data);
           req.session.alerts = {
-            commentDeleteFlag : true
+            commentDeleteFlag: true
           }
           //renderResourcePage(req, res, response.data.resourceId, null, true, null);
           res.redirect('/recurso/' + response.data.resourceId)
@@ -777,7 +900,7 @@ router.get('/comment/delete/hard/:id', function (req, res) {
         .catch((error) => {
           console.log(error);
           req.session.alerts = {
-            commentDeleteFlag : false,
+            commentDeleteFlag: false,
             msg: "Não foi possivel remover o comentário."
           }
           //renderResourcePage(req, res, response.data.resourceId, null, false, null, "Não foi possivel remover o comentário.");
@@ -786,16 +909,16 @@ router.get('/comment/delete/hard/:id', function (req, res) {
     })
     .catch((error) => {
       console.log(error);
-      if(req.session.alerts.resourceID != undefined){
+      if (req.session.alerts.resourceID != undefined) {
         var resourceID = req.session.alerts.resourceID
         req.session.alerts = {
-          commentDeleteFlag : false,
+          commentDeleteFlag: false,
           msg: "Não foi possível remover o comentário."
         }
         res.redirect('/recurso/' + resourceID)
-      } else{
+      } else {
         req.session.alerts = {
-          commentDeleteFlag : false,
+          commentDeleteFlag: false,
           msg: "Não foi possivel apagar o comentário"
         }
         res.redirect('/recursos')
@@ -825,7 +948,7 @@ router.get('/resource/delete/:id', function (req, res) {
     .catch((error) => {
       console.log(error);
       req.session.alerts = {
-        commentDeleteFlag : false,
+        commentDeleteFlag: false,
         msg: "Não foi possivel fazer remover o recurso."
       }
       //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
@@ -848,17 +971,17 @@ router.post('/resource/filter', function (req, res) {
     type: req.body.type,
   }
 
-  
+
   // verify if fields of body are empty
   for (var key in campos) {
     if (campos[key] == "" || campos[key] == undefined) {
       campos[key] = null;
     }
   }
-  
+
   console.log(campos);
 
-  axios.post(process.env.API_DATA_URL + '/resource',campos, {
+  axios.post(process.env.API_DATA_URL + '/resource', campos, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }
@@ -888,17 +1011,17 @@ router.post('/resource/filter/geral', function (req, res) {
     type: req.body.type,
   }
 
-  
+
   // verify if fields of body are empty
   for (var key in campos) {
     if (campos[key] == "" || campos[key] == undefined) {
       campos[key] = null;
     }
   }
-  
+
   console.log(campos);
 
-  axios.post(process.env.API_DATA_URL + '/resource',campos, {
+  axios.post(process.env.API_DATA_URL + '/resource', campos, {
     headers: {
       Authorization: `Bearer ${req.session.user.token}`
     }

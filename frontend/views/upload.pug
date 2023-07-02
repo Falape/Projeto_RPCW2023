@@ -4,10 +4,10 @@ block content
     include header
     include navbar
 
-    div.w3-display-middle(style='margin-top: 75px;')
-        div.w3-card-4.w3-padding-large.w3-light-grey(style='width: 100%; min-width: 600px;')
+    div(style='margin-top: 75px; display: flex; justify-content: center;')
+        div.w3-card-4.w3-padding-large.w3-light-grey.w3-margin-bottom(style='width: 60%; min-width: 600px;')
             h2.w3-center Carregue um Ficheiro
-            form.w3-container(action='/upload', method='POST', enctype='multipart/form-data')
+            form.w3-container.w3-margin-bottom(action='/upload2', method='POST', enctype='multipart/form-data')
                 p
                     label(for='title') Título:
                     input.w3-input(type='text' id='title' name='title' required)
@@ -31,18 +31,86 @@ block content
                         option(value='exame') Exame
                         option(value='problema resolvido') Problema resolvido
                 p
-                    label(for='file') Selecione um ficheiro:
-                    input.w3-input(type='file' id='file' name='Myfile' required)
+                    label(for='description') Descrição:
+                    textarea.w3-input(id='description' name='description')
+                p
+                    input(type='checkbox' id='multipleSwitch', name='multiple', style='margin-right: 5px;')
+                    label(for='multipleSwitch') Permitir vários ficheiros
+                p#filesContainer
+                    div.file-input-group
+                        label(for='fileSingle') Selecione um ficheiro:
+                        input.w3-input(type='file' id='fileSingle' name='Myfiles' required)
+                p
+                    button#addFileButton(type='button' style='display: none;') Adicionar outro arquivo
+
                 p.w3-center
                     button.w3-button.w3-blue(type='submit') Submeter
-
 
     div(style="padding-top: 100px;")
     include footer
 
     script.
-        var flagAlert = "#{flagAlert}"
-        if (flagAlert === "true") {
-            var flagError = "#{flagError}";
-            alert('Upload do recurso falhou: ' + flagError);
-        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var flagAlert = "#{flagAlert}"
+            if (flagAlert === "true") {
+                var flagError = "#{flagError}";
+                alert('Upload do recurso falhou: ' + flagError);
+            }
+
+            const multipleSwitch = document.getElementById('multipleSwitch');
+            const filesContainer = document.getElementById('filesContainer');
+            const addFileButton = document.getElementById('addFileButton');
+            let fileCount = 1;
+
+            multipleSwitch.addEventListener('change', () => {
+                if (multipleSwitch.checked) {
+                    addFileButton.style.display = 'block';
+                    addFileButton.click();  // simulate a click on the addFileButton when the checkbox is checked
+                } else {
+                    addFileButton.style.display = 'none';
+                    const allAdditionalInputGroups = document.querySelectorAll('.additional');  // select all "additional" file input groups
+                    allAdditionalInputGroups.forEach(group => group.remove());
+                    fileCount = 1;
+                }
+            });
+
+            addFileButton.addEventListener('click', () => {
+                const newFileInput = document.createElement('input');
+                const removeButton = document.createElement('button');
+                const fileInputGroup = document.createElement('div');
+                fileInputGroup.className = 'file-input-group additional';
+                
+                newFileInput.type = 'file';
+                newFileInput.name = 'Myfiles';
+                newFileInput.classList.add('w3-input');
+                newFileInput.required = true;
+                newFileInput.id = `file${++fileCount}`;
+
+                if (fileCount > 2) {    
+                    removeButton.textContent = 'Remover';
+                    removeButton.type = 'button';
+                    removeButton.addEventListener('click', () => {
+                        fileInputGroup.remove();
+                        fileCount--;
+                    });
+                    fileInputGroup.append(newFileInput, removeButton);
+                }
+                else{
+                    fileInputGroup.append(newFileInput);
+                }
+
+                //- filesContainer.appendChild(fileInputGroup);
+                //- filesContainer.insertBefore(fileInputGroup, addFileButton);
+                //- filesContainer.append(fileInputGroup);
+                const firstFileInputGroup = document.querySelector('.file-input-group');
+                firstFileInputGroup.parentNode.insertBefore(fileInputGroup, firstFileInputGroup.nextSibling);
+
+            });
+
+            function removeFileInput() {
+                const inputToRemove = document.getElementById(`file${fileCount--}`);
+                if(inputToRemove) {
+                    inputToRemove.parentNode.remove();
+                }
+            }
+        });

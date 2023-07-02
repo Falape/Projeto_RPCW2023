@@ -23,9 +23,15 @@ block content
   p
     strong Data de submissão: 
     | #{resource.dateCreated}
-  p
-    strong Data da última atualização: 
-    | #{resource.updateDate}
+  if resource.updateDate
+    p
+      strong Data da última atualização: 
+      | #{resource.updateDate}
+
+  if resource.description
+    h2 Descrição do Recurso:
+    div.w3-card-4.w3-padding.w3-light-grey.w3-margin-bottom(style='width: 100%;')
+      p #{resource.description}
 
   h2 Ficheiros do Recurso:
   include tabelaFiles
