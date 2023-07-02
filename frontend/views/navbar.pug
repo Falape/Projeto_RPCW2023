@@ -2,8 +2,8 @@ extends layout
 
 block content
   nav.w3-bar.w3-black
-    if false
-      a.w3-bar-item.w3-button.w3-right(data-bs-toggle="modal" data-bs-target="#logoutModal") Logout
+    if true
+      a.w3-bar-item.w3-button.w3-right(id="logoutButton" data-bs-toggle="modal" data-bs-target="#logoutModal") Logout
     else 
       a.w3-bar-item.w3-button.w3-right(href='/logout') Logout
     a.w3-bar-item.w3-button.w3-right(href='/users/getUser') Perfil 
@@ -15,5 +15,6 @@ block content
       a.w3-bar-item.w3-button.w3-right(href='/users/recursos/' + userInfo.userId) Meus Recursos
     a.w3-bar-item.w3-button.w3-right(href='/recursos') Recursos
     a.w3-bar-item.w3-button.w3-right(href='/') Home
+  include modal_logout
 
 

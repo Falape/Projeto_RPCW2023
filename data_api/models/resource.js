@@ -9,6 +9,7 @@ var resourceSchema = new Schema({
     type: { type: String, required: true },  
     public: Boolean, // Se o recurso é público ou não
     path : String, // caminho para o ficheiro
+    description: String, // descrição do recurso
     dateCreated: String,
     updateDate: String,
     //for soft delete

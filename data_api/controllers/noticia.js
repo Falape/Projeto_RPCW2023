@@ -50,7 +50,7 @@ module.exports.addNoticia = noticiaData => {
 
 // Hard delete Para testes
 module.exports.deleteNoticiaHard = id => {
-    return File.deleteOne({_id:id})
+    return Noticia.deleteOne({_id:id})
         .then(resposta => {
             return resposta
         })

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var resourceController = require('../controllers/resource')
 var noticiaController = require('../controllers/noticia')
+var fileController = require('../controllers/file')
 const { checkValidTokenAdmin, checkValidTokenProducer, checkValidToken } = require('../javascript/validateToken');
 
 /* AFTER TESTS, INCLUDE TOKEN VERIFICATION ON ALL BELLOW */
@@ -18,7 +19,6 @@ router.post('/', checkValidToken, function (req, res) {
         public: req.body.public, // default is public or must come in request
         dateCreated: req.body.dateCreated,
         path: req.body.path,
-        browserSupported: req.body.browserSupported,
         updateDate: req.body.updateDate,
         deleted: req.body.deleted,
         deleteDate: req.body.deleteDate,
@@ -127,6 +127,103 @@ router.post('/add', checkValidTokenProducer, function (req, res) {
         })
 });
 
+
+router.post('/add2', checkValidTokenProducer, function (req, res) {
+    //check for required fields
+    const requiredFields = ['title', 'type', 'uploadedBy', 'uploadedByUsername'];
+    const missingFields = [];
+    for (let field of requiredFields) {
+        if (!req.body[field])
+            missingFields.push(field);
+    }
+    if (missingFields.length > 0) {
+        return res.status(400).jsonp({ error: `Missing required fields: ${missingFields.join(', ')}` });
+    }
+    // get fields from body, if not present in request, it will be null
+    re_data = {
+        title: req.body.title,
+        author: req.body.author || null,
+        uploadedBy: req.payload._id,
+        uploadedByUsername: req.body.uploadedByUsername,
+        type: req.body.type,
+        public: req.body.public == null ? true : req.body.public, // default is public or must come in request
+        dateCreated: new Date().toISOString().substring(0, 16),
+        path: req.body.path,
+        description: req.body.description,
+        deleted: false,
+        deleteDate: null,
+        deletedBy: null
+    }
+    console.log("RE_DATA:", re_data)
+    resourceController.addResource(re_data)
+        .then(resource => {
+            //add the files resources
+            console.log("list_files: ", req.body.list_files)
+            if (req.body.list_files) {
+                for(let file of req.body.list_files){
+
+                    console.log("file to add: ", file)
+                
+                    // get fields from body
+                    ra_data = {
+                        fileName : file.fileName,
+                        resourceId: resource._id,
+                        type: file.type,
+                        path: file.path,
+                        browserSupported: file.browserSupported,
+                    }
+                    fileController.addFile(ra_data)
+                        .then(fileAdded => {
+                            console.log("file added: ", fileAdded)
+                            //res.status(200).jsonp(file)
+                        })
+                        .catch(error => {
+                            resourceController.deleteResourceHard(resource._id)
+                            .then(respDelete => {
+                                res.status(504).jsonp({ error: error, message: "Erro a adicionar ficheiro..." })
+                            }).catch(error => {
+                                res.status(400).jsonp({ error: error, message: "Erro a adicionar ficheiro e erro a apagar recurso!" });
+                            });                            
+                        })
+                }
+            }
+
+            
+            ra_data = {
+                title: resource.title,
+                uploadedBy: resource.uploadedBy,
+                uploadedByUsername: resource.uploadedByUsername,
+                resourceId: resource._id,
+                type: resource.type,
+                public: resource.public,
+                dateCreated: resource.dateCreated
+            }
+            console.log("NOTICIA_data: ", ra_data)
+            noticiaController.addNoticia(ra_data)
+                .then(noticia => {
+                    console.log("noticia added: ", noticia)
+                    console.log("resource added: ", resource)
+                    res.status(200).jsonp(resource)
+                    //res.status(200).jsonp(noticia)
+                })
+                .catch(error => {
+                    console.log("error adding noticia: ", error)
+                    res.status(200).jsonp(resource)
+                    //res.status(504).jsonp({ error: error, message: "Error adding noticia..." })
+                })
+            
+        })
+        .catch(error => {
+            console.log("error adding resource: ", error.message)
+            if(error.code == 11000){
+                return res.status(400).jsonp({ error: error, message: "Já existe um recurso com este nome!" });
+            }else{
+
+                res.status(503).jsonp({ error: error, message: "Falha ao adicionar o recurso!" })
+            }
+        })
+});
+
 /* Update resource information */
 router.put('/edit/:id', checkValidTokenProducer, function (req, res) {
 
@@ -181,7 +278,7 @@ router.put('/edit/:id', checkValidTokenProducer, function (req, res) {
 
 
 // delete resource (hard)
-router.delete('/delete/hard/:id', checkValidTokenAdmin, function (req, res) {
+router.delete('/delete/hard/:id', checkValidTokenProducer, function (req, res) {
     re_id = req.params.id
     resourceController.deleteResourceMEGA(re_id)
         .then(resources => {
