@@ -18,16 +18,62 @@ Na plataforma podem ser submetidos qualquer tipo de ficheiros. Caso seja submeti
 
 ## Características
 
-### Api Design
-
-The OAuth-server utilizes a MongoDB database to store registered client information and manage active tokens in the system. It also uses JSON Schema to verify the authorization scopes of the clients.
+Nesta secção descrevemos como são compostas as apis ao explicar o que cada endpoint disponivel faz.
 
 #### Api dados
 A Api de dados, tal como o nome indica, trata de todos os dados da plataforma, tais como os dados dos recursos, dos comentários, das classificações e das noticias. As operações disponiveis são baseadas em CRUD (create, read, update, and delete).
 
 ### Api Auth 
 
-hello world
+Aqui estão as rotas disponíveis em /admin:
+
+- `GET /updateRoleList`: Obtém a lista de pedidos de atualização role. Esta rota é usada para buscar uma lista de todas as solicitações para atualizar as funções dos utilizadores.
+
+- `GET /updateRole/:id`: Obtém a solicitação de atualização de role por ID. Esta rota é usada para buscar uma solicitação específica de atualização de role usando seu ID.
+
+- `POST /updateRole/:id`: Aceita ou rejeita a solicitação de atualização de role. Esta rota é usada para aceitar ou rejeitar uma solicitação específica de atualização de role, atualizando o registro de solicitação e possivelmente o papel do utilizador.
+
+- `GET /updateRoleAcceptRefuse/:id`: Aceita ou recusa a solicitação de atualização de role. Semelhante à rota `POST /updateRole/:id`, mas aceita ou recusa o pedido com base no parâmetro de consulta 'accept' enviado com o pedido.
+
+- `GET /getUser/:id`: Obtém um utilizador por ID. Esta rota é usada para buscar um utilizador específico por seu ID.
+
+- `POST /listUsers`: Lista todos os utilizadores. Esta rota é usada para buscar uma lista de todos os utilizadores no sistema.
+
+- `POST /updatePassword/:id`: Atualiza a senha do utilizador pelo ID. Esta rota é usada para atualizar a senha de um utilizador específico usando seu ID.
+
+- `DELETE /deleteUser/:id`: Faz o delete um utilizador pelo ID. Esta rota é usada para excluir um utilizador específico usando seu ID.
+
+- `PUT /updateUser/:id`: Atualiza um utilizador pelo ID. Esta rota é usada para atualizar as informações de um utilizador específico (como o nome de utilizador e o email) usando seu ID.
+
+**Nota**: Todas as rotas estão protegidas pelo middleware `checkValidTokenAdmin`, o que significa que elas exigem um token de autenticação válido de um administrador para serem acessadas.
+
+Aqui estão as rotas disponíveis em /:
+
+- `POST /signup`: rota de registro de utilizador. Esta rota é usado para registrar um novo utilizador no sistema com a função de 'consumer'. O corpo da requisição deve incluir o `email`, `password`, `name`, `filiation` e `username` do utilizador.
+
+- `POST /login`: rota de login do utilizador. Esta rota é usado para fazer login de um utilizador. O corpo da requisição deve incluir o `username` e `password` do utilizador.
+
+- `POST /updatePassword`: rota de atualização de senha do utilizador. Esta rota é usado para atualizar a senha de um utilizador. O corpo da requisição deve incluir a `oldPassword` e `newPassword` do utilizador. Esta rota requer um token de autenticação válido.
+
+- `GET /logout`: rota de logout do utilizador. Esta rota é usado para fazer logout de um utilizador. Esta rota requer um token de autenticação válido.
+
+- `GET /listUsers`: rota de lista de utilizadores. Esta rota é usado para obter uma lista de todos os utilizadores. Esta rota requer um token de autenticação válido.
+
+- `GET /getUser/:id`: rota de obtenção de utilizador por ID. Esta rota é usado para obter um utilizador específico usando seu ID. Esta rota requer um token de autenticação válido.
+- `POST /getUserGoogleID/:id`: Esta rota é usado para obter um utilizador usando o ID do Google. Ele recebe um objeto JSON com as propriedades `name`, `id_oauth` e `email`. Se o utilizador existir, um token de autenticação JWT é retornado. Caso contrário, um novo utilizador é criado com um nome de utilizador exclusivo gerado automaticamente e um token de autenticação JWT é retornado.
+
+**Observação**: Todos os pontos finais são protegidos pelo middleware `checkValidToken`, o que significa que eles requerem um token de autenticação válido para serem acessados.
+
+Aqui estão as rotas disponíveis em /users:
+
+- `POST /requestUpdateRole`: Solicita atualização de função. Esta rota é usada para enviar uma solicitação de atualização de função, fornecendo o papel requerido pelo utilizador.
+
+- `GET /getUser`: Obtém informações do utilizador. Esta rota é usada para obter as informações do utilizador atualmente autenticado.
+
+- `DELETE /deleteUser`: Exclui o utilizador. Esta rota é usada para excluir o utilizador atualmente autenticado.
+
+**Observação**: Todos os pontos finais são protegidos pelo middleware `checkValidToken`, o que significa que eles requerem um token de autenticação válido para serem acessados.
+
 
 ### Api users 
 
