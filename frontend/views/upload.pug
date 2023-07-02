@@ -31,6 +31,9 @@ block content
                         option(value='exame') Exame
                         option(value='problema resolvido') Problema resolvido
                 p
+                    label(for='description') Descrição:
+                    textarea.w3-input(id='description' name='description' required)
+                p
                     input(type='checkbox' id='multipleSwitch', name='multiple', style='margin-right: 5px;')
                     label(for='multipleSwitch') Permitir vários ficheiros
                 p#filesContainer
