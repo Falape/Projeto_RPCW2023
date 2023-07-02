@@ -213,45 +213,45 @@ Aqui estão as rotas disponíveis em /:
 
 - `POST /upload2`: Lida com o upload de arquivos usando o middleware multer_upload. A rota recebe os arquivos enviados pelo formulário de upload, renomeia-os e os move para a pasta de uploads. Em seguida, o roteador executa diferentes lógicas, dependendo do número de arquivos enviados e do tipo de arquivo. Se houver vários arquivos enviados ou se o arquivo enviado não for um arquivo zip, a rota cria um SIP (Submission Information Package) a partir dos arquivos e armazena-o. Em seguida, envia os metadados e caminhos dos arquivos para a API de dados, que os armazena no banco de dados. Finalmente, redireciona para a página do recurso recém-criado. Se apenas um arquivo zip for enviado, a rota lê o conteúdo do arquivo zip e verifica se está no formato correto. Se estiver, cria um SIP e armazena-o. Em seguida, envia os metadados e caminhos dos arquivos para a API de dados, que os armazena no banco de dados. Finalmente, redireciona para a página do recurso recém-criado.Se ocorrer algum erro durante o processo de upload e armazenamento, a rota renderiza a página de upload novamente, exibindo uma mensagem de erro.
 
-- `/comment`: Rota que lida com a adição de comentários a um recurso. Quando acionada por uma requisição POST, envia os dados do comentário para o endpoint /comment/add/:resourceId da API de dados.
+- `POST /comment`: Rota que lida com a adição de comentários a um recurso. Quando acionada por uma requisição POST, envia os dados do comentário para o endpoint /comment/add/:resourceId da API de dados.
 
-- `/comment/delete/soft/:id`: Rota para exclusão suave de um comentário. Quando acessada por uma requisição GET, recupera o comentário com o ID especificado e envia uma requisição DELETE para o endpoint /comment/delete/soft/:id da API de dados para removê-lo.
+- `GET /comment/delete/soft/:id`: Rota para exclusão suave de um comentário. Quando acessada por uma requisição GET, recupera o comentário com o ID especificado e envia uma requisição DELETE para o endpoint /comment/delete/soft/:id da API de dados para removê-lo.
 
-- `/comment/delete/hard/:id`: Rota para exclusão permanente de um comentário. Funciona de maneira semelhante à rota anterior, mas envia uma requisição DELETE para o endpoint /comment/delete/hard/:id da API de dados, realizando uma exclusão irreversível.
+- `GET /comment/delete/hard/:id`: Rota para exclusão permanente de um comentário. Funciona de maneira semelhante à rota anterior, mas envia uma requisição DELETE para o endpoint /comment/delete/hard/:id da API de dados, realizando uma exclusão irreversível.
 
-- `/rate`: Rota responsável por lidar com a adição de avaliações a um recurso. Quando acionada por uma requisição POST, envia o valor da avaliação para o endpoint /rating/add/:resourceId da API de dados.
+- `POST /rate`: Rota responsável por lidar com a adição de avaliações a um recurso. Quando acionada por uma requisição POST, envia o valor da avaliação para o endpoint /rating/add/:resourceId da API de dados.
 
-- `/download/:id`: Rota para download de um arquivo. Quando acessada por uma requisição GET com um ID de arquivo específico, a rota solicita ao endpoint /file/:id da API de dados o caminho do arquivo para iniciar o download.
+- `GET /download/:id`: Rota para download de um arquivo. Quando acessada por uma requisição GET com um ID de arquivo específico, a rota solicita ao endpoint /file/:id da API de dados o caminho do arquivo para iniciar o download.
 
-- `/download/resource/:id`: Rota para download de um recurso. Similar à rota anterior, mas solicita ao endpoint /resource/:id da API de dados o caminho do recurso para o download.
+- `GET /download/resource/:id`: Rota para download de um recurso. Similar à rota anterior, mas solicita ao endpoint /resource/:id da API de dados o caminho do recurso para o download.
 
-- `/listUsers`: Rota para listar todos os usuários. Quando acessada por uma requisição GET, solicita ao endpoint /listUsers da API de autenticação a lista de usuários.
+- `GET /listUsers`: Rota para listar todos os usuários. Quando acessada por uma requisição GET, solicita ao endpoint /listUsers da API de autenticação a lista de usuários.
 
-- `/getUser/:id`: Rota para obter informações de um usuário específico. Quando acessada por uma requisição GET com um ID de usuário específico, a rota solicita ao endpoint /getUser/:id da API de autenticação as informações do usuário correspondente.
+- `GET /getUser/:id`: Rota para obter informações de um usuário específico. Quando acessada por uma requisição GET com um ID de usuário específico, a rota solicita ao endpoint /getUser/:id da API de autenticação as informações do usuário correspondente.
 
-- `/logout`: Rota para fazer o logout do usuário. Ao ser acessada por uma requisição GET, limpa a sessão do usuário e redireciona para a página inicial.
+- `GET /logout`: Rota para fazer o logout do usuário. Ao ser acessada por uma requisição GET, limpa a sessão do usuário e redireciona para a página inicial.
 
-- `/resource/filter`: Rota para filtrar recursos com base em critérios específicos. Quando acionada por uma requisição POST, envia os critérios de filtragem para o endpoint /resource da API de dados para obter os recursos filtrados.
+- `POST /resource/filter`: Rota para filtrar recursos com base em critérios específicos. Quando acionada por uma requisição POST, envia os critérios de filtragem para o endpoint /resource da API de dados para obter os recursos filtrados.
 
-- `/resource/filter/geral`: Rota semelhante à rota anterior, mas possui critérios de filtragem diferentes. Também envia os critérios para o endpoint /resource da API de dados para obter os recursos filtrados.
+- `POST /resource/filter/geral`: Rota semelhante à rota anterior, mas possui critérios de filtragem diferentes. Também envia os critérios para o endpoint /resource da API de dados para obter os recursos filtrados.
 
-- `/login/google`: Rota para iniciar o processo de autenticação do Google OAuth. Quando acessada por uma requisição GET, redireciona o usuário para a página de login do Google.
+- `GET /login/google`: Rota para iniciar o processo de autenticação do Google OAuth. Quando acessada por uma requisição GET, redireciona o usuário para a página de login do Google.
 
-- `/callback/google`: Rota para lidar com o retorno da autenticação do Google OAuth. É acionada após o usuário fazer login no Google e retorna os dados de autenticação, como o token de acesso e as informações do perfil do usuário.
+- `GET /callback/google`: Rota para lidar com o retorno da autenticação do Google OAuth. É acionada após o usuário fazer login no Google e retorna os dados de autenticação, como o token de acesso e as informações do perfil do usuário.
 
-- `/resource/delete/:id`: Rota para excluir um recurso permanentemente. Quando acessada por uma requisição GET com um ID de recurso específico, envia uma requisição DELETE para o endpoint /resource/delete/hard/:id da API de dados, realizando a exclusão irreversível do recurso.
+- `GET /resource/delete/:id`: Rota para excluir um recurso permanentemente. Quando acessada por uma requisição GET com um ID de recurso específico, envia uma requisição DELETE para o endpoint /resource/delete/hard/:id da API de dados, realizando a exclusão irreversível do recurso.
 
 Aqui estão as rotas disponíveis em /users:
 
-- `/getUser`: Rota para obter informações do usuário logado. Quando acessada por uma requisição GET, envia uma solicitação para o endpoint /user/getUser da API de autenticação para recuperar as informações do usuário com base no token de acesso. Em seguida, renderiza a página user_page com os dados do usuário.
+- `GET /getUser`: Rota para obter informações do usuário logado. Quando acessada por uma requisição GET, envia uma solicitação para o endpoint /user/getUser da API de autenticação para recuperar as informações do usuário com base no token de acesso. Em seguida, renderiza a página user_page com os dados do usuário.
 
-- `/updatePassword`: Rota para atualizar a senha do usuário. Quando acionada por uma requisição POST, verifica se a senha antiga e a nova senha fornecidas são válidas e correspondem. Em seguida, envia uma solicitação para o endpoint /updatePassword da API de autenticação para atualizar a senha. Dependendo do resultado, renderiza a página user_page com uma mensagem de sucesso ou erro.
+- `POST /updatePassword`: Rota para atualizar a senha do usuário. Quando acionada por uma requisição POST, verifica se a senha antiga e a nova senha fornecidas são válidas e correspondem. Em seguida, envia uma solicitação para o endpoint /updatePassword da API de autenticação para atualizar a senha. Dependendo do resultado, renderiza a página user_page com uma mensagem de sucesso ou erro.
 
-- `/requestRoleUpdate`: Rota para solicitar a atualização de função do usuário. Quando acionada por uma requisição POST, verifica se a função fornecida é válida. Em seguida, envia uma solicitação para o endpoint /user/requestUpdateRole da API de autenticação para solicitar a atualização de função do usuário. Dependendo do resultado, renderiza a página user_page com uma mensagem de sucesso ou erro.
+- `POST /requestRoleUpdate`: Rota para solicitar a atualização de função do usuário. Quando acionada por uma requisição POST, verifica se a função fornecida é válida. Em seguida, envia uma solicitação para o endpoint /user/requestUpdateRole da API de autenticação para solicitar a atualização de função do usuário. Dependendo do resultado, renderiza a página user_page com uma mensagem de sucesso ou erro.
 
-- `/delete`: Rota para excluir o usuário logado. Quando acessada por uma requisição GET, envia uma solicitação DELETE para o endpoint /user/deleteUser da API de autenticação para excluir o usuário. Em seguida, envia solicitações DELETE para os endpoints correspondentes da API de dados para excluir os recursos e comentários associados ao usuário. Dependendo do resultado, renderiza a página user_page com uma mensagem de sucesso ou erro e redireciona para a página de login.
+- `GET /delete`: Rota para excluir o usuário logado. Quando acessada por uma requisição GET, envia uma solicitação DELETE para o endpoint /user/deleteUser da API de autenticação para excluir o usuário. Em seguida, envia solicitações DELETE para os endpoints correspondentes da API de dados para excluir os recursos e comentários associados ao usuário. Dependendo do resultado, renderiza a página user_page com uma mensagem de sucesso ou erro e redireciona para a página de login.
 
-- `/recursos/:id`: Rota para listar os recursos de um usuário específico. Quando acessada por uma requisição GET com um ID de usuário específico, envia uma solicitação POST para o endpoint /resource da API de dados para obter os recursos do usuário correspondente. Em seguida, renderiza a página list_resources3 com os recursos obtidos.
+- `GET /recursos/:id`: Rota para listar os recursos de um usuário específico. Quando acessada por uma requisição GET com um ID de usuário específico, envia uma solicitação POST para o endpoint /resource da API de dados para obter os recursos do usuário correspondente. Em seguida, renderiza a página list_resources3 com os recursos obtidos.
 
 
 
