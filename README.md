@@ -23,6 +23,86 @@ Nesta secção descrevemos como são compostas as apis ao explicar o que cada en
 #### Api dados
 A Api de dados, tal como o nome indica, trata de todos os dados da plataforma, tais como os dados dos recursos, dos comentários, das classificações e das noticias. As operações disponiveis são baseadas em CRUD (create, read, update, and delete).
 
+Aqui estão as rotas disponíveis em /resource:
+
+- `POST /`: Lista todos os recursos. Esta rota é usada para recuperar uma lista de todos os recursos.
+
+- `GET /:id`: Recupera um recurso pelo seu ID. Esta rota é usada para obter um recurso específico fornecendo o seu ID como parâmetro.
+
+- `POST /add`: Adiciona um novo recurso. Esta rota é usada para adicionar um novo recurso. Os dados do recurso são fornecidos no corpo da requisição.
+
+- `PUT /edit/:id`: Atualiza as informações de um recurso. Esta rota é usada para atualizar as informações de um recurso específico identificado pelo seu ID. Os dados atualizados do recurso são fornecidos no corpo da requisição.
+
+- `DELETE /delete/hard/:id`: Deleta um recurso permanentemente. Esta rota é usada para excluir um recurso permanentemente do sistema. O recurso é identificado pelo seu ID, fornecido como parâmetro na URL.
+
+- `DELETE /delete/soft/:id`: Deleta um recurso de forma suave. Esta rota é usada para marcar um recurso como deletado, sem excluí-lo permanentemente do sistema. O recurso é identificado pelo seu ID, fornecido como parâmetro na URL.
+
+Aqui estão as rotas disponíveis em /comment:
+
+- `POST /`: Lista todos os comentários. Esta rota é usada para obter uma lista de todos os comentários.
+
+- `GET /:id`: Recupera um comentário pelo seu ID. Esta rota é usada para obter um comentário específico fornecendo seu ID como parâmetro.
+
+- `GET /resource/:id`: Recupera comentários de um recurso específico. Esta rota é usada para obter todos os comentários associados a um recurso específico, identificado pelo seu ID.
+
+- `POST /add/:id`: Adiciona um novo comentário a um recurso. Esta rota é usada para adicionar um novo comentário a um recurso. O conteúdo do comentário e o ID do recurso são fornecidos no corpo da requisição e no parâmetro da URL, respectivamente.
+
+- `PUT /edit/:id`: Atualiza as informações de um comentário. Esta rota é usada para atualizar as informações de um comentário específico identificado pelo seu ID. Os dados atualizados do comentário são fornecidos no corpo da requisição.
+
+- `DELETE /delete/hard/:id`: Deleta um comentário permanentemente. Esta rota é usada para excluir um comentário permanentemente do sistema. O comentário é identificado pelo seu ID, fornecido como parâmetro na URL.
+
+- `DELETE /delete/soft/:id`: Deleta um comentário suavemente. Esta rota é usada para deletar um comentário suavemente, marcando-o como excluído sem removê-lo permanentemente do sistema. O comentário é identificado pelo seu ID, fornecido como parâmetro na URL.
+
+Aqui estão as rotas disponíveis em /noticia:
+
+- `POST /`: Lista todas as notícias. Esta rota é usada para recuperar uma lista de todas as notícias.
+
+- `GET /:id`: Recupera uma notícia pelo seu ID. Esta rota é usada para obter uma notícia específica fornecendo o seu ID como parâmetro.
+
+- `GET /resource/:id`: Recupera notícias de um recurso específico. Esta rota é usada para obter todas as notícias associadas a um recurso específico, identificado pelo seu ID.
+
+- `POST /add/:id`: Adiciona uma nova notícia a um recurso. Esta rota é usada para adicionar uma nova notícia a um recurso. O título da notícia, o ID do recurso, o tipo, a flag "pública" e a data de criação são fornecidos no corpo da requisição e como parâmetro na URL.
+
+- `POST /addAviso`: Adiciona um novo aviso. Esta rota é usada para adicionar um novo aviso. O título do aviso, o nome de usuário do usuário que fez o upload, o tipo, a flag "pública", o conteúdo e a data de criação são fornecidos no corpo da requisição.
+
+- `DELETE /delete/hard/:id`: Deleta uma notícia permanentemente. Esta rota é usada para excluir uma notícia permanentemente do sistema. A notícia é identificada pelo seu ID, fornecido como parâmetro na URL.
+
+Aqui estão as rotas disponíveis em /rating:
+
+- `POST /`: Lista todas as avaliações. Esta rota é usada para recuperar uma lista de todas as avaliações.
+
+- `GET /:id`: Recupera uma avaliação pelo seu ID. Esta rota é usada para obter uma avaliação específica fornecendo o seu ID como parâmetro.
+
+- `GET /resource/list/:id`: Recupera a lista de avaliações de um recurso específico. Esta rota é usada para obter todas as avaliações associadas a um recurso específico, identificado pelo seu ID.
+
+- `GET /resource/:id`: Recupera a avaliação total de um recurso. Esta rota é usada para obter a avaliação total de um recurso, que é a média das avaliações dadas pelos usuários.
+
+- `POST /add/:id`: Adiciona uma nova avaliação a um recurso. Esta rota é usada para adicionar uma nova avaliação a um recurso. O valor da avaliação e o ID do recurso são fornecidos no corpo da requisição e como parâmetro na URL.
+
+- `PUT /edit/:id`: Atualiza as informações de uma avaliação. Esta rota é usada para atualizar as informações de uma avaliação específica identificada pelo seu ID. Os dados atualizados da avaliação são fornecidos no corpo da requisição.
+
+- `DELETE /delete/hard/:id`: Deleta uma avaliação permanentemente. Esta rota é usada para excluir uma avaliação permanentemente do sistema. A avaliação é identificada pelo seu ID, fornecido como parâmetro na URL.
+
+- `DELETE /delete/soft/:id`: Deleta uma avaliação de forma suave. Esta rota é usada para marcar uma avaliação como deletada, sem excluí-la permanentemente do sistema. A avaliação é identificada pelo seu ID, fornecido como parâmetro na URL.
+
+Aqui estão as rotas disponíveis em /file:
+
+- `GET /:id`: Recupera um arquivo pelo seu ID. Esta rota é usada para obter um arquivo específico fornecendo seu ID como parâmetro.
+
+- `GET /resource/:id`: Recupera arquivos de um recurso específico. Esta rota é usada para obter todos os arquivos associados a um recurso específico, identificado pelo seu ID.
+
+- `POST /add/:id`: Adiciona um novo arquivo a um recurso. Esta rota é usada para adicionar um novo arquivo a um recurso. O nome do arquivo, o tipo, o caminho e o suporte do navegador são fornecidos no corpo da requisição, e o ID do recurso é fornecido como parâmetro na URL.
+
+- `DELETE /delete/hard/:id`: Deleta um arquivo permanentemente. Esta rota é usada para excluir um arquivo permanentemente do sistema. O arquivo é identificado pelo seu ID, fornecido como parâmetro na URL.
+
+Aqui estão as rotas disponíveis em /api:
+
+- `DELETE /delete/hard/:id`: Deleta um recurso permanentemente pelo ID. Esta rota é usada para excluir um recurso específico permanentemente usando seu ID.
+
+- `DELETE /delete/hard/user/:id`: Deleta todos os recursos e comentários associados de um usuário permanentemente pelo ID do usuário. Esta rota é usada para excluir todos os recursos e seus comentários de um usuário específico permanentemente usando seu ID.
+
+- `DELETE /delete/hard/comments/:id`: Deleta todos os comentários de um usuário permanentemente pelo ID do usuário. Esta rota é usada para excluir todos os comentários de um usuário específico permanentemente usando seu ID.
+
 ### Api Auth 
 
 Aqui estão as rotas disponíveis em /admin:
