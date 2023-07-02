@@ -1,7 +1,6 @@
 var express = require('express');
 var jwt = require('jsonwebtoken');
 const axios = require('axios');
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const passport = require("passport"),
 
   User = require("../controllers/user"),
