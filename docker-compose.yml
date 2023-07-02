@@ -2,8 +2,7 @@ version: "3"
 services:
   front:
     build:
-      context: arom98/rpcw23-frontend:latest
-      dockerfile: Dockerfile
+      image: arom98/rpcw23-frontend:latest<
     ports:
       - 3000:3000
     volumes:
@@ -11,8 +10,7 @@ services:
 
   auth-api:
     build:
-      context: arom98/rpcw23-auth-api:latest
-      dockerfile: Dockerfile
+      image: arom98/rpcw23-auth-api:latest
     ports:
       - 3001:3001
     volumes:
@@ -22,8 +20,7 @@ services:
 
   user-api:
     build:
-      context: arom98/rpcw23-user-api:latest
-      dockerfile: Dockerfile
+      image: arom98/rpcw23-user-api:latest
     ports:
       - 3002:3002
     volumes:
@@ -33,8 +30,7 @@ services:
 
   data-api:
     build:
-      context: arom98/rpcw23-data-api:latest
-      dockerfile: Dockerfile
+      image: arom98/rpcw23-data-api:latest
     ports:
       - 3003:3003
     volumes:
