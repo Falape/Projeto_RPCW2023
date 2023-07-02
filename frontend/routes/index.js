@@ -361,31 +361,41 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
     if (req.body.multiple == undefined && req.files.length == 1 && req.files[0].mimetype == 'application/zip') {
       //handle multiple files here
       console.log("single file zip");
-      sip_store.StoreSIP(listFilePaths[0])
-      .then((files) => {
-        console.log("files:", files);
-        //console.log('--- SIP STORED ---');
-        body.path = files.zip_path
-        body.list_files = files.list_files
-        axios.post(process.env.API_DATA_URL + '/resource/add2', body, {
-          headers: {
-            Authorization: `Bearer ${req.session.user.token}`
-          }
-          })
-          .then((response) => {
-            console.log(response.data);
-            res.redirect('/recurso/' + response.data._id);
-          })
-          .catch((error) => {
-            //console.log(error);
-            //console.log("message error: ",error.response.data.message)
-            if(error.response.data !=undefined && error.response.data.message!=undefined){
-              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError:error.response.data.message });
-            }else  
-              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
-          })
-        })
+      sip_read.readZipArchive(__dirname + '/../uploads/' + req.files[0].originalname)
+          .then((resp) => {
+            if (resp == false) {
+              // zip não se encontra no formato correcto.
 
+              //res.render('error_page', { message: "ZIP is invalid." });
+              res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "ZIP is invalid." });
+            }
+            else {
+              sip_store.StoreSIP(listFilePaths[0])
+              .then((files) => {
+                console.log("files:", files);
+                //console.log('--- SIP STORED ---');
+                body.path = files.zip_path
+                body.list_files = files.list_files
+                axios.post(process.env.API_DATA_URL + '/resource/add2', body, {
+                  headers: {
+                    Authorization: `Bearer ${req.session.user.token}`
+                  }
+                  })
+                  .then((response) => {
+                    console.log(response.data);
+                    res.redirect('/recurso/' + response.data._id);
+                  })
+                  .catch((error) => {
+                    //console.log(error);
+                    //console.log("message error: ",error.response.data.message)
+                    if(error.response.data !=undefined && error.response.data.message!=undefined){
+                      res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError:error.response.data.message });
+                    }else  
+                      res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+                  })
+                })
+            }
+          })
     } else {
       //handle error here
       console.log("error porque tem mais que um ficheiro e não está selecionado o multiple");
