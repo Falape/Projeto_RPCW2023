@@ -1,9 +1,9 @@
 <h1 align="center">Projeto RPCW 2023</h1>
       
 <p align="center">
-  <a href="#about">Sobre</a> •
+  <a href="#sobre">Sobre</a> •
   <a href="#features">Features</a> •
-  <a href="#installation">Installation and usage</a> •
+  <a href="#instalação-e-uso">Instalação e uso</a> •
   <a href="#wiki">Wiki</a> 
 </p>
 
@@ -17,7 +17,7 @@ Para isto, existem três tipos de utilizadores, consumers, producers e admins. O
 Na plataforma podem ser submetidos qualquer tipo de ficheiros. Caso seja submetido um zip, este deverá estar no formato SIP aceite pela plataforma, no qual apenas requer um manifesto no formato json, no qual o nome de todos os ficheiros presentes no zip, devem estar associados a sua hash md5.
 
 
-## Instalação e utilização:
+## Instalação e uso:
 
 Para a instalação, deverá ter disponivel o Docker. Todos os serviços desenvolvidos estão em docker containers que serão "levantados" ao usar o docker compose presente na raiz do projecto. Este docker compose deverá então por todos os serviços a correr de modo que se posssa proceder a utilização da plataforma logo de seguida.
 
