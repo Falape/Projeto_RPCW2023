@@ -59,12 +59,12 @@ router.get('/getUser', checkValidToken, function(req, res, next) {
           userResp.filiacao = response.data.filiacao;
           userResp.created_date = response.data.created_date;
           userResp.last_access = response.data.last_access;
-          console.log(userResp);
+          console.log("User: ",userResp);
   
           res.status(200).jsonp(userResp);
         })
         .catch(error => {
-          console.log(error);
+          console.log("Error: ",error);
           // Handle the error, e.g., log the error or set default values for userResp properties
           //console.log(userResp);
           res.status(200).jsonp(userResp);

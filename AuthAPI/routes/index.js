@@ -212,7 +212,7 @@ router.get('/getUser/:id', checkValidToken, async function (req, res, next) {
           userResp.filiacao = response.data.filiacao;
           userResp.created_date = response.data.created_date;
           userResp.last_access = response.data.last_access;
-          console.log(userResp);
+          console.log("User: ",userResp);
 
           res.status(200).json(userResp);
         })
