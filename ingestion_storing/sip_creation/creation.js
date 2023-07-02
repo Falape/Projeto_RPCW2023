@@ -82,7 +82,8 @@ async function createSIP(inputPath) {
 
   // Process the input path (file or directory) and generate the manifest
   const manifest = [];
-  await processPath2(inputPath, zip, manifest);
+  await processPath(inputPath, path.dirname(inputPath),zip, manifest);
+  //await processPath2(inputPath, zip, manifest);
 
   // Append the manifest to the zip archive as 'manifest.json'
   const manifestFile = 'manifest.json';
@@ -94,5 +95,7 @@ async function createSIP(inputPath) {
 
 // Example usage
 const listPaths = ['./registos/0c6ae33fe5955aa6/257358dbf6b48b2e/unziped/jacasld.jpg', './registos/0c6ae33fe5955aa6/257358dbf6b48b2e/unziped/manifesto1.xml', './registos/0c6ae33fe5955aa6/257358dbf6b48b2e/template4.zip']
-createSIP(listPaths);
+//createSIP(listPaths);
+
+createSIP('./registos');
 
