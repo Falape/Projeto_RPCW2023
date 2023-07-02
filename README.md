@@ -47,6 +47,9 @@ O processo de storing consiste em fazer a hash md5 do ficheiro zip, a qual tem 3
 
 Para a instalação, deverá ter disponivel o Docker. Todos os serviços desenvolvidos estão em docker containers que serão "levantados" ao usar o docker compose presente na raiz do projecto. Este docker compose deverá então por todos os serviços a correr de modo que se posssa proceder a utilização da plataforma logo de seguida.
 
+É possivel fazer download da ultima versão da plataforma [aqui](https://github.com/Falape/Projeto_RPCW2023/archive/refs/heads/main.zip) .
+
 ## Wiki
 
-... TBC
+Para mais informações sobre Docker e de como proceder para o instalar, consultar a documentação presente [aqui](https://www.docker.com/) .
+
