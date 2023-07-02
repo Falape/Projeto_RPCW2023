@@ -219,7 +219,7 @@ router.get('/recurso/:id', function (req, res, next) {
                   console.log(response4.data);
                   //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
                   req.session.alerts = {
-                    resourceID: response.data._id
+                    resourceID: response.data._id,
                   }
                   console.log("alerts: ", req.session.alerts)
                   res.render('resource', { resource: response.data, userInfo: req.session.user, files: response2.data, rating: response3.data, comments: response4.data, downloadFlag: alerts.downloadFlag, updateFlag: alerts.updateFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, commentDeleteFlag: alerts.commentDeleteFlag, errorFlag: alerts.errorFlag, msg: alerts.msg });
@@ -950,7 +950,11 @@ router.get('/resource/delete/:id', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      res.redirect('/');
+      if(req.session.user.role == "admin"){
+        res.redirect('/recursos');
+      }else{
+        res.redirect('/users/recursos/'+req.session.user.userId);
+      }
 
     })
     .catch((error) => {
