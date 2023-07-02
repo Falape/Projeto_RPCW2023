@@ -2,6 +2,6 @@ FROM node:18.13.0
 WORKDIR /app
 COPY ["package.json", "package-lock.json*", "./"]
 RUN npm install
-EXPOSE 3003
+EXPOSE 3002
 COPY . .
 CMD ["npm", "run", "dev"]

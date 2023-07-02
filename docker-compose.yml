@@ -1,0 +1,56 @@
+version: "3"
+services:
+  front:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+
+  auth-api:
+    build:
+      context: ./AuthAPI
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    depends_on:
+      - mongodb_auth
+
+  user-api:
+    build:
+      context: ./UserAPI
+      dockerfile: Dockerfile
+    ports:
+      - 3002:3002
+    depends_on:
+      - mongodb_user
+
+  data-api:
+    build:
+      context: ./data_api
+      dockerfile: Dockerfile
+    ports:
+      - 3003:3003
+    depends_on:
+      - mongodb_data
+
+  mongodb_auth:
+    image: mongo:5.0.16-focal
+    container_name: mongodb-auth
+    ports:
+      - 4001:27017
+    restart: unless-stopped
+
+  mongodb_user:
+    image: mongo:5.0.16-focal
+    container_name: mongodb-user
+    ports:
+      - 4002:27017
+    restart: unless-stopped
+
+  mongodb_data:
+    image: mongo:5.0.16-focal
+    container_name: mongodb-data-api
+    ports:
+      - 4003:27017
+    restart: unless-stopped

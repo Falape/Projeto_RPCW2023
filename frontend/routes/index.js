@@ -1,5 +1,4 @@
 var express = require('express');
-const resource = require('../../data_api/models/resource');
 var router = express.Router();
 const axios = require('axios');
 //var fs = require('fs')
