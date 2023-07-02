@@ -110,7 +110,7 @@ router.post('/add/:id', checkValidTokenProducer, function (req, res) {
 router.post('/addAviso', checkValidTokenAdmin, function (req, res) {
     console.log("req.body: ", req.body)
     //check for required fields
-    const requiredFields = ['title', 'public', 'uploadedByUsername'];
+    const requiredFields = ['title', 'public', 'content'];
     const missingFields = [];
     for (let field of requiredFields) {
         if (!req.body[field]) 
@@ -125,12 +125,11 @@ router.post('/addAviso', checkValidTokenAdmin, function (req, res) {
     ra_data = {
         title : req.body.title,
         uploadedBy: req.payload._id,
-        uploadedByUsername: req.body.uploadedByUsername,
-        resourceId: req.params.id,
-        type: req.body.type,
+        uploadedByUsername: req.payload.username,
+        type: 'Alert',
         public: req.body.public,
         content : req.body.content,
-        power : req.body.power,
+        power : true,
         dateCreated: new Date().toISOString().substring(0, 16)
     }
     noticiaController.addNoticia(ra_data)

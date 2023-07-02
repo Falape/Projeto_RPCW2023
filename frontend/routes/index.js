@@ -1118,6 +1118,25 @@ router.get('/callback/google', function (req, res, next) {
 
         res.redirect('/noticias');
 
+      })
+      .catch((error) => {
+        console.log("error: ", error)
+        //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+        res.render('error_page', { message: "Não foi possivel registar o utilizador com OAuth." });
+      })
+
+    
+    // tirar dados 
+    // Verificar se tem conta interna no nosso sistema 
+    //User.findByFilter({id_oauth: })
+    // se tiver, cria um token e continua normalmente
+    // se não tiver, cria uma conta interna, cria um token e continua normalmente
+
+
+  })(req, res, next);
+
+});
+
 // MEGA HARD DELETE
 router.get('/noticia/delete/:id', function (req, res) {
   
@@ -1145,26 +1164,6 @@ router.get('/noticia/delete/:id', function (req, res) {
       res.redirect('/');
       //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
     })
-});
-
-
-      })
-      .catch((error) => {
-        console.log("error: ", error)
-        //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
-        res.render('error_page', { message: "Não foi possivel registar o utilizador com OAuth." });
-      })
-
-    
-    // tirar dados 
-    // Verificar se tem conta interna no nosso sistema 
-    //User.findByFilter({id_oauth: })
-    // se tiver, cria um token e continua normalmente
-    // se não tiver, cria uma conta interna, cria um token e continua normalmente
-
-
-  })(req, res, next);
-
 });
 
 

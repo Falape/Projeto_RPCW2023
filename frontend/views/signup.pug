@@ -5,7 +5,7 @@ block content
   header.w3-container.w3-black
     h2.w3-center Sign Up
   div.w3-container(style="display: flex; justify-content: center;")
-    form.w3-container.w3-card-4.w3-light-grey.w3-text-black.w3-margin(style='min-width: 500px;', method='post', action='/signup')
+    form.w3-container.w3-card-4.w3-light-grey.w3-text-black.w3-margin(style='min-width: 500px;', method='post', action='/signup', onsubmit="return validatePasswordForm(this)")
       h3.w3-center Create an account
 
       label Username
@@ -21,7 +21,12 @@ block content
       input.w3-input.w3-border.w3-margin-bottom(type='text', name='filiation', required)
 
       label Password
-      input.w3-input.w3-border.w3-margin-bottom(type='password', name='password', pattern='.{8,}', title='Password must have at least 8 characters', required)
+      input.w3-input.w3-border.w3-margin-bottom(type='password', name='password', id='password', pattern='.{8,}', title='Password must have at least 8 characters', required)
+    
+
+      label(for="newPasswordConfirm") Confirm a Password
+      input.w3-input.w3-border.w3-margin-bottom(type="password" name="newPasswordConfirm" id="newPasswordConfirm" required)
+      small#passwordWarning2(style="display: none; color: red") Password nova e de confirmação não são iguais!
 
       button.w3-button.w3-block.w3-black.w3-margin-bottom(type='submit') Sign Up
 
@@ -38,3 +43,19 @@ block content
         alert('Signup failed: ' + error);
       }
     include footer
+
+    script.
+
+      function validatePasswordForm(form) {
+            var newPassword = form.password.value;
+            var newPasswordConfirm = form.newPasswordConfirm.value;
+            var passwordWarning = document.getElementById('passwordWarning');
+
+            if (newPassword !== newPasswordConfirm) {
+                passwordWarning.style.display = 'block';
+                return false;
+            } else {
+                passwordWarning.style.display = 'none';
+                return true;
+            }
+        }

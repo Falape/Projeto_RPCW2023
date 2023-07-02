@@ -27,7 +27,7 @@ router.get('/updateRequests', function (req, res, next) {
   //renderListRoleUpdateRequests(req, res);
 });
 
-router.post('/updatePassword/:id', function(req, res, next) {
+router.post('/updatePassword/:id', function (req, res, next) {
   console.log("updatePasswordById")
   if (!req.session.user) {
     return res.redirect('/login');
@@ -43,48 +43,48 @@ router.post('/updatePassword/:id', function(req, res, next) {
   //   }
   //   //renderUserPage(req, res, true, false, null, null, null, "Old password missing!" );
   //   res.redirect('/users/getUser')
-    
-      if(req.body.newPassword != req.body.newPasswordConfirm){
-        //res.render('error_page', { message: "New password and confimation doesn't match!" });
-        req.session.alerts = {
-          passwordFlag: false,
-          msg: "Password nova e confirmação não coincidem!"
-        }
-        res.redirect('/getUser/' + req.params.id)
-        //renderUserPage(req, res, true, false, null, null, null, "New password and confimation doesn't match!" );
-      } else{
 
-          axios.post(process.env.API_AUTH_URL + '/admin/updatePassword/' + req.params.id, {
-              newPassword: req.body.newPassword
-            }, {
-              headers: {
-                Authorization: `Bearer ${req.session.user.token}`
-              }
-            })
-            .then((response) => {
-              //console.log(response);
-              //res.render('user_page', { user: response.data, owner:true, admin:false, passwordFlag:true });
-              req.session.alerts = {
-                passwordFlag: true
-              } 
-              //renderUserPage(req, res, true, true, null, null, null, null);
-              res.redirect('/getUser/'+ req.params.id)
-            })
-            .catch((error) => {
-              console.log(error);
-              //res.render('error_page', { message: error.response.data.error });
-              if (error.response && error.response.data){
-                req.session.alerts = {
-                  passwordFlag: false,
-                  msg: error.response.data.error
-                }
-                //renderUserPage(req, res, true, false, null, null, null,error.response.data.error);
-                res.redirect('/getUser/' + req.params.id)
-              }else{
-                res.render('error_page', { message: error });
-              }
-          });
+  if (req.body.newPassword != req.body.newPasswordConfirm) {
+    //res.render('error_page', { message: "New password and confimation doesn't match!" });
+    req.session.alerts = {
+      passwordFlag: false,
+      msg: "Password nova e confirmação não coincidem!"
+    }
+    res.redirect('/getUser/' + req.params.id)
+    //renderUserPage(req, res, true, false, null, null, null, "New password and confimation doesn't match!" );
+  } else {
+
+    axios.post(process.env.API_AUTH_URL + '/admin/updatePassword/' + req.params.id, {
+      newPassword: req.body.newPassword
+    }, {
+      headers: {
+        Authorization: `Bearer ${req.session.user.token}`
       }
+    })
+      .then((response) => {
+        //console.log(response);
+        //res.render('user_page', { user: response.data, owner:true, admin:false, passwordFlag:true });
+        req.session.alerts = {
+          passwordFlag: true
+        }
+        //renderUserPage(req, res, true, true, null, null, null, null);
+        res.redirect('/getUser/' + req.params.id)
+      })
+      .catch((error) => {
+        console.log(error);
+        //res.render('error_page', { message: error.response.data.error });
+        if (error.response && error.response.data) {
+          req.session.alerts = {
+            passwordFlag: false,
+            msg: error.response.data.error
+          }
+          //renderUserPage(req, res, true, false, null, null, null,error.response.data.error);
+          res.redirect('/getUser/' + req.params.id)
+        } else {
+          res.render('error_page', { message: error });
+        }
+      });
+  }
 });
 
 router.get('/requestRoleUpdate/:id', function (req, res, next) {
@@ -92,78 +92,46 @@ router.get('/requestRoleUpdate/:id', function (req, res, next) {
     return res.redirect('/login');
   }
   console.log(req.query.accept)
-  if(req.query.accept!=undefined){
+  if (req.query.accept != undefined) {
 
-  axios.get(process.env.API_AUTH_URL + '/admin/updateRoleAcceptRefuse/' + req.params.id, {
-    params: {
-      accept: req.query.accept
-    },
-    headers: {
-      Authorization: `Bearer ${req.session.user.token}`
-    }
-  })
-    .then((response) => {
-      console.log(response.data)
-      if(req.query.accept == "true"){
-        req.session.alerts = {
-          acceptedFlag: true,
-        }
-      }else{
-        req.session.alerts = {
-          acceptedFlag: false,
-        }
+    axios.get(process.env.API_AUTH_URL + '/admin/updateRoleAcceptRefuse/' + req.params.id, {
+      params: {
+        accept: req.query.accept
+      },
+      headers: {
+        Authorization: `Bearer ${req.session.user.token}`
       }
-      res.redirect('/admin/updateRequests')
-      //renderListRoleUpdateRequests(req, res, true, null)
     })
-    .catch((error) => {
-      console.log(error);
-      if (error.response && error.response.data) {
-        req.session.alerts = {
-          errorFlag: true,
-          msg: error.response.data.error
+      .then((response) => {
+        console.log(response.data)
+        if (req.query.accept == "true") {
+          req.session.alerts = {
+            acceptedFlag: true,
+          }
+        } else {
+          req.session.alerts = {
+            acceptedFlag: false,
+          }
         }
         res.redirect('/admin/updateRequests')
-        //renderListRoleUpdateRequests(req, res, null, error.response.data.error)
-      } else {
-        res.render('error_page', { message: error });
-      }
-    });
-  }else
+        //renderListRoleUpdateRequests(req, res, true, null)
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response && error.response.data) {
+          req.session.alerts = {
+            errorFlag: true,
+            msg: error.response.data.error
+          }
+          res.redirect('/admin/updateRequests')
+          //renderListRoleUpdateRequests(req, res, null, error.response.data.error)
+        } else {
+          res.render('error_page', { message: error });
+        }
+      });
+  } else
     res.render('error_page', { message: "Missing accept parameter!" });
 });
-
-// router.get('/requestRoleUpdate/refuse/:id', function (req, res, next) {
-//   if (!req.session.user) {
-//     return res.redirect('/login');
-//   }
-//   axios.get(process.env.API_AUTH_URL + '/admin/updateRole/refuse/' + req.params.id, {
-//     headers: {
-//       Authorization: `Bearer ${req.session.user.token}`
-//     }
-//   })
-//     .then((response) => {
-//       console.log(response.data)
-//       req.session.alerts = {
-//         acceptedFlag: true,
-//       }
-//       res.redirect('/admin/updateRequests')
-//       //renderListRoleUpdateRequests(req, res, false, null)
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//       if (error.response && error.response.data) {
-//         req.session.alerts = {
-//           errorFlag: true,
-//           msg: error.response.data.error
-//         }
-//         res.redirect('/admin/updateRequests')
-//         //renderListRoleUpdateRequests(req, res, null, error.response.data.error)
-//       } else {
-//         res.render('error_page', { message: error });
-//       }
-//     });
-// });
 
 
 router.get('/delete/:id', function (req, res, next) {
@@ -230,5 +198,54 @@ router.get('/delete/:id', function (req, res, next) {
       }
     });
 });
+
+router.get('/noticia/add', function (req, res) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  res.render('add_noticia', {userInfo: req.session.user});
+});
+
+router.post('/noticia/add', function (req, res, next) {
+  console.log("Creating new noticia");
+  
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  console.log(req.body);
+
+  // you may want to add validation for req.body.title, req.body.public, and req.body.content
+
+  axios.post(process.env.API_DATA_URL + '/noticia/addAviso', {
+    title: req.body.title,
+    public: req.body.public === "true" ? true : false,
+    content: req.body.content
+  }, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      req.session.alerts = {
+        noticiaFlag: true,
+      }
+      res.redirect('/noticias') // redirect to where you list your noticias
+    })
+    .catch((error) => {
+      console.log(error);
+      if (error.response && error.response.data) {
+        req.session.alerts = {
+          noticiaFlag: false,
+          msg: error.response.data.error
+        }
+        res.redirect('/admin/noticia/add')
+      } else {
+        res.render('error_page', { message: error });
+      }
+    });
+});
+
 
 module.exports = router;

@@ -1,0 +1,29 @@
+extends layout
+
+block content
+    include header
+    include navbar
+    .w3-container
+        h1 Adicionar Notícia
+        form(method="POST" action="/admin/noticia/add")
+            .w3-section
+                label(for="title") Título
+                input.w3-input(type="text" id="title" name="title" required)
+            .w3-section
+                label(for="public") Público
+                select.w3-select(id="public" name="public" required)
+                    option(value="true") Sim
+                    option(value="false") Não
+            .w3-section
+                label(for="content") Conteúdo
+                textarea.w3-input(type="text" id="content" name="content" required)
+            .w3-section.w3-right-align
+                button.w3-button.w3-green(type="submit") Submit
+    include footer
+
+    script.
+        var noticiaFlag = "#{noticiaFlag}"
+         if (noticiaFlag === "false") {
+            var msg = "#{msg}";
+            alert('Falha ao c: ' + msg);
+        }
