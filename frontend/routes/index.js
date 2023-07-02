@@ -84,7 +84,7 @@ router.post('/login', function (req, res, next) {
         token: rep.data.token,
         userId: rep.data.userId
       };
-      res.render('test', { userInfo: req.session.user });
+      res.redirect('/noticias')
     }).catch((err) => {
 
       if (err.response && err.response.data) {
@@ -160,7 +160,7 @@ router.get('/recursos', function (req, res, next) {
     .then((response) => {
       //console.log(response.data);
       console.log(alerts)
-      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag: alerts.downloadFlag, commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg });
+      res.render('list_resources2', { resources: response.data, userInfo: req.session.user, downloadFlag: alerts.downloadFlag, resourceDeletedFlag:alerts.resourceDeletedFlag , commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg });
 
     })
     .catch((error) => {
@@ -219,7 +219,7 @@ router.get('/recurso/:id', function (req, res, next) {
                   console.log(response4.data);
                   //to be used in the delete comments and download Files, i need the id to roll back if an error occurs 
                   req.session.alerts = {
-                    resourceID: response.data._id
+                    resourceID: response.data._id,
                   }
                   console.log("alerts: ", req.session.alerts)
                   res.render('resource', { resource: response.data, userInfo: req.session.user, files: response2.data, rating: response3.data, comments: response4.data, downloadFlag: alerts.downloadFlag, updateFlag: alerts.updateFlag, resourceDeletedFlag: alerts.resourceDeletedFlag, commentDeleteFlag: alerts.commentDeleteFlag, errorFlag: alerts.errorFlag, msg: alerts.msg });
@@ -950,7 +950,14 @@ router.get('/resource/delete/:id', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      res.redirect('/');
+      req.session.alerts = {
+        resourceDeletedFlag: true,
+      }
+      if(req.session.user.role == "admin"){
+        res.redirect('/recursos');
+      }else{
+        res.redirect('/users/recursos/'+req.session.user.userId);
+      }
 
     })
     .catch((error) => {
@@ -996,7 +1003,7 @@ router.post('/resource/filter', function (req, res) {
   })
     .then((response) => {
       console.log(response.data);
-      res.render('list_resources3', { resources: response.data, userInfo: req.session.user });
+      res.render('list_resources3', { resources: response.data, userInfo: req.session.user, downloadFlag: alerts.downloadFlag, resourceDeletedFlag:alerts.resourceDeletedFlag , commentDeleteFlag: alerts.commentDeleteFlag, msg: alerts.msg  });
       //res.redirect('/noticias');
     })
     .catch((error) => {
