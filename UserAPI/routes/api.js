@@ -8,7 +8,23 @@ var router = express.Router();
 //must create some sord of OAuth2.0, so in the signup, a requests is sent to here
 router.post('/create', function(req, res) {
   console.log("create")
-  const user = new userModel({name: req.body.name, username: req.body.username, userId: req.body.userId, filiacao: req.body.filiacao, created_date: Date.now(), last_access: Date.now()})
+
+  body = {
+    name: req.body.name,
+    username: req.body.username,
+    userId: req.body.userId,
+    filiacao: req.body.filiacao,
+    created_date: Date.now(),
+    last_access: Date.now()
+  }
+
+  Object.keys(re_data).forEach(key => {
+    if (re_data[key] === undefined || re_data[key] === null) {
+        delete re_data[key];
+    }
+  });
+
+  const user = new userModel(body)
   User.insert(user)
     .then(savedUser => {
       res.status(200).json(savedUser);

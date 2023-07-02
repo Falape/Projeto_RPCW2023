@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cookieSession = require('cookie-session');
+require('dotenv').config({ path: '.env' })
 
 const crypto = require('crypto');
 
@@ -27,15 +28,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Configure session middleware
 app.use(cookieSession({
   name: 'session',
-  keys: [ crypto.randomBytes(32).toString('hex'),  crypto.randomBytes(32).toString('hex')],
+  keys: [crypto.randomBytes(32).toString('hex'), crypto.randomBytes(32).toString('hex')],
   maxAge: process.env.COOKIE_SESSION_EXPIRATION * 60 * 1000, // 24 hours
 }));
 
 app.use((req, res, next) => {
+  if (req.session.user === undefined) {
+    req.session.user = {};
+  }
   if (req.session.alerts === undefined) {
       req.session.alerts = {};
   }
-  next();
+    next();
 });
 
 app.use('/', indexRouter);
@@ -43,12 +47,12 @@ app.use('/users', usersRouter);
 app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

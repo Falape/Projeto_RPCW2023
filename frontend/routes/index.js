@@ -10,11 +10,18 @@ const sip_creation = require('../public/javascripts/creation');
 const sip_read = require('../public/javascripts/readArchive');
 const sip_store = require('../public/javascripts/store');
 const { fail } = require('assert');
+const passport = require("passport");
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 //const { renderUserPage } = require('../public/javascripts/renderPages')
 
 //... rest of your code
 
+const { v4: uuidv4 } = require('uuid');
+
+function generateUniqueUsername() {
+  return 'user_' + uuidv4();
+}
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -27,6 +34,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/noticias', function (req, res, next) {
+  console.log(req.session)
   console.log(req.session.user)
   if (!req.session.user) {
     return res.redirect('/login');
@@ -1037,6 +1045,71 @@ router.post('/resource/filter/geral', function (req, res) {
     })
 });
 
+/*  Google AUTH  */
+const GOOGLE_CLIENT_ID = process.env.CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = process.env.REDIRECT_URI;
+console.log("GOOGLE_CLIENT_ID: ", GOOGLE_CLIENT_ID)
+console.log("GOOGLE_CLIENT_SECRET: ", GOOGLE_CLIENT_SECRET)
+console.log("GOOGLE_REDIRECT_URI: ", GOOGLE_REDIRECT_URI)
+
+passport.use(new GoogleStrategy({
+  clientID: GOOGLE_CLIENT_ID,
+  clientSecret: GOOGLE_CLIENT_SECRET,
+  callbackURL: GOOGLE_REDIRECT_URI
+},
+  function (accessToken, refreshToken, profile, done) {
+    //userProfile=profile;
+
+    userProfile = {
+      id: profile.id,
+      displayName: profile.displayName,
+      email: profile.emails[0].value, // gets the first email
+      provider: profile.provider
+    };
+    console.log("userProfile: ", userProfile)
+
+    return done(null, userProfile);
+  }
+));
+
+router.get('/login/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+
+router.get('/callback/google', function (req, res, next) {
+  console.log("callback")
+  passport.authenticate('google', { failureJSON: { message: 'An error has occurred' } }, function (err, user, info) {
+    if (err) {
+      return res.status(500).json({ error: 'Erro no login1: ', err });
+    }
+    if (!user) {
+      return res.status(500).json({ error: 'Erro no login2: ', err });
+    }
+    console.log("user: ", user)
+    console.log("info: ", info)
+
+    body = {
+      name: user.displayName,
+      email: user.email,
+      id_oauth: user.id,
+    }
+
+    axios.post(process.env.API_AUTH_URL + '/getUserGoogleID/', body)
+      .then((response) => {
+        console.log("response: ", response.data)
+        
+        // esta resposta já inclui o token
+        // fazer update do req.session.user
+        // dar então redirect para /noticias
+        req.session.user = {
+          token: response.data.token,
+          username: response.data.username,
+          role: response.data.role,
+          userId: response.data.userId,
+        }
+
+        res.redirect('/noticias');
 
 // MEGA HARD DELETE
 router.get('/noticia/delete/:id', function (req, res) {
@@ -1067,6 +1140,25 @@ router.get('/noticia/delete/:id', function (req, res) {
     })
 });
 
+
+      })
+      .catch((error) => {
+        console.log("error: ", error)
+        //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+        res.render('error_page', { message: "Não foi possivel registar o utilizador com OAuth." });
+      })
+
+    
+    // tirar dados 
+    // Verificar se tem conta interna no nosso sistema 
+    //User.findByFilter({id_oauth: })
+    // se tiver, cria um token e continua normalmente
+    // se não tiver, cria uma conta interna, cria um token e continua normalmente
+
+
+  })(req, res, next);
+
+});
 
 
 module.exports = router;

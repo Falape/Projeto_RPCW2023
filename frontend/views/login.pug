@@ -1,6 +1,7 @@
 extends layout
-
 block content
+  link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")
+  link(rel='stylesheet', href='/stylesheets/social_style.css')
   include header
   header.w3-container.w3-black
     h2.w3-center Login
@@ -19,6 +20,10 @@ block content
       button.w3-button.w3-block.w3-black.w3-margin-bottom(type='submit') Login
 
       a.w3-button.w3-block.w3-blue.w3-margin-bottom(href='/signup') Sign Up
+
+      a.google-btn.w3-button.w3-block.w3-margin-bottom(href='/login/google')
+        img(src='https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg', alt='Google logo')
+        span Login with Google
   include footer
 
   script.
