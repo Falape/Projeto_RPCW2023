@@ -915,6 +915,35 @@ router.post('/resource/filter/geral', function (req, res) {
 });
 
 
+// MEGA HARD DELETE
+router.get('/noticia/delete/:id', function (req, res) {
+  
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  axios.delete(process.env.API_DATA_URL + '/noticia/delete/hard/' + req.params.id, {
+    headers: {
+      Authorization: `Bearer ${req.session.user.token}`
+    }
+  })
+    .then((response) => {
+      console.log(response.data);
+      res.redirect('/');
+
+    })
+    .catch((error) => {
+      console.log(error);
+      req.session.alerts = {
+        commentDeleteFlag : false,
+        msg: "Não foi possivel fazer remover a notícia."
+      }
+      //renderResourcePage(req, res, req.params.id, null, false, null, "Não foi possivel fazer remover o recurso.");
+      res.redirect('/');
+      //res.render('error_page', { message: "Não foi possivel fazer download do recurso." });
+    })
+});
+
 
 
 module.exports = router;
