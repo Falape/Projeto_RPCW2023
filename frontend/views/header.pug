@@ -4,6 +4,10 @@ block content
   header.w3-container.w3-black.w3-display-container
     img.w3-left(src="/images/dragon.jpeg", alt="Your Logo", style="height: 100px; margin-right: 20px;")
     div.w3-rest
-      h1 Repositório de Recursos Educativos
-      p "Todos os seus recursos num só sitio."
+      div(style="display: flex; justify-content: space-between; align-items: center;")
+        div
+          h1 Repositório de Recursos Educativos
+          p "Todos os seus recursos num só sitio."
+        if userInfo
+          p(style="display: inline-block;") Bem vindo, #{userInfo.username} [#{userInfo.role}]
     //- include navbar
