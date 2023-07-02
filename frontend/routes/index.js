@@ -340,13 +340,13 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
             res.redirect('/recurso/' + response.data._id);
           })
           .catch((error) => {
-            console.log(error);
+            console.log("message error: ",error.message)
             res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
           })
 
       })
       .catch((error) => {
-        console.log(error);
+        console.log("message error: ",error.message)
         res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
       });
 
@@ -354,16 +354,31 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
 
 
   } else {
-    if (req.body.multiple == undefined && req.files.length == 1) {
+    if (req.body.multiple == undefined && req.files.length == 1 && req.files[0].mimetype == 'application/zip') {
       //handle multiple files here
-      console.log("single file");
+      console.log("single file zip");
+      sip_store.StoreSIP(listFilePaths[0])
+      .then((files) => {
+        console.log("files:", files);
+        //console.log('--- SIP STORED ---');
+        body.path = files.zip_path
+        body.list_files = files.list_files
+        axios.post(process.env.API_DATA_URL + '/resource/add2', body, {
+          headers: {
+            Authorization: `Bearer ${req.session.user.token}`
+          }
+          })
+          .then((response) => {
+            console.log(response.data);
+            res.redirect('/recurso/' + response.data._id);
+          })
+          .catch((error) => {
+            //console.log(error);
+            console.log("message error: ",error.message)
+            res.render('upload', { userInfo: req.session.user, flagAlert: true, flagError: "Não foi possivel concluir o processo de armazenamento." });
+          })
+        })
 
-      if (req.files[0].mimetype == 'application/zip') {
-        console.log("é um zip");
-        
-      } else {
-        console.log("não é um zip");
-      }
     } else {
       //handle error here
       console.log("error porque tem mais que um ficheiro e não está selecionado o multiple");
