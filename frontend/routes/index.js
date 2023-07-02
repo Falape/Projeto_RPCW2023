@@ -314,7 +314,7 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
     }
   }
   console.log("Lista de paths: ", listFilePaths);
-  if (req.body.multiple != undefined && req.body.multiple == 'on' && req.files.length > 1) {
+  if (req.body.multiple != undefined && req.body.multiple == 'on' || req.files.length == 1 && req.files[0].mimetype != 'application/zip') {
     //hadle multiple files here
     console.log("multiple files");
 
@@ -358,10 +358,11 @@ router.post('/upload2', multer_upload.array('Myfiles'), async function (req, res
       //handle multiple files here
       console.log("single file");
 
-      if (req.file[0].mimetype == 'application/zip') {
-
+      if (req.files[0].mimetype == 'application/zip') {
+        console.log("é um zip");
+        
       } else {
-
+        console.log("não é um zip");
       }
     } else {
       //handle error here
