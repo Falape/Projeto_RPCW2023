@@ -34,7 +34,7 @@ block content
   if files && files.length > 1
     p
       button.w3-button.w3-green(onclick=`window.location.href='/download/resource/${resource._id}'`) Download do Recurso
-  if resource.uploadedBy === userInfo.userId
+  if resource.uploadedBy === userInfo.userId || userInfo.role === 'admin'
     p
       a.w3-button.w3-red(href='/resource/delete/' + resource._id) Apagar Recurso
   include comment_section
