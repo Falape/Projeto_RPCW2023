@@ -94,14 +94,32 @@ block content
                         button.w3-button.w3-blue(data-bs-toggle="modal" data-bs-target="#updatePasswordModal") Update Password
                     if false
                         a.w3-button.w3-green(href='/user/update') Update User
-        div.user-info
-            p Email: #{user.email}
+        div.user-info(style="margin-left: 20px;")
             if user.name
-                p Name: #{user.name}
+              p
+                strong Name: 
+                | #{user.name}     
+            p 
+              strong Email: 
+              | #{user.email}
+        
             if user.filiation
-                p Filiation: #{user.filiation}
+              p
+                strong Filiation: 
+                | #{user.filiation}
+            if user.name && (user.role === 'admin' || owner)
+              p
+                strong Último acesso: 
+                | #{user.last_access}
+              p
+                strong Criado em: 
+                | #{user.created_date}
+
             div(style="display: flex; align-items: center;")
-                p(style="margin-right: 10px;") Role: #{user.role}
+              p(style="margin-right: 10px;")
+                strong Role: 
+                | #{user.role}
+
                 if owner
                     a.w3-button.w3-orange(data-bs-toggle="modal" data-bs-target="#requestRoleUpdateModal") Pedir Atualização
 

@@ -126,7 +126,8 @@ router.post('/signup', function (req, res, next) {
         userId: response.data.userId
       };
       // TODO: Render the home page or redirect to a different route
-      res.render('test', { userInfo: req.session.user, user: req.session.user });
+      //res.render('test', { userInfo: req.session.user, user: req.session.user });
+      res.redirect('/noticias')
     })
     .catch((error) => {
       //console.log(error.response);
@@ -788,7 +789,7 @@ router.get('/getUser/:id', function (req, res, next) {
       if (req.session.user.userId == response.data._id) {
         owner = true;
       }
-
+      console.log("DATA: ",response.data)
       res.render('user_page', { user: response.data, owner: owner, userInfo: req.session.user, passwordFlag: alerts.passwordFlag, requestRoleUpdateFlag: alerts.requestRoleUpdateFlag, userDeletedFlag: alerts.userDeletedFlag, msg: alerts.msg });
     }).catch((err) => {
       console.log(err)
