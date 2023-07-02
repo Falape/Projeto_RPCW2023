@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3000:3000
+    volumes:
+      - ./env_files/.env_front:/app/.env
 
   auth-api:
     build:
@@ -13,6 +15,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3001:3001
+    volumes:
+      - ./env_files/.env_auth:/app/.env
     depends_on:
       - mongodb_auth
 
@@ -22,6 +26,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3002:3002
+    volumes:
+      - ./env_files/.env_user:/app/.env
     depends_on:
       - mongodb_user
 
@@ -31,6 +37,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - 3003:3003
+    volumes:
+      - ./env_files/.env_data:/app/.env
     depends_on:
       - mongodb_data
 
