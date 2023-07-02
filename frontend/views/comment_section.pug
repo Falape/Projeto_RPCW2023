@@ -3,6 +3,7 @@ extends layout
 block content
   #comments.w3-container
     h2.w3-xlarge Comentários
+    hr(style="border: none; height: 2px; background: linear-gradient(to right, blue, purple);")
     each comment, index in comments
       if comment.deleted === false
         .comment.w3-card-4.w3-margin
