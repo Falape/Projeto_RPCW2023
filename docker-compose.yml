@@ -1,16 +1,14 @@
 version: "3"
 services:
   front:
-    build:
-      image: arom98/rpcw23-frontend:latest<
+    image: arom98/rpcw23-frontend:latest
     ports:
       - 3000:3000
     volumes:
       - ./env_files/.env_front:/app/.env
 
   auth-api:
-    build:
-      image: arom98/rpcw23-auth-api:latest
+    image: arom98/rpcw23-auth-api:latest
     ports:
       - 3001:3001
     volumes:
@@ -19,8 +17,7 @@ services:
       - mongodb_auth
 
   user-api:
-    build:
-      image: arom98/rpcw23-user-api:latest
+    image: arom98/rpcw23-user-api:latest
     ports:
       - 3002:3002
     volumes:
@@ -29,8 +26,7 @@ services:
       - mongodb_user
 
   data-api:
-    build:
-      image: arom98/rpcw23-data-api:latest
+    image: arom98/rpcw23-data-api:latest
     ports:
       - 3003:3003
     volumes:
