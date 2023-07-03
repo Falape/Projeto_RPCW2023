@@ -11,27 +11,27 @@ block content
       label Username
       input.w3-input.w3-border.w3-margin-bottom(type='text', name='username', required)
 
-      label Name
+      label Nome
       input.w3-input.w3-border.w3-margin-bottom(type='text', name='name', required)
 
       label Email
       input.w3-input.w3-border.w3-margin-bottom(type='email', name='email', required)
 
-      label Filiation
+      label Filiação
       input.w3-input.w3-border.w3-margin-bottom(type='text', name='filiation', required)
 
       label Password
       input.w3-input.w3-border.w3-margin-bottom(type='password', name='password', id='password', pattern='.{8,}', title='Password must have at least 8 characters', required)
     
 
-      label(for="newPasswordConfirm") Confirm a Password
+      label(for="newPasswordConfirm") Confirme a Password
       input.w3-input.w3-border.w3-margin-bottom(type="password" name="newPasswordConfirm" id="newPasswordConfirm" required)
       small#passwordWarning(style="display: none; color: red") Password nova e de confirmação não são iguais!
 
       button.w3-button.w3-block.w3-black.w3-margin-bottom(type='submit') Sign Up
 
       div.w3-container.w3-text-center.w3-margin-bottom(style='justify-content: center; display: flex; flex-direction: column; align-items: center;')
-        span.w3-small Return to  
+        span.w3-small Voltar a   
           a.w3-link(href='/login') Login
 
     script.
