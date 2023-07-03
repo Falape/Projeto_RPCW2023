@@ -14,7 +14,7 @@ router.post('/create', function(req, res) {
     username: req.body.username,
     userId: req.body.userId,
     filiacao: req.body.filiacao,
-    created_date:Date().toISOString().substring(0, 16),
+    created_date:new Date().toISOString().substring(0, 16),
     last_access:new Date().toISOString().substring(0, 16),
   }
 
@@ -24,8 +24,9 @@ router.post('/create', function(req, res) {
   //   }
   // });
 
-  console.log(body)
+  console.log("body: ", body)
   const user = new userModel(body)
+  console.log(user)
   User.insert(user)
     .then(savedUser => {
       res.status(200).json(savedUser);
