@@ -6,7 +6,7 @@ block content
     div(style='margin-top: 75px; display: flex; justify-content: center;')
         div.w3-card-4.w3-padding-large.w3-light-grey.w3-margin-bottom(style='width: 60%; min-width: 600px;')
             h2.w3-center Adicionar Notícia
-            form.w3-container.w3-margin-bottom(action='/upload2', method='POST', enctype='multipart/form-data')
+            form.w3-container.w3-margin-bottom(action='/admin/noticia/add', method='POST', enctype='multipart/form-data')
                 p
                     label(for='title') Título:
                     input.w3-input(type="text" id="title" name="title" required)
